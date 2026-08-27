@@ -13,9 +13,9 @@ export struct MinePage {
   @State opacityValue: number = 1;
   
   async aboutToAppear() {
-    const userId = await PreferencesUtil.getInstance().getCurrentUserId();
+    const userId: number = await PreferencesUtil.getCurrentUserId();
     if (userId > 0) {
-      this.currentUser = await RdbHelper.getInstance().queryUserById(userId);
+      this.currentUser = await RdbHelper.queryUserById(userId);
     }
   }
 
@@ -109,7 +109,7 @@ export struct MinePage {
               { text: '取消', color: '#888888' },
               { text: '退出', color: '#ff4d4f' }
             ]
-          }).then(async (data) => {
+          }).then(async (data: promptAction.ShowDialogSuccessResponse) => {
             if (data.index === 1) { // 确认退出
               // 触发手动转场动画
               animateTo({ duration: 400, curve: Curve.EaseInOut }, () => {
@@ -119,7 +119,7 @@ export struct MinePage {
               
               // 动画结束后路由
               setTimeout(async () => {
-                await PreferencesUtil.getInstance().setCurrentUserId(-1);
+                await PreferencesUtil.setCurrentUserId(-1);
                 router.replaceUrl({ url: 'pages/login/LoginPage' });
               }, 400);
             }
