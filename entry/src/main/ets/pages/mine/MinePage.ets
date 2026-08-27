@@ -57,7 +57,7 @@ export struct MinePage {
         .justifyContent(FlexAlign.Center)
         .position({ x: '100%', y: 20 })
         .translate({ x: '-100%' })
-        .margin({ right: 15 })
+        .margin({ right: 12 })
         .onClick(() => { router.pushUrl({ url: 'pages/mine/SettingPage' }); })
 
         // 居中头像与昵称

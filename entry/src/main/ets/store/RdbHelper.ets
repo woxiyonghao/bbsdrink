@@ -77,6 +77,23 @@ export class RdbHelper {
   }
 
   /**
+   * 更新用户信息
+   */
+  public async updateUser(user: User): Promise<number> {
+    if (!this.rdbStore || !user.id) { return -1; }
+    const valueBucket: relationalStore.ValuesBucket = {
+      'nickname': user.nickname,
+      'avatar': user.avatar || '',
+      'gender': user.gender,
+      'birthday': user.birthday,
+      'createTime': user.createTime
+    };
+    let predicates = new relationalStore.RdbPredicates('user');
+    predicates.equalTo('id', user.id);
+    return await this.rdbStore.update(valueBucket, predicates);
+  }
+
+  /**
    * 获取所有用户
    */
   public async queryAllUsers(): Promise<User[]> {
