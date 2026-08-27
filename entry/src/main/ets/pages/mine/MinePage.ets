@@ -47,20 +47,18 @@ export struct MinePage {
     Column() {
       // 1. 顶部 Header 区域 (居中头像排版)
       Stack({ alignContent: Alignment.Top }) {
-        // 小程序风格胶囊按钮 (右上角)
+        // 设置按钮 (右上角单图标)
         Row() {
-          Text('···').fontSize(16).fontWeight(FontWeight.Bold).fontColor('#FFFFFF')
-          Divider().vertical(true).height(12).color('#FFFFFF').opacity(0.3).margin({ left: 8, right: 8 })
-          Image($r('app.media.ic_settings_white')).width(16).height(16)
+          Image($r('app.media.ic_settings_white')).width(20).height(20)
         }
-        .width(80).height(32)
+        .width(36).height(36)
         .backgroundColor('#33000000') // 黑色半透明
-        .borderRadius(16)
+        .borderRadius(18)
         .justifyContent(FlexAlign.Center)
         .position({ x: '100%', y: 20 })
         .translate({ x: '-100%' })
         .margin({ right: 15 })
-        .onClick(() => { promptAction.showToast({message: '设置待开发', bottom: 60}); })
+        .onClick(() => { router.pushUrl({ url: 'pages/mine/SettingPage' }); })
 
         // 居中头像与昵称
         Column() {
