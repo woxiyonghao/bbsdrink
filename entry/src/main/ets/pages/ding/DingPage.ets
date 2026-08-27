@@ -5,6 +5,13 @@ import promptAction from '@ohos.promptAction';
 export struct DingPage {
   @State isCheckedIn: boolean = false;
   @State shakeAngle: number = 0;
+  
+  // 动效：泼洒/飞溅的水滴
+  @State splashOffsetLeft: number = -10;
+  @State splashOffsetRight: number = 10;
+  @State splashOpacityLeft: number = 0;
+  @State splashOpacityRight: number = 0;
+  
   private shakeInterval: number = -1;
 
   aboutToAppear() {
@@ -17,26 +24,49 @@ export struct DingPage {
 
   startShakeAnimation() {
     if (this.isCheckedIn) return;
-    // 使用精准的状态翻转来实现持续的高频抖动
+    // 持续的高频抖动，并伴随水滴泼洒效果（日漫摇头感）
     this.shakeInterval = setInterval(() => {
       if (this.isCheckedIn) return;
       
-      // 更高频率的左右晃动
-      animateTo({ duration: 40, curve: Curve.Linear }, () => { this.shakeAngle = -15; })
+      // 1. 杯子向左摇，右边水滴飞出
+      animateTo({ duration: 40, curve: Curve.Linear }, () => { 
+        this.shakeAngle = -20; 
+        this.splashOpacityRight = 1;
+        this.splashOffsetRight = 40;
+      })
       
+      // 2. 杯子向右摇，右边水滴消失，左边水滴飞出
       setTimeout(() => {
-        animateTo({ duration: 80, curve: Curve.Linear }, () => { this.shakeAngle = 15; })
+        animateTo({ duration: 80, curve: Curve.Linear }, () => { 
+          this.shakeAngle = 20; 
+          this.splashOpacityRight = 0;
+          this.splashOffsetRight = 10;
+          this.splashOpacityLeft = 1;
+          this.splashOffsetLeft = -40;
+        })
       }, 40);
       
+      // 3. 杯子再向左摇，左边水滴消失，右边水滴再次飞出
       setTimeout(() => {
-        animateTo({ duration: 80, curve: Curve.Linear }, () => { this.shakeAngle = -15; })
+        animateTo({ duration: 80, curve: Curve.Linear }, () => { 
+          this.shakeAngle = -20; 
+          this.splashOpacityLeft = 0;
+          this.splashOffsetLeft = -10;
+          this.splashOpacityRight = 1;
+          this.splashOffsetRight = 40;
+        })
       }, 120);
       
+      // 4. 回正，水滴收回隐藏
       setTimeout(() => {
-        animateTo({ duration: 40, curve: Curve.Linear }, () => { this.shakeAngle = 0; })
+        animateTo({ duration: 40, curve: Curve.Linear }, () => { 
+          this.shakeAngle = 0; 
+          this.splashOpacityRight = 0;
+          this.splashOffsetRight = 10;
+        })
       }, 200);
       
-    }, 800); // 抖动间隔缩短，频率变高
+    }, 800); // 抖动间隔
   }
 
   stopShakeAnimation() {
@@ -53,6 +83,8 @@ export struct DingPage {
       this.stopShakeAnimation();
       animateTo({ duration: 300, curve: Curve.Friction }, () => {
         this.shakeAngle = 0;
+        this.splashOpacityLeft = 0;
+        this.splashOpacityRight = 0;
       })
       promptAction.showToast({ message: '今日打卡成功！' });
     }
@@ -72,15 +104,33 @@ export struct DingPage {
 
       // 中心打卡大按钮
       Column() {
-        Image($r('app.media.ic_cup_water'))
-          .width(140)
-          .height(140)
-          .objectFit(ImageFit.Contain)
-          .fillColor(this.isCheckedIn ? '#07C160' : '#D3D3D3') // 未打卡为浅灰，打卡为微信绿
-          .rotate({ angle: this.shakeAngle })
-          .onClick(() => {
-            this.handleCheckIn();
-          })
+        Stack() {
+          // 左侧飞溅水滴
+          Text('💦')
+            .fontSize(24)
+            .opacity(this.splashOpacityLeft)
+            .translate({ x: this.splashOffsetLeft, y: -20 })
+          
+          // 右侧飞溅水滴
+          Text('💦')
+            .fontSize(24)
+            .opacity(this.splashOpacityRight)
+            .translate({ x: this.splashOffsetRight, y: -20 })
+
+          // 核心玻璃杯
+          Image($r('app.media.ic_cup_water'))
+            .width(140)
+            .height(140)
+            .objectFit(ImageFit.Contain)
+            .fillColor(this.isCheckedIn ? '#07C160' : '#D3D3D3') // 未打卡为浅灰，打卡为微信绿
+            .rotate({ angle: this.shakeAngle })
+            .onClick(() => {
+              this.handleCheckIn();
+            })
+        }
+        .width(200)
+        .height(180)
+        .alignContent(Alignment.Center)
         
         Text(this.isCheckedIn ? '今日已打卡' : '点击打卡')
           .fontSize(16)
