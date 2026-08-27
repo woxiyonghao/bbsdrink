@@ -7,6 +7,7 @@ interface ActivityItem {
   color2: string;
   progress: number;
   icon: ResourceStr;
+  isEmoji?: boolean;
 }
 
 @Entry
@@ -17,13 +18,18 @@ export struct RunPage {
   @State listHeight: number = 0;
 
   @State activities: ActivityItem[] = [
-    { name: '伸懒腰', duration: '1分钟', color1: '#FFB75E', color2: '#ED8F03', progress: 0, icon: $r('app.media.ic_sport_white') },
+    { name: '伸懒腰', duration: '1分钟', color1: '#FFB75E', color2: '#ED8F03', progress: 0, icon: '🙆', isEmoji: true },
     { name: '接杯水', duration: '3分钟', color1: '#8ECAE6', color2: '#219EBC', progress: 0, icon: $r('app.media.ic_cup_water') },
     { name: '颈椎操', duration: '5分钟', color1: '#A8E063', color2: '#56AB2F', progress: 0, icon: $r('app.media.ic_sit_record') },
-    { name: '眼保健操', duration: '5分钟', color1: '#FFD166', color2: '#F4A261', progress: 0, icon: $r('app.media.ic_sport_white') },
     { name: '喝杯咖啡', duration: '5分钟', color1: '#D4A373', color2: '#A98467', progress: 0, icon: $r('app.media.ic_drink_coffee') },
-    { name: '闭目养神', duration: '3分钟', color1: '#FF758C', color2: '#FF7EB3', progress: 0, icon: $r('app.media.ic_home_filled') },
+    { name: '眼保健操', duration: '5分钟', color1: '#FFD166', color2: '#F4A261', progress: 0, icon: '💆', isEmoji: true },
+    { name: '吃点水果', duration: '5分钟', color1: '#EF476F', color2: '#D90429', progress: 0, icon: '🍎', isEmoji: true },
+    { name: '喝杯牛奶', duration: '3分钟', color1: '#8ECAE6', color2: '#0077B6', progress: 0, icon: $r('app.media.ic_drink_milk') },
+    { name: '眺望窗外', duration: '2分钟', color1: '#06D6A0', color2: '#00A896', progress: 0, icon: '🏞️', isEmoji: true },
+    { name: '闭目养神', duration: '3分钟', color1: '#FF758C', color2: '#FF7EB3', progress: 0, icon: '🧘', isEmoji: true },
     { name: '喝杯果汁', duration: '3分钟', color1: '#FF9A9E', color2: '#FECFEF', progress: 0, icon: $r('app.media.ic_drink_juice') },
+    { name: '站起来动动', duration: '3分钟', color1: '#A8E063', color2: '#56AB2F', progress: 0, icon: '🤸', isEmoji: true },
+    { name: '深蹲一下', duration: '3分钟', color1: '#FFB75E', color2: '#ED8F03', progress: 0, icon: '🏋️', isEmoji: true },
     { name: '楼下走走', duration: '10分钟', color1: '#06D6A0', color2: '#00A896', progress: 0, icon: $r('app.media.ic_sport_white') },
     { name: '喝杯茶', duration: '10分钟', color1: '#90E0EF', color2: '#0077B6', progress: 0, icon: $r('app.media.ic_drink_tea') },
     { name: '跑一下', duration: '15分钟', color1: '#118AB2', color2: '#073B4C', progress: 0, icon: $r('app.media.ic_sport_white') }
@@ -96,7 +102,7 @@ export struct RunPage {
             router.back();
           })
         
-        Text('起来走走')
+        Text('运动一下')
           .fontSize(22)
           .fontWeight(FontWeight.Bold)
           .fontColor('#333333')
@@ -127,19 +133,25 @@ export struct RunPage {
               .layoutWeight(1)
               .margin({ left: 25 })
 
-              // 右侧：类似手表运动的环形进度 + 高清图标
+              // 右侧：类似手表运动的环形进度 + 混合图标
               Stack() {
                 Progress({ value: item.progress, total: 100, type: ProgressType.Ring })
-                  .width(60) // 增大圆环
+                  .width(60) 
                   .height(60)
                   .color(Color.White)
                   .style({ strokeWidth: 5 })
                 
-                // 专属高清 SVG 图标，增大尺寸并填充白色
-                Image(item.icon)
-                  .width(32)
-                  .height(32)
-                  .fillColor(Color.White)
+                if (item.isEmoji) {
+                  // 如果是表情符号图标
+                  Text(item.icon as string)
+                    .fontSize(30)
+                } else {
+                  // 专属高清 SVG 图标
+                  Image(item.icon)
+                    .width(32)
+                    .height(32)
+                    .fillColor(Color.White)
+                }
               }
               .margin({ right: 25 })
             }

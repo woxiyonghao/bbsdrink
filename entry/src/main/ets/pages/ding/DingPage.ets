@@ -207,7 +207,7 @@ export struct DingPage {
 
         // 久坐运动卡片
         Row() {
-          Text('起来走走')
+          Text('运动一下')
             .fontSize(22)
             .fontWeight(FontWeight.Bold)
             .fontColor(Color.White)
