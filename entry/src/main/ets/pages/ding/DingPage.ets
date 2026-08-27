@@ -6,11 +6,14 @@ export struct DingPage {
   @State isCheckedIn: boolean = false;
   @State shakeAngle: number = 0;
   
-  // 动效：泼洒/飞溅的水滴
-  @State splashOffsetLeft: number = -10;
-  @State splashOffsetRight: number = 10;
-  @State splashOpacityLeft: number = 0;
-  @State splashOpacityRight: number = 0;
+  // 动效：泼洒飞溅的液滴 (更加写实的轨迹)
+  @State splashLeftX: number = 0;
+  @State splashLeftY: number = 0;
+  @State splashLeftOpacity: number = 0;
+
+  @State splashRightX: number = 0;
+  @State splashRightY: number = 0;
+  @State splashRightOpacity: number = 0;
   
   private shakeInterval: number = -1;
 
@@ -24,49 +27,59 @@ export struct DingPage {
 
   startShakeAnimation() {
     if (this.isCheckedIn) return;
-    // 持续的高频抖动，并伴随水滴泼洒效果（日漫摇头感）
+    // 使用拟物化的抛物线洒水动效
     this.shakeInterval = setInterval(() => {
       if (this.isCheckedIn) return;
       
-      // 1. 杯子向左摇，右边水滴飞出
-      animateTo({ duration: 40, curve: Curve.Linear }, () => { 
-        this.shakeAngle = -20; 
-        this.splashOpacityRight = 1;
-        this.splashOffsetRight = 40;
+      // 准备阶段：重置右侧水滴位置
+      this.splashRightX = 20;
+      this.splashRightY = -30;
+      this.splashRightOpacity = 0;
+      
+      // 1. 杯子向左摇，右侧洒水
+      animateTo({ duration: 80, curve: Curve.EaseOut }, () => { 
+        this.shakeAngle = -25;
       })
       
-      // 2. 杯子向右摇，右边水滴消失，左边水滴飞出
+      // 飞溅动效
+      animateTo({ duration: 400, curve: Curve.EaseOut }, () => {
+        this.splashRightOpacity = 1;
+        this.splashRightX = 80;
+        this.splashRightY = -90;
+      })
       setTimeout(() => {
-        animateTo({ duration: 80, curve: Curve.Linear }, () => { 
-          this.shakeAngle = 20; 
-          this.splashOpacityRight = 0;
-          this.splashOffsetRight = 10;
-          this.splashOpacityLeft = 1;
-          this.splashOffsetLeft = -40;
-        })
-      }, 40);
-      
-      // 3. 杯子再向左摇，左边水滴消失，右边水滴再次飞出
-      setTimeout(() => {
-        animateTo({ duration: 80, curve: Curve.Linear }, () => { 
-          this.shakeAngle = -20; 
-          this.splashOpacityLeft = 0;
-          this.splashOffsetLeft = -10;
-          this.splashOpacityRight = 1;
-          this.splashOffsetRight = 40;
-        })
-      }, 120);
-      
-      // 4. 回正，水滴收回隐藏
-      setTimeout(() => {
-        animateTo({ duration: 40, curve: Curve.Linear }, () => { 
-          this.shakeAngle = 0; 
-          this.splashOpacityRight = 0;
-          this.splashOffsetRight = 10;
-        })
+        animateTo({ duration: 200 }, () => { this.splashRightOpacity = 0; })
       }, 200);
+
+      // 2. 向右摇，左侧洒水
+      setTimeout(() => {
+        // 重置左侧水滴位置
+        this.splashLeftX = -20;
+        this.splashLeftY = -30;
+        this.splashLeftOpacity = 0;
+        
+        animateTo({ duration: 120, curve: Curve.EaseInOut }, () => { 
+          this.shakeAngle = 25; 
+        })
+        
+        animateTo({ duration: 400, curve: Curve.EaseOut }, () => {
+          this.splashLeftOpacity = 1;
+          this.splashLeftX = -80;
+          this.splashLeftY = -90;
+        })
+        setTimeout(() => {
+          animateTo({ duration: 200 }, () => { this.splashLeftOpacity = 0; })
+        }, 200);
+      }, 150);
       
-    }, 800); // 抖动间隔
+      // 3. 回正
+      setTimeout(() => {
+        animateTo({ duration: 120, curve: Curve.EaseInOut }, () => { 
+          this.shakeAngle = 0; 
+        })
+      }, 350);
+      
+    }, 1200); // 稍微拉长间隔，让水滴有足够时间飞洒
   }
 
   stopShakeAnimation() {
@@ -83,8 +96,8 @@ export struct DingPage {
       this.stopShakeAnimation();
       animateTo({ duration: 300, curve: Curve.Friction }, () => {
         this.shakeAngle = 0;
-        this.splashOpacityLeft = 0;
-        this.splashOpacityRight = 0;
+        this.splashLeftOpacity = 0;
+        this.splashRightOpacity = 0;
       })
       promptAction.showToast({ message: '今日打卡成功！' });
     }
@@ -105,17 +118,23 @@ export struct DingPage {
       // 中心打卡大按钮
       Column() {
         Stack() {
-          // 左侧飞溅水滴
-          Text('💦')
-            .fontSize(24)
-            .opacity(this.splashOpacityLeft)
-            .translate({ x: this.splashOffsetLeft, y: -20 })
+          // 左侧飞溅的写实水滴
+          Row({ space: 4 }) {
+            Circle().width(6).height(6).fill('#8ECAE6')
+            Circle().width(10).height(10).fill('#8ECAE6').margin({ top: -10 })
+            Circle().width(4).height(4).fill('#8ECAE6')
+          }
+          .opacity(this.splashLeftOpacity)
+          .translate({ x: this.splashLeftX, y: this.splashLeftY })
           
-          // 右侧飞溅水滴
-          Text('💦')
-            .fontSize(24)
-            .opacity(this.splashOpacityRight)
-            .translate({ x: this.splashOffsetRight, y: -20 })
+          // 右侧飞溅的写实水滴
+          Row({ space: 4 }) {
+            Circle().width(4).height(4).fill('#8ECAE6')
+            Circle().width(10).height(10).fill('#8ECAE6').margin({ top: -10 })
+            Circle().width(6).height(6).fill('#8ECAE6')
+          }
+          .opacity(this.splashRightOpacity)
+          .translate({ x: this.splashRightX, y: this.splashRightY })
 
           // 核心玻璃杯
           Image($r('app.media.ic_cup_water'))
