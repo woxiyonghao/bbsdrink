@@ -17,29 +17,26 @@ export struct DingPage {
 
   startShakeAnimation() {
     if (this.isCheckedIn) return;
-    // 使用精准的状态翻转来实现持续抖动
+    // 使用精准的状态翻转来实现持续的高频抖动
     this.shakeInterval = setInterval(() => {
       if (this.isCheckedIn) return;
       
-      // 快速向左
-      animateTo({ duration: 50, curve: Curve.Linear }, () => { this.shakeAngle = -10; })
+      // 更高频率的左右晃动
+      animateTo({ duration: 40, curve: Curve.Linear }, () => { this.shakeAngle = -15; })
       
-      // 向右
       setTimeout(() => {
-        animateTo({ duration: 100, curve: Curve.Linear }, () => { this.shakeAngle = 10; })
-      }, 50);
+        animateTo({ duration: 80, curve: Curve.Linear }, () => { this.shakeAngle = 15; })
+      }, 40);
       
-      // 再向左
       setTimeout(() => {
-        animateTo({ duration: 100, curve: Curve.Linear }, () => { this.shakeAngle = -10; })
-      }, 150);
+        animateTo({ duration: 80, curve: Curve.Linear }, () => { this.shakeAngle = -15; })
+      }, 120);
       
-      // 回正
       setTimeout(() => {
-        animateTo({ duration: 50, curve: Curve.Linear }, () => { this.shakeAngle = 0; })
-      }, 250);
+        animateTo({ duration: 40, curve: Curve.Linear }, () => { this.shakeAngle = 0; })
+      }, 200);
       
-    }, 2000);
+    }, 800); // 抖动间隔缩短，频率变高
   }
 
   stopShakeAnimation() {
@@ -76,19 +73,14 @@ export struct DingPage {
       // 中心打卡大按钮
       Column() {
         Stack() {
-          // 未打卡时，显示一个高级质感的空心圆圈 + 水滴
+          // 未打卡时，显示一个好看的玻璃杯
           if (!this.isCheckedIn) {
-            Circle()
-              .width(130)
-              .height(130)
-              .fill(Color.White)
-              .stroke('#07C160')
-              .strokeWidth(3)
-              .shadow({ radius: 15, color: '#3307C160', offsetY: 8 })
-            
-            // 使用系统自带的水滴图标组合，避免依赖网络图片
-            Text('💧')
-              .fontSize(50)
+            Image($r('app.media.ic_drink_water')) // 玻璃杯图标
+              .width(90)
+              .height(90)
+              .objectFit(ImageFit.Contain)
+              // 加上一点淡淡的阴影显得立体
+              .shadow({ radius: 10, color: '#3307C160', offsetY: 5 })
           } else {
             // 打卡成功显示实心大绿勾
             Circle()
