@@ -1,6 +1,7 @@
 import { HomePage } from '../home/HomePage';
 import { DingPage } from '../ding/DingPage';
 import { MinePage } from '../mine/MinePage';
+import { THEME_COLOR } from '../../tools/Theme';
 
 @Entry
 @Component
@@ -9,8 +10,7 @@ export struct TabsPage {
   @State currentIndex: number = 0;
   private tabsController: TabsController = new TabsController();
 
-  // 主色调：健康绿色
-  private primaryColor: string = '#34C759';
+  private primaryColor: string = THEME_COLOR;
   private unselectedColor: string = '#8A8A8A';
 
   @Builder

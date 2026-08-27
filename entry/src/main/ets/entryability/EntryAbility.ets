@@ -1,6 +1,8 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
+import PreferencesUtil from '../store/PreferencesUtil';
+import RdbHelper from '../store/RdbHelper';
 
 const DOMAIN = 0x0000;
 
@@ -18,11 +20,22 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
   }
 
-  onWindowStageCreate(windowStage: window.WindowStage): void {
+  async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
-    windowStage.loadContent('pages/tabs/TabsPage', (err) => {
+    // 初始化基础组件
+    await PreferencesUtil.init(this.context);
+    await RdbHelper.init(this.context);
+
+    // 检查是否存在当前用户的 ID
+    const userId = await PreferencesUtil.getCurrentUserId();
+    let targetPage = 'pages/login/LoginPage';
+    if (userId && userId > 0) {
+      targetPage = 'pages/tabs/TabsPage';
+    }
+
+    windowStage.loadContent(targetPage, (err) => {
       if (err.code) {
         hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
         return;

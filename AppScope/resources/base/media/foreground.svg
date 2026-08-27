@@ -1,0 +1,5 @@
+<svg viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Water drop with a leaf motif -->
+  <path d="M128 32 C128 32 72 120 72 164 A56 56 0 0 0 184 164 C184 120 128 32 128 32 Z" fill="#FFFFFF"/>
+  <path d="M128 90 C128 90 96 135 96 164 A32 32 0 0 0 160 164 C160 135 128 90 128 90 Z" fill="#34C759"/>
+</svg>

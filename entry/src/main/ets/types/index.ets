@@ -2,6 +2,8 @@ export interface User {
   id?: number;
   nickname: string;
   avatar?: string;
+  gender: number; // 0: 女, 1: 男, 2: 未知
+  birthday: number; // 出生年月日的时间戳
   createTime: number;
 }
 

@@ -1,5 +1,6 @@
 {
   "src": [
+    "pages/login/LoginPage",
     "pages/tabs/TabsPage",
     "pages/home/HomePage",
     "pages/ding/DingPage",

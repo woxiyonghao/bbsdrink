@@ -7,7 +7,8 @@ const STORE_CONFIG: relationalStore.StoreConfig = {
   securityLevel: relationalStore.SecurityLevel.S1
 };
 
-const SQL_CREATE_USER_TABLE = 'CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY AUTOINCREMENT, nickname TEXT NOT NULL, avatar TEXT, createTime INTEGER)';
+const SQL_CREATE_USER_TABLE = 'CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY AUTOINCREMENT, nickname TEXT NOT NULL, avatar TEXT, gender INTEGER, birthday INTEGER, createTime INTEGER)';
+const SQL_SEED_USER_ID = "INSERT OR IGNORE INTO sqlite_sequence (name, seq) VALUES ('user', 9999)";
 const SQL_CREATE_TASK_TABLE = 'CREATE TABLE IF NOT EXISTS task (id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER, title TEXT NOT NULL, targetCount INTEGER, unit TEXT, createTime INTEGER)';
 const SQL_CREATE_RECORD_TABLE = 'CREATE TABLE IF NOT EXISTS record (id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER, type INTEGER, taskId INTEGER, value INTEGER, timestamp INTEGER)';
 
@@ -28,6 +29,7 @@ export class RdbHelper {
     try {
       this.rdbStore = await relationalStore.getRdbStore(context, STORE_CONFIG);
       await this.rdbStore.executeSql(SQL_CREATE_USER_TABLE);
+      await this.rdbStore.executeSql(SQL_SEED_USER_ID);
       await this.rdbStore.executeSql(SQL_CREATE_TASK_TABLE);
       await this.rdbStore.executeSql(SQL_CREATE_RECORD_TABLE);
     } catch (err) {
@@ -35,27 +37,36 @@ export class RdbHelper {
     }
   }
 
-  // ============== User APIs ==============
+  /**
+   * 插入新用户
+   */
   public async insertUser(user: User): Promise<number> {
-    if (!this.rdbStore) return -1;
+    if (!this.rdbStore) { return -1; }
     const valueBucket: relationalStore.ValuesBucket = {
       'nickname': user.nickname,
       'avatar': user.avatar || '',
+      'gender': user.gender,
+      'birthday': user.birthday,
       'createTime': user.createTime
     };
     return await this.rdbStore.insert('user', valueBucket);
   }
 
+  /**
+   * 根据 ID 查询用户
+   */
   public async queryUserById(id: number): Promise<User | null> {
-    if (!this.rdbStore) return null;
+    if (!this.rdbStore) { return null; }
     let predicates = new relationalStore.RdbPredicates('user');
     predicates.equalTo('id', id);
-    let resultSet = await this.rdbStore.query(predicates, ['id', 'nickname', 'avatar', 'createTime']);
+    let resultSet = await this.rdbStore.query(predicates, ['id', 'nickname', 'avatar', 'gender', 'birthday', 'createTime']);
     if (resultSet.goToFirstRow()) {
       const user: User = {
         id: resultSet.getLong(resultSet.getColumnIndex('id')),
         nickname: resultSet.getString(resultSet.getColumnIndex('nickname')),
         avatar: resultSet.getString(resultSet.getColumnIndex('avatar')),
+        gender: resultSet.getLong(resultSet.getColumnIndex('gender')),
+        birthday: resultSet.getLong(resultSet.getColumnIndex('birthday')),
         createTime: resultSet.getLong(resultSet.getColumnIndex('createTime'))
       };
       resultSet.close();
@@ -65,16 +76,21 @@ export class RdbHelper {
     return null;
   }
 
+  /**
+   * 获取所有用户
+   */
   public async queryAllUsers(): Promise<User[]> {
-    if (!this.rdbStore) return [];
+    if (!this.rdbStore) { return []; }
     let predicates = new relationalStore.RdbPredicates('user');
-    let resultSet = await this.rdbStore.query(predicates, ['id', 'nickname', 'avatar', 'createTime']);
+    let resultSet = await this.rdbStore.query(predicates, ['id', 'nickname', 'avatar', 'gender', 'birthday', 'createTime']);
     let users: User[] = [];
     while (resultSet.goToNextRow()) {
       users.push({
         id: resultSet.getLong(resultSet.getColumnIndex('id')),
         nickname: resultSet.getString(resultSet.getColumnIndex('nickname')),
         avatar: resultSet.getString(resultSet.getColumnIndex('avatar')),
+        gender: resultSet.getLong(resultSet.getColumnIndex('gender')),
+        birthday: resultSet.getLong(resultSet.getColumnIndex('birthday')),
         createTime: resultSet.getLong(resultSet.getColumnIndex('createTime'))
       });
     }
