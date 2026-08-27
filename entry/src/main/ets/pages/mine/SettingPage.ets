@@ -54,6 +54,7 @@ struct NicknameDialog {
 export struct SettingPage {
   @State currentUser: User | null = null;
   @State currentNickname: string = '';
+  @State currentAvatar: string = '';
 
   dialogController: CustomDialogController = new CustomDialogController({
     builder: NicknameDialog({
@@ -69,6 +70,7 @@ export struct SettingPage {
       this.currentUser = await RdbHelper.queryUserById(userId);
       if (this.currentUser) {
         this.currentNickname = this.currentUser.nickname;
+        this.currentAvatar = this.currentUser.avatar || '';
       }
     }
   }
@@ -78,6 +80,7 @@ export struct SettingPage {
     if (this.currentUser) {
       this.currentUser.nickname = newName;
       await RdbHelper.updateUser(this.currentUser);
+      this.currentNickname = newName;
       promptAction.showToast({ message: '昵称修改成功' });
     }
   }
@@ -127,6 +130,7 @@ export struct SettingPage {
           if (PhotoSelectResult.photoUris.length > 0 && this.currentUser) {
             this.currentUser.avatar = PhotoSelectResult.photoUris[0];
             await RdbHelper.updateUser(this.currentUser);
+            this.currentAvatar = this.currentUser.avatar;
             promptAction.showToast({ message: '头像修改成功' });
           }
         } catch (err) {
@@ -159,8 +163,8 @@ export struct SettingPage {
           // 头像行
           Row() {
             Text('头像').fontSize(16).fontColor('#333333').layoutWeight(1)
-            if (this.currentUser.avatar) {
-              Image(this.currentUser.avatar).width(48).height(48).borderRadius(24).objectFit(ImageFit.Cover)
+            if (this.currentAvatar) {
+              Image(this.currentAvatar).width(48).height(48).borderRadius(24).objectFit(ImageFit.Cover)
             } else {
               Image($r('app.media.ic_avatar_placeholder')).width(48).height(48).borderRadius(24)
             }

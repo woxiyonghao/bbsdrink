@@ -12,7 +12,7 @@ export struct MinePage {
   @State scaleValue: number = 1;
   @State opacityValue: number = 1;
   
-  async aboutToAppear() {
+  async onPageShow() {
     const userId: number = await PreferencesUtil.getCurrentUserId();
     if (userId > 0) {
       this.currentUser = await RdbHelper.queryUserById(userId);
@@ -55,9 +55,7 @@ export struct MinePage {
         .backgroundColor('#33000000') // 黑色半透明
         .borderRadius(18)
         .justifyContent(FlexAlign.Center)
-        .position({ x: '100%', y: 20 })
-        .translate({ x: '-100%' })
-        .margin({ right: 12 })
+        .position({ right: 12, top: 20 })
         .onClick(() => { router.pushUrl({ url: 'pages/mine/SettingPage' }); })
 
         // 居中头像与昵称
