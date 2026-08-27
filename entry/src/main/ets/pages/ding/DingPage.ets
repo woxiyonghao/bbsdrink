@@ -72,35 +72,15 @@ export struct DingPage {
 
       // 中心打卡大按钮
       Column() {
-        Stack() {
-          // 未打卡时，显示一个好看的玻璃杯
-          if (!this.isCheckedIn) {
-            Image($r('app.media.ic_drink_water')) // 玻璃杯图标
-              .width(90)
-              .height(90)
-              .objectFit(ImageFit.Contain)
-              // 加上一点淡淡的阴影显得立体
-              .shadow({ radius: 10, color: '#3307C160', offsetY: 5 })
-          } else {
-            // 打卡成功显示实心大绿勾
-            Circle()
-              .width(130)
-              .height(130)
-              .fill('#07C160')
-              .shadow({ radius: 15, color: '#4D07C160', offsetY: 8 })
-            
-            Image($r('app.media.ic_ding_checked')) // 实心勾
-              .width(80)
-              .height(80)
-              .fillColor(Color.White)
-          }
-        }
-        .width(130)
-        .height(130)
-        .rotate({ angle: this.shakeAngle })
-        .onClick(() => {
-          this.handleCheckIn();
-        })
+        Image($r('app.media.ic_cup_water'))
+          .width(140)
+          .height(140)
+          .objectFit(ImageFit.Contain)
+          .fillColor(this.isCheckedIn ? '#07C160' : '#D3D3D3') // 未打卡为浅灰，打卡为微信绿
+          .rotate({ angle: this.shakeAngle })
+          .onClick(() => {
+            this.handleCheckIn();
+          })
         
         Text(this.isCheckedIn ? '今日已打卡' : '点击打卡')
           .fontSize(16)
