@@ -79,8 +79,15 @@ export struct SettingPage {
       this.currentUser.nickname = newName;
       await RdbHelper.updateUser(this.currentUser);
       this.currentNickname = newName;
-      // 强制刷新整个对象引用
-      this.currentUser = { ...this.currentUser } as User;
+      // 强制刷新整个对象引用 (绕过 arkts-no-spread)
+      this.currentUser = {
+        id: this.currentUser.id,
+        nickname: this.currentUser.nickname,
+        avatar: this.currentUser.avatar,
+        gender: this.currentUser.gender,
+        birthday: this.currentUser.birthday,
+        createTime: this.currentUser.createTime
+      };
       promptAction.showToast({ message: '昵称修改成功' });
     }
   }
@@ -120,8 +127,15 @@ export struct SettingPage {
           if (PhotoSelectResult.photoUris.length > 0 && this.currentUser) {
             this.currentUser.avatar = PhotoSelectResult.photoUris[0];
             await RdbHelper.updateUser(this.currentUser);
-            // 强制刷新整个对象引用
-            this.currentUser = { ...this.currentUser } as User;
+            // 强制刷新整个对象引用 (绕过 arkts-no-spread)
+            this.currentUser = {
+              id: this.currentUser.id,
+              nickname: this.currentUser.nickname,
+              avatar: this.currentUser.avatar,
+              gender: this.currentUser.gender,
+              birthday: this.currentUser.birthday,
+              createTime: this.currentUser.createTime
+            };
             promptAction.showToast({ message: '头像修改成功' });
           }
         } catch (err) {
