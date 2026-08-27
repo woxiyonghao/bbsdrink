@@ -9,11 +9,13 @@ import promptAction from '@ohos.promptAction';
 @Component
 export struct MinePage {
   @State currentUser: User | null = null;
+  @State scaleValue: number = 1;
+  @State opacityValue: number = 1;
   
   async aboutToAppear() {
-    const userId = await PreferencesUtil.getCurrentUserId();
+    const userId = await PreferencesUtil.getInstance().getCurrentUserId();
     if (userId > 0) {
-      this.currentUser = await RdbHelper.queryUserById(userId);
+      this.currentUser = await RdbHelper.getInstance().queryUserById(userId);
     }
   }
 
@@ -37,44 +39,57 @@ export struct MinePage {
   build() {
     Column() {
       // 1. 顶部 Header 区域
-      Stack({ alignContent: Alignment.Bottom }) {
-        Column() {
-          // 右上角设置图标
-          Row() {
-            Text('我的')
-              .fontSize(24).fontWeight(FontWeight.Bold).fontColor('#FFFFFF').layoutWeight(1)
-            Image($r('app.media.ic_settings_white')).width(26).height(26)
-              .onClick(() => { promptAction.showToast({message: '设置待开发', bottom: 60}); })
-          }
-          .width('100%').padding({ left: 20, right: 20, top: 20, bottom: 30 })
-          
-          // 用户信息区
-          Row() {
-            if (this.currentUser && this.currentUser.avatar) {
-              Image(this.currentUser.avatar)
-                .width(70).height(70).borderRadius(35)
-                .border({ width: 2, color: '#FFFFFF' })
-            } else {
-              Image($r('app.media.ic_avatar_placeholder'))
-                .width(70).height(70).borderRadius(35)
-            }
-            
-            Column({ space: 8 }) {
-              Text(this.currentUser?.nickname || '未登录')
-                .fontSize(22).fontWeight(FontWeight.Bold).fontColor('#FFFFFF')
-              Text(`健康 ID: ${this.currentUser?.id || '--'}`)
-                .fontSize(14).fontColor('#E0E0E0')
-            }
-            .alignItems(HorizontalAlign.Start)
-            .margin({ left: 15 })
-          }
-          .width('100%').padding({ left: 20, right: 20, bottom: 80 })
+      Stack({ alignContent: Alignment.TopStart }) {
+        // 右上角设置图标
+        Image($r('app.media.ic_settings_white')).width(26).height(26)
+          .position({ x: '100%', y: 30 })
+          .translate({ x: '-100%' })
+          .margin({ right: 20 })
+          .onClick(() => { promptAction.showToast({message: '设置待开发', bottom: 60}); })
+
+        // 右侧大头像
+        if (this.currentUser && this.currentUser.avatar) {
+          Image(this.currentUser.avatar)
+            .width(160).height(160)
+            .borderRadius(80)
+            .position({ x: '55%', y: 80 })
+            .opacity(0.8)
+            .objectFit(ImageFit.Cover)
+        } else {
+          Image($r('app.media.ic_avatar_placeholder'))
+            .width(160).height(160)
+            .borderRadius(80)
+            .position({ x: '55%', y: 80 })
+            .opacity(0.5)
         }
-        .width('100%').height(260)
-        .backgroundColor(THEME_COLOR) // 微信绿主色调
-        .borderRadius({ bottomLeft: 30, bottomRight: 30 })
+
+        // 左侧文字排版区
+        Column() {
+          Text('我的')
+            .fontSize(36).fontWeight(FontWeight.Bold).fontColor('#FFFFFF')
+          
+          Blank() // 撑开中间空间
+          
+          Divider().color('#FFFFFF').strokeWidth(3).width(20)
+            .margin({ bottom: 20 })
+            
+          Row() {
+            Text(this.currentUser?.nickname || '未登录')
+              .fontSize(28).fontWeight(FontWeight.Medium).fontColor('#FFFFFF')
+            Image($r('app.media.ic_edit_white')).width(20).height(20).margin({ left: 10 })
+          }
+          .margin({ bottom: 8 })
+          
+          Text(`健康达人 ${this.currentUser?.id || '--'}`)
+            .fontSize(14).fontColor('#E0E0E0')
+        }
+        .alignItems(HorizontalAlign.Start)
+        .height('100%')
+        .padding({ left: 25, top: 70, bottom: 60 })
       }
-      .width('100%')
+      .width('100%').height(320)
+      .backgroundColor(THEME_COLOR) // 微信绿主色调
+      .borderRadius({ bottomLeft: 30, bottomRight: 30 })
 
       // 3. 菜单列表区 (向上偏移，覆盖在绿色背景上)
       Column() {
@@ -86,9 +101,29 @@ export struct MinePage {
         
         this.MenuItem($r('app.media.ic_about'), '关于', () => { promptAction.showToast({message: '关于健康打卡 v1.0.0', bottom: 60}); })
 
-        this.MenuItem($r('app.media.ic_logout'), '退出登录', async () => {
-          await PreferencesUtil.setCurrentUserId(-1);
-          router.replaceUrl({ url: 'pages/login/LoginPage' });
+        this.MenuItem($r('app.media.ic_logout'), '退出登录', () => {
+          promptAction.showDialog({
+            title: '退出登录',
+            message: '确认要退出当前账号吗？',
+            buttons: [
+              { text: '取消', color: '#888888' },
+              { text: '退出', color: '#ff4d4f' }
+            ]
+          }).then(async (data) => {
+            if (data.index === 1) { // 确认退出
+              // 触发手动转场动画
+              animateTo({ duration: 400, curve: Curve.EaseInOut }, () => {
+                this.scaleValue = 0.8;
+                this.opacityValue = 0;
+              });
+              
+              // 动画结束后路由
+              setTimeout(async () => {
+                await PreferencesUtil.getInstance().setCurrentUserId(-1);
+                router.replaceUrl({ url: 'pages/login/LoginPage' });
+              }, 400);
+            }
+          })
         })
       }
       .width('100%')
@@ -99,5 +134,7 @@ export struct MinePage {
     .width('100%')
     .height('100%')
     .backgroundColor('#F5F7FA') // 浅灰背景色
+    .scale({ x: this.scaleValue, y: this.scaleValue })
+    .opacity(this.opacityValue)
   }
 }
