@@ -18,3 +18,32 @@
    - `tools/`: 通用工具类 (如时间处理、字符串处理等)
    - `store/`: 状态管理、本地存储 (Preferences)、数据库 (SQLite/RelationalStore) 操作
    - `types/`: 全局的 TypeScript 接口声明和类型定义 (Interfaces, Types)
+
+4. **规范的中文注释**：
+   - 必须为所有公共方法、核心业务逻辑、共享属性添加**简体中文注释**，说明其作用和参数意义，增强代码可读性。
+
+5. **代码整洁与控制流规范 (Clean Code)**：
+   - **避免深度嵌套的 if-else**：遇到多重条件判断时，尽量将其封装为 `enum` 枚举，并使用 `switch-case` 结构。
+   - **使用尽早返回 (Early Return) 模式**：避免冗长的 `else` 块。
+     - ❌ **Bad (避免使用)**:
+       ```typescript
+       const process = (isValid: boolean) => {
+         if (isValid) {
+           // do long things...
+         } else {
+           // do another thing...
+         }
+       }
+       ```
+     - ✅ **Good (推荐使用)**:
+       ```typescript
+       const process = (isValid: boolean) => {
+         if (!isValid) {
+           return; // 或抛出异常、处理另一分支
+         }
+         // do long things...
+       }
+       ```
+
+6. **UI 与设计规范**：
+   - **主色调**：项目属于“工具 + 健康”类，主色调必须统一使用 **绿色 (Green)**。在使用高亮、强调色、选中状态时，请使用优雅健康的绿色（如 `#34C759`）。
