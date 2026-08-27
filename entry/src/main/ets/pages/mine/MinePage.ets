@@ -12,7 +12,7 @@ export struct MinePage {
   @State scaleValue: number = 1;
   @State opacityValue: number = 1;
   
-  async onPageShow() {
+  async aboutToAppear() {
     const userId: number = await PreferencesUtil.getCurrentUserId();
     if (userId > 0) {
       this.currentUser = await RdbHelper.queryUserById(userId);

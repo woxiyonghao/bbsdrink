@@ -1,5 +1,5 @@
 import promptAction from '@ohos.promptAction';
-
+import router from '@ohos.router';
 @Entry
 @Component
 export struct DingPage {
@@ -229,7 +229,7 @@ export struct DingPage {
         })
         .shadow({ radius: 12, color: '#4D56AB2F', offsetY: 6 })
         .onClick(() => {
-          promptAction.showToast({ message: '功能未开发，请稍等。' });
+          router.pushUrl({ url: 'pages/run/RunPage' });
         })
       }
       .width('100%')

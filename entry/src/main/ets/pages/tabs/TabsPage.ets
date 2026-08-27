@@ -81,4 +81,19 @@ export struct TabsPage {
     .height('100%')
     .backgroundColor('#F5F5F5') // 页面底层给点底色，毛玻璃效果更明显
   }
+
+  // 页面转场动画定义
+  pageTransition() {
+    // 退场动画 (当push新页面时，当前页退场)
+    // ding -> 变大，透明度渐渐变透明，1.0->1.4
+    PageTransitionExit({ type: RouteType.Push, duration: 400, curve: Curve.Linear })
+      .opacity(0)
+      .scale({ x: 1.4, y: 1.4 })
+
+    // 进场动画 (当从新页面pop回来时，当前页进场)
+    // ding从原本消失时变大的1.4倍变回1.0，透明渐渐不透明
+    PageTransitionEnter({ type: RouteType.Pop, duration: 400, curve: Curve.Linear })
+      .opacity(0)
+      .scale({ x: 1.4, y: 1.4 })
+  }
 }

@@ -41,7 +41,7 @@ export struct HomePage {
   @State todayDrank: number = 0;
   @State dailyGoal: number = 2000; // 默认2000ml
 
-  async onPageShow() {
+  async aboutToAppear() {
     const userId = await PreferencesUtil.getCurrentUserId();
     if (userId > 0) {
       // 每次页面展示时，重新查询当天的喝水量，确保打卡返回后能实时刷新
