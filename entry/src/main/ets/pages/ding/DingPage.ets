@@ -27,59 +27,76 @@ export struct DingPage {
 
   startShakeAnimation() {
     if (this.isCheckedIn) return;
-    // 使用拟物化的抛物线洒水动效
+    
+    // 定时循环：杯子抖动 + 飞溅
     this.shakeInterval = setInterval(() => {
       if (this.isCheckedIn) return;
       
-      // 准备阶段：重置右侧水滴位置
-      this.splashRightX = 20;
+      // 准备阶段：重置水滴位置 (藏在杯口)
+      this.splashRightX = 0;
       this.splashRightY = -30;
       this.splashRightOpacity = 0;
       
-      // 1. 杯子向左摇，右侧洒水
-      animateTo({ duration: 80, curve: Curve.EaseOut }, () => { 
-        this.shakeAngle = -25;
-      })
+      this.splashLeftX = 0;
+      this.splashLeftY = -30;
+      this.splashLeftOpacity = 0;
       
-      // 飞溅动效
-      animateTo({ duration: 400, curve: Curve.EaseOut }, () => {
-        this.splashRightOpacity = 1;
-        this.splashRightX = 80;
-        this.splashRightY = -90;
-      })
+      // ==========================================
+      // 1. 杯子极速左右摇摆 (快)
+      // ==========================================
+      animateTo({ duration: 50, curve: Curve.EaseInOut }, () => { this.shakeAngle = -25; })
       setTimeout(() => {
-        animateTo({ duration: 200 }, () => { this.splashRightOpacity = 0; })
-      }, 200);
-
-      // 2. 向右摇，左侧洒水
+        animateTo({ duration: 100, curve: Curve.EaseInOut }, () => { this.shakeAngle = 25; })
+      }, 50);
       setTimeout(() => {
-        // 重置左侧水滴位置
-        this.splashLeftX = -20;
-        this.splashLeftY = -30;
-        this.splashLeftOpacity = 0;
-        
-        animateTo({ duration: 120, curve: Curve.EaseInOut }, () => { 
-          this.shakeAngle = 25; 
-        })
-        
-        animateTo({ duration: 400, curve: Curve.EaseOut }, () => {
-          this.splashLeftOpacity = 1;
-          this.splashLeftX = -80;
-          this.splashLeftY = -90;
-        })
-        setTimeout(() => {
-          animateTo({ duration: 200 }, () => { this.splashLeftOpacity = 0; })
-        }, 200);
+        animateTo({ duration: 100, curve: Curve.EaseInOut }, () => { this.shakeAngle = -25; })
       }, 150);
-      
-      // 3. 回正
       setTimeout(() => {
-        animateTo({ duration: 120, curve: Curve.EaseInOut }, () => { 
-          this.shakeAngle = 0; 
-        })
-      }, 350);
+        animateTo({ duration: 50, curve: Curve.EaseInOut }, () => { this.shakeAngle = 0; })
+      }, 250);
+
+      // ==========================================
+      // 2. 抛物线水滴泼洒 (完整上升与下落)
+      // ==========================================
+      // 右侧水滴飞出 (当杯子向左摇时触发)
+      this.splashRightOpacity = 1;
       
-    }, 1200); // 稍微拉长间隔，让水滴有足够时间飞洒
+      // X轴匀速向外飞 (总时长 600ms)
+      animateTo({ duration: 600, curve: Curve.Linear }, () => {
+        this.splashRightX = 140;
+      })
+      // Y轴上升阶段 (前半段，减速抗拒重力到达最高点)
+      animateTo({ duration: 300, curve: Curve.EaseOut }, () => {
+        this.splashRightY = -100;
+      })
+      // Y轴下落阶段 (后半段，加速坠落)
+      animateTo({ duration: 300, delay: 300, curve: Curve.EaseIn }, () => {
+        this.splashRightY = 30; // 跌落到比起始点更低的位置
+      })
+      // 在坠落过程中渐隐消失
+      animateTo({ duration: 200, delay: 400, curve: Curve.Linear }, () => {
+        this.splashRightOpacity = 0;
+      })
+
+      // 左侧水滴飞出 (延迟 100ms 匹配杯子向右摇的时机)
+      setTimeout(() => {
+        this.splashLeftOpacity = 1;
+        
+        animateTo({ duration: 600, curve: Curve.Linear }, () => {
+          this.splashLeftX = -140;
+        })
+        animateTo({ duration: 300, curve: Curve.EaseOut }, () => {
+          this.splashLeftY = -100;
+        })
+        animateTo({ duration: 300, delay: 300, curve: Curve.EaseIn }, () => {
+          this.splashLeftY = 30;
+        })
+        animateTo({ duration: 200, delay: 400, curve: Curve.Linear }, () => {
+          this.splashLeftOpacity = 0;
+        })
+      }, 100);
+
+    }, 1500); // 间隔时间拉长，让慢速的泼洒下落动画能完整展示完毕
   }
 
   stopShakeAnimation() {
