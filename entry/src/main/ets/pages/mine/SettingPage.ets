@@ -54,7 +54,6 @@ struct NicknameDialog {
 export struct SettingPage {
   @State currentUser: User | null = null;
   @State currentNickname: string = '';
-  @State currentAvatar: string = '';
 
   dialogController: CustomDialogController = new CustomDialogController({
     builder: NicknameDialog({
@@ -70,7 +69,6 @@ export struct SettingPage {
       this.currentUser = await RdbHelper.queryUserById(userId);
       if (this.currentUser) {
         this.currentNickname = this.currentUser.nickname;
-        this.currentAvatar = this.currentUser.avatar || '';
       }
     }
   }
@@ -81,6 +79,8 @@ export struct SettingPage {
       this.currentUser.nickname = newName;
       await RdbHelper.updateUser(this.currentUser);
       this.currentNickname = newName;
+      // 强制刷新整个对象引用
+      this.currentUser = { ...this.currentUser } as User;
       promptAction.showToast({ message: '昵称修改成功' });
     }
   }
@@ -99,16 +99,6 @@ export struct SettingPage {
     if (gender === 1) return '男生';
     if (gender === 0) return '女生';
     return '未知';
-  }
-
-  // 列表行组件 (文字类型)
-  @Builder TextRow(title: string, value: string, onClickAction?: () => void) {
-    Row() {
-      Text(title).fontSize(16).fontColor('#333333').layoutWeight(1)
-      Text(value).fontSize(16).fontColor('#888888')
-    }
-    .width('100%').height(60)
-    .onClick(onClickAction ? onClickAction : () => {})
   }
 
   // 处理头像点击
@@ -130,7 +120,8 @@ export struct SettingPage {
           if (PhotoSelectResult.photoUris.length > 0 && this.currentUser) {
             this.currentUser.avatar = PhotoSelectResult.photoUris[0];
             await RdbHelper.updateUser(this.currentUser);
-            this.currentAvatar = this.currentUser.avatar;
+            // 强制刷新整个对象引用
+            this.currentUser = { ...this.currentUser } as User;
             promptAction.showToast({ message: '头像修改成功' });
           }
         } catch (err) {
@@ -160,11 +151,11 @@ export struct SettingPage {
       // 内容列表区
       if (this.currentUser) {
         Column() {
-          // 头像行
+          // 1. 头像行
           Row() {
             Text('头像').fontSize(16).fontColor('#333333').layoutWeight(1)
-            if (this.currentAvatar) {
-              Image(this.currentAvatar).width(48).height(48).borderRadius(24).objectFit(ImageFit.Cover)
+            if (this.currentUser.avatar) {
+              Image(this.currentUser.avatar).width(48).height(48).borderRadius(24).objectFit(ImageFit.Cover)
             } else {
               Image($r('app.media.ic_avatar_placeholder')).width(48).height(48).borderRadius(24)
             }
@@ -174,18 +165,40 @@ export struct SettingPage {
           
           Divider().color('#F5F5F5')
           
-          this.TextRow('昵称', this.currentNickname, () => {
-            this.dialogController.open();
-          })
+          // 2. 昵称行
+          Row() {
+            Text('昵称').fontSize(16).fontColor('#333333').layoutWeight(1)
+            Text(this.currentNickname).fontSize(16).fontColor('#888888')
+          }
+          .width('100%').height(60)
+          .onClick(() => { this.dialogController.open(); })
           
           Divider().color('#F5F5F5')
-          this.TextRow('健康 ID', this.currentUser.id?.toString() || '--')
+          
+          // 3. 健康 ID
+          Row() {
+            Text('健康 ID').fontSize(16).fontColor('#333333').layoutWeight(1)
+            Text(this.currentUser.id?.toString() || '--').fontSize(16).fontColor('#888888')
+          }
+          .width('100%').height(60)
           
           Divider().color('#F5F5F5')
-          this.TextRow('性别', this.formatGender(this.currentUser.gender))
+          
+          // 4. 性别
+          Row() {
+            Text('性别').fontSize(16).fontColor('#333333').layoutWeight(1)
+            Text(this.formatGender(this.currentUser.gender)).fontSize(16).fontColor('#888888')
+          }
+          .width('100%').height(60)
           
           Divider().color('#F5F5F5')
-          this.TextRow('生日', this.formatDate(this.currentUser.birthday))
+          
+          // 5. 生日
+          Row() {
+            Text('生日').fontSize(16).fontColor('#333333').layoutWeight(1)
+            Text(this.formatDate(this.currentUser.birthday)).fontSize(16).fontColor('#888888')
+          }
+          .width('100%').height(60)
         }
         .width('100%').padding({ left: 20, right: 20 })
         .backgroundColor('#FFFFFF')
