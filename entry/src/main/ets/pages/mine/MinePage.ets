@@ -166,7 +166,7 @@ export struct MinePage {
         Divider().color('#F5F5F5').margin({ left: 15, right: 15 })
         
         Row() {
-          this.GridItem($r('app.media.ic_drink_record'), '喝水记录', () => { promptAction.showToast({message: '喝水记录待开发', bottom: 60}); })
+          this.GridItem($r('app.media.ic_drink_record'), '喝水记录', () => { router.pushUrl({ url: 'pages/mine/DrinkHistoryPage' }); })
           this.GridItem($r('app.media.ic_sit_record'), '久坐记录', () => { promptAction.showToast({message: '久坐记录待开发', bottom: 60}); })
           this.GridItem($r('app.media.ic_check_record'), '打卡记录', () => { promptAction.showToast({message: '打卡记录待开发', bottom: 60}); })
         }

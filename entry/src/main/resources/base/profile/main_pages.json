@@ -9,6 +9,7 @@
     "pages/mine/SettingPage",
     "pages/mine/AboutPage",
     "pages/home/ArticleDetailPage",
-    "pages/home/CheckInCalendarPage"
+    "pages/home/CheckInCalendarPage",
+    "pages/mine/DrinkHistoryPage"
   ]
 }
