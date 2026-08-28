@@ -4,6 +4,7 @@
     "pages/tabs/TabsPage",
     "pages/home/HomePage",
     "pages/ding/DingPage",
+    "pages/ding/DrinkRecordPage",
     "pages/mine/MinePage",
     "pages/mine/SettingPage",
     "pages/mine/AboutPage",
