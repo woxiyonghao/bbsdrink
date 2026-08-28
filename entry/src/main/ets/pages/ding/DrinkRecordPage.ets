@@ -89,24 +89,24 @@ export struct DrinkRecordPage {
         id: now + i,
         x: Math.random() * 90 + 5, // 5% 到 95%
         y: 100, // 从底部开始
-        size: Math.random() * 15 + 10,
+        size: Math.random() * 40 + 15,
         opacity: Math.random() * 0.4 + 0.3
       });
     }
-    this.bubbles = [...this.bubbles, ...newBubbles];
+    this.bubbles = this.bubbles.concat(newBubbles);
     
     setTimeout(() => {
       animateTo({ duration: 2500, curve: Curve.EaseOut }, () => {
         this.bubbles = this.bubbles.map(b => {
           if (b.id >= now) {
-            return { ...b, y: -20 }; // 飘出屏幕顶部
+            return { id: b.id, x: b.x, y: -20, size: b.size, opacity: b.opacity }; // 飘出屏幕顶部
           }
           return b;
         });
       });
       
       setTimeout(() => {
-        this.bubbles = this.bubbles.filter(b => b.id > now + 30);
+        this.bubbles = this.bubbles.filter(b => b.id < now || b.id >= now + 20);
       }, 3000);
     }, 50);
   }
@@ -178,11 +178,25 @@ export struct DrinkRecordPage {
         .backgroundColor('#29C5F6')
 
       // 汽水气泡层
+      // 汽水气泡层 (升级为肥皂泡质感)
       ForEach(this.bubbles, (b: Bubble) => {
         Circle({ width: b.size, height: b.size })
-          .fill('rgba(255, 255, 255, 0.6)') // 白色气泡
+          .fill('transparent')
+          .stroke('rgba(255, 255, 255, 0.8)')
+          .strokeWidth(b.size > 30 ? 1.5 : 1)
+          .radialGradient({
+            center: ['30%', '30%'],
+            radius: '70%',
+            colors: [
+              ['rgba(255, 255, 255, 0.9)', 0.0],
+              ['rgba(100, 255, 255, 0.2)', 0.2],
+              ['rgba(200, 150, 255, 0.3)', 0.7],
+              ['rgba(255, 255, 255, 0.8)', 1.0]
+            ]
+          })
           .position({ x: `${b.x}%`, y: `${b.y}%` })
           .opacity(b.opacity)
+          .hitTestBehavior(HitTestMode.None)
       }, (b: Bubble) => b.id.toString())
 
       Column() {
