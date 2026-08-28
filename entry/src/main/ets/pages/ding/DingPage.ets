@@ -3,24 +3,6 @@ import router from '@ohos.router';
 import PreferencesUtil from '../../store/PreferencesUtil';
 import RdbHelper from '../../store/RdbHelper';
 
-class HabitTask {
-  title: string = '';
-  subtitle: string = '';
-  emoji: string = '';
-  colorStart: string = '';
-  colorEnd: string = '';
-  shadowColor: string = '';
-}
-
-const HABIT_TASKS: HabitTask[] = [
-  { title: '喝水', subtitle: '补充每日水分', emoji: '💧', colorStart: '#8ECAE6', colorEnd: '#219EBC', shadowColor: '#4D219EBC' },
-  { title: '起来走走', subtitle: '拒绝久坐', emoji: '🚶‍♂️', colorStart: '#A8E063', colorEnd: '#56AB2F', shadowColor: '#4D56AB2F' },
-  { title: '晨跑 3KM', subtitle: '唤醒燃脂', emoji: '🏃‍♂️', colorStart: '#FF9A9E', colorEnd: '#FECFEF', shadowColor: '#4DFECFEF' },
-  { title: '冥想专注', subtitle: '放空 15 分钟', emoji: '🧘‍♀️', colorStart: '#a18cd1', colorEnd: '#fbc2eb', shadowColor: '#4Dfbc2eb' },
-  { title: '力量训练', subtitle: '突破自我', emoji: '🏋️‍♂️', colorStart: '#f6d365', colorEnd: '#fda085', shadowColor: '#4Dfda085' },
-  { title: '健康轻食', subtitle: '记录一餐', emoji: '🥗', colorStart: '#84fab0', colorEnd: '#8fd3f4', shadowColor: '#4D8fd3f4' }
-];
-
 @Entry
 @Component
 export struct DingPage {
@@ -168,104 +150,110 @@ export struct DingPage {
       .width('100%')
       .padding({ left: 25, top: 40, bottom: 10 })
 
-      Scroll() {
-        Column() {
-          // 中心打卡大按钮
-          Column() {
-            Stack() {
-              // 左侧飞溅的写实水滴
-              Row({ space: 4 }) {
-                Circle().width(6).height(6).fill('#8ECAE6')
-                Circle().width(10).height(10).fill('#8ECAE6').margin({ top: -10 })
-                Circle().width(4).height(4).fill('#8ECAE6')
-              }
-              .opacity(this.splashLeftOpacity)
-              .translate({ x: this.splashLeftX, y: this.splashLeftY })
-              
-              // 右侧飞溅的写实水滴
-              Row({ space: 4 }) {
-                Circle().width(4).height(4).fill('#8ECAE6')
-                Circle().width(10).height(10).fill('#8ECAE6').margin({ top: -10 })
-                Circle().width(6).height(6).fill('#8ECAE6')
-              }
-              .opacity(this.splashRightOpacity)
-              .translate({ x: this.splashRightX, y: this.splashRightY })
-
-              // 核心玻璃杯
-              Image($r('app.media.ic_cup_water'))
-                .width(140)
-                .height(140)
-                .objectFit(ImageFit.Contain)
-                .fillColor(this.isCheckedIn ? '#07C160' : '#D3D3D3')
-                .rotate({ angle: this.shakeAngle })
-                .onClick(() => {
-                  this.handleCheckIn();
-                })
-            }
-            .width(200)
-            .height(180)
-            .alignContent(Alignment.Center)
-            
-            Text(this.isCheckedIn ? '今日已打卡' : '点击打卡')
-              .fontSize(16)
-              .fontColor(this.isCheckedIn ? '#07C160' : '#888888')
-              .margin({ top: 20 })
-              .fontWeight(FontWeight.Medium)
+      // 中心打卡大按钮
+      Column() {
+        Stack() {
+          // 左侧飞溅的写实水滴
+          Row({ space: 4 }) {
+            Circle().width(6).height(6).fill('#8ECAE6')
+            Circle().width(10).height(10).fill('#8ECAE6').margin({ top: -10 })
+            Circle().width(4).height(4).fill('#8ECAE6')
           }
-          .margin({ top: 20, bottom: 40 })
+          .opacity(this.splashLeftOpacity)
+          .translate({ x: this.splashLeftX, y: this.splashLeftY })
+          
+          // 右侧飞溅的写实水滴
+          Row({ space: 4 }) {
+            Circle().width(4).height(4).fill('#8ECAE6')
+            Circle().width(10).height(10).fill('#8ECAE6').margin({ top: -10 })
+            Circle().width(6).height(6).fill('#8ECAE6')
+          }
+          .opacity(this.splashRightOpacity)
+          .translate({ x: this.splashRightX, y: this.splashRightY })
 
-          // 底部精美卡片 (网格形式)
-          Grid() {
-            ForEach(HABIT_TASKS, (item: HabitTask) => {
-              GridItem() {
-                Column() {
-                  // 右上角Emoji
-                  Row() {
-                    Blank()
-                    Text(item.emoji)
-                      .fontSize(36)
-                      .opacity(0.9)
-                  }.width('100%').margin({ bottom: 12 })
-
-                  // 文字在底部
-                  Column() {
-                    Text(item.title)
-                      .fontSize(18)
-                      .fontWeight(FontWeight.Bold)
-                      .fontColor(Color.White)
-                    Text(item.subtitle)
-                      .fontSize(12)
-                      .fontColor('rgba(255, 255, 255, 0.8)')
-                      .margin({ top: 4 })
-                  }
-                  .width('100%')
-                  .alignItems(HorizontalAlign.Start)
-                }
-                .padding(16)
-                .width('100%')
-                .height(130)
-                .borderRadius(20)
-                .linearGradient({
-                  direction: GradientDirection.RightBottom,
-                  colors: [[item.colorStart, 0.0], [item.colorEnd, 1.0]]
-                })
-                .shadow({ radius: 10, color: item.shadowColor, offsetY: 6 })
-                .onClick(() => {
-                  promptAction.showToast({ message: `${item.title} 打卡成功！` });
-                })
-              }
+          // 核心玻璃杯
+          Image($r('app.media.ic_cup_water'))
+            .width(140)
+            .height(140)
+            .objectFit(ImageFit.Contain)
+            .fillColor(this.isCheckedIn ? '#07C160' : '#D3D3D3') // 未打卡为浅灰，打卡为微信绿
+            .rotate({ angle: this.shakeAngle })
+            .onClick(() => {
+              this.handleCheckIn();
             })
-          }
-          .columnsTemplate('1fr 1fr')
-          .rowsGap(16)
-          .columnsGap(16)
-          .width('100%')
-          .padding({ left: 20, right: 20, bottom: 100 }) // 给底部留出空间
+        }
+        .width(200)
+        .height(180)
+        .alignContent(Alignment.Center)
+        
+        Text(this.isCheckedIn ? '今日已打卡' : '点击打卡')
+          .fontSize(16)
+          .fontColor(this.isCheckedIn ? '#07C160' : '#888888')
+          .margin({ top: 20 })
+          .fontWeight(FontWeight.Medium)
+      }
+      .margin({ top: 40, bottom: 50 })
+
+      // 底部精美卡片 (各占一行)
+      Column({ space: 20 }) {
+        // 喝水卡片
+        Row() {
+          Text('喝水')
+            .fontSize(22)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(Color.White)
+            .layoutWeight(1)
+            .margin({ left: 25 })
+          
+          Image($r('app.media.ic_water_glass_white'))
+            .width(50)
+            .height(50)
+            .margin({ right: 25 })
+            .opacity(0.9)
         }
         .width('100%')
+        .height(120) // 增高，占满单行
+        .borderRadius(20)
+        .linearGradient({
+          direction: GradientDirection.Right,
+          colors: [['#8ECAE6', 0.0], ['#219EBC', 1.0]] // 浅蓝色渐变
+        })
+        .shadow({ radius: 12, color: '#4D219EBC', offsetY: 6 })
+        .onClick(() => {
+          promptAction.showToast({ message: '功能未开发，请稍等。' });
+        })
+
+        // 久坐运动卡片
+        Row() {
+          Text('起来走走')
+            .fontSize(22)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(Color.White)
+            .layoutWeight(1)
+            .margin({ left: 25 })
+          
+          Image($r('app.media.ic_sport_white'))
+            .width(50)
+            .height(50)
+            .margin({ right: 25 })
+            .opacity(0.9)
+        }
+        .width('100%')
+        .height(120) // 增高，占满单行
+        .borderRadius(20)
+        .linearGradient({
+          direction: GradientDirection.Right,
+          colors: [['#A8E063', 0.0], ['#56AB2F', 1.0]] // 浅绿色渐变
+        })
+        .shadow({ radius: 12, color: '#4D56AB2F', offsetY: 6 })
+        .onClick(() => {
+          promptAction.showToast({ message: '功能未开发，请稍等。' });
+        })
       }
-      .layoutWeight(1)
-      .scrollBar(BarState.Off)
+      .width('100%')
+      .padding({ left: 20, right: 20 })
+
+      Blank()
     }
     .width('100%')
     .height('100%')
