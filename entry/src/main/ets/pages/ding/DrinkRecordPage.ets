@@ -70,28 +70,8 @@ export struct DrinkRecordPage {
 
   build() {
     Stack({ alignContent: Alignment.Bottom }) {
-      // 全局背景：包含底部的动态水波纹
-      Stack({ alignContent: Alignment.BottomStart }) {
-        Column().width('100%').height('100%').backgroundColor('#F5F7FA')
-
-        // 动态波浪水位 (放在整个页面的背景)
-        Stack({ alignContent: Alignment.BottomStart }) {
-          Path()
-            .commands('M0,30 Q50,0 100,30 T200,30 T300,30 T400,30 T500,30 T600,30 T700,30 T800,30 T900,30 T1000,30 T1100,30 T1200,30 T1300,30 T1400,30 L1400,1000 L0,1000 Z')
-            .fill('rgba(33, 158, 188, 0.2)')
-            .offset({ x: this.waveOffsetX, y: 0 })
-          
-          Path()
-            .commands('M0,30 Q50,60 100,30 T200,30 T300,30 T400,30 T500,30 T600,30 T700,30 T800,30 T900,30 T1000,30 T1100,30 T1200,30 T1300,30 T1400,30 L1400,1000 L0,1000 Z')
-            .fill('rgba(142, 202, 230, 0.4)')
-            .offset({ x: this.waveOffsetX * 1.5, y: 0 })
-        }
-        .width('400%') // 足够宽以配合动画
-        .height('60%') // 占据页面下半部分，供毛玻璃去模糊
-        .animation({ duration: 800, curve: Curve.FastOutSlowIn })
-      }
-      .width('100%')
-      .height('100%')
+      // 全局纯色背景
+      Column().width('100%').height('100%').backgroundColor('#F5F7FA')
 
       Column() {
         // 顶部导航
