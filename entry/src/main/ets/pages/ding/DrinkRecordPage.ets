@@ -112,8 +112,12 @@ export struct DrinkRecordPage {
 
   build() {
     Stack({ alignContent: Alignment.Bottom }) {
-      // 全局纯色背景
-      Column().width('100%').height('100%').backgroundColor('#F5F7FA')
+      // 全局纯色背景：Tabs的淡绿 + blur，防止白色的icon跟白色的底层看不清
+      Column()
+        .width('100%')
+        .height('100%')
+        .backgroundColor('rgba(7, 193, 96, 0.15)')
+        .backgroundBlurStyle(BlurStyle.Thin)
 
       Column() {
         // 顶部导航
@@ -223,18 +227,16 @@ export struct DrinkRecordPage {
     .width('100%')
     .height('100%') // 关键：让这个Column撑满屏幕，Blank才能生效
 
-    // 悬浮飞出动画层
-    if (this.flyOpacity > 0) {
-      Image(this.DRINKS[this.selectedIndex].icon)
-        .width(36)
-        .height(36)
-        .fillColor('#FFFFFF')
-        .margin({ bottom: 48 }) // 与底部Button的中心对齐 (30 + 72/2 - 36/2 = 48)
-        .translate({ y: this.flyY })
-        .scale({ x: this.flyScale, y: this.flyScale })
-        .rotate({ angle: this.flyRotate })
-        .opacity(this.flyOpacity)
-    }
+    // 悬浮飞出动画层 (不使用if条件包裹，防止动画还没播放就被销毁)
+    Image(this.DRINKS[this.selectedIndex].icon)
+      .width(36)
+      .height(36)
+      .fillColor('#FFFFFF')
+      .margin({ bottom: 48 }) // 与底部Button的中心对齐
+      .translate({ y: this.flyY })
+      .scale({ x: this.flyScale, y: this.flyScale })
+      .rotate({ angle: this.flyRotate })
+      .opacity(this.flyOpacity)
   } // 结束 Stack (全局根组件)
   .width('100%')
   .height('100%')
