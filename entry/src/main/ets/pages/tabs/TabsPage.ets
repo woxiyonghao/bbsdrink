@@ -44,13 +44,13 @@ export struct TabsPage {
       // 1. 内容区域
       Tabs({ barPosition: BarPosition.End, controller: this.tabsController }) {
         TabContent() {
-          HomePage()
+          HomePage({ currentTabIndex: this.currentIndex })
         }
         TabContent() {
-          DingPage()
+          DingPage({ currentTabIndex: this.currentIndex })
         }
         TabContent() {
-          MinePage()
+          MinePage({ currentTabIndex: this.currentIndex })
         }
       }
       .scrollable(false)

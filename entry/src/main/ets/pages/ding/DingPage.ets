@@ -20,6 +20,19 @@ export struct DingPage {
   
   private shakeInterval: number = -1;
 
+  @Prop @Watch('onTabChange') currentTabIndex: number = 0;
+
+  async onTabChange() {
+    if (this.currentTabIndex === 1 && this.userId > 0) {
+      this.isCheckedIn = await RdbHelper.hasCheckedInToday(this.userId);
+      if (!this.isCheckedIn) {
+        this.startShakeAnimation();
+      }
+    } else if (this.currentTabIndex !== 1) {
+      this.stopShakeAnimation();
+    }
+  }
+
   async aboutToAppear() {
     this.userId = await PreferencesUtil.getCurrentUserId();
     if (this.userId > 0) {

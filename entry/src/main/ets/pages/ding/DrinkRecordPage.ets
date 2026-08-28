@@ -1,19 +1,10 @@
+import { DrinkOption, GLOBAL_DRINKS } from "../../types";
+
 import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
 import RdbHelper from '../../store/RdbHelper';
 import PreferencesUtil from '../../store/PreferencesUtil';
 
-class DrinkOption {
-  type: number;
-  name: string;
-  icon: Resource;
-  
-  constructor(type: number, name: string, icon: Resource) {
-    this.type = type;
-    this.name = name;
-    this.icon = icon;
-  }
-}
 
 @Observed
 class Bubble {
@@ -89,22 +80,17 @@ export struct DrinkRecordPage {
   
   private scroller: Scroller = new Scroller();
 
-  readonly DRINKS: DrinkOption[] = [
-    new DrinkOption(0, '水', $r('app.media.ic_drink_water')),
-    new DrinkOption(1, '咖啡', $r('app.media.ic_drink_coffee')),
-    new DrinkOption(2, '绿茶', $r('app.media.ic_drink_tea')),
-    new DrinkOption(3, '牛奶', $r('app.media.ic_drink_milk')),
-    new DrinkOption(4, '果汁', $r('app.media.ic_drink_juice')),
-    new DrinkOption(5, '柠檬茶', $r('app.media.ic_drink_lemon')),
-    new DrinkOption(6, '运动饮料', $r('app.media.ic_drink_sports')),
-    new DrinkOption(7, '气泡水', $r('app.media.ic_drink_sparkling')),
-    new DrinkOption(8, '椰子水', $r('app.media.ic_drink_coconut')),
-    new DrinkOption(9, '花茶', $r('app.media.ic_drink_herbal')),
-    new DrinkOption(10, '热可可', $r('app.media.ic_drink_cocoa')),
-    new DrinkOption(11, '补剂', $r('app.media.ic_drink_bottle'))
-  ];
+  readonly DRINKS: DrinkOption[] = GLOBAL_DRINKS;
 
   aboutToAppear() {
+    let params = router.getParams() as Record<string, number>;
+    if (params && params.defaultType !== undefined) {
+      const type = params.defaultType;
+      const idx = this.DRINKS.findIndex(d => d.type === type);
+      if (idx >= 0) {
+        this.selectedIndex = idx;
+      }
+    }
     this.startWaveAnimation();
     this.loadCategoryData();
   }
@@ -117,6 +103,14 @@ export struct DrinkRecordPage {
       animateTo({ duration: 600, curve: Curve.EaseInOut }, () => {
         this.todayCategoryAmount = total;
       });
+    }
+  }
+
+  onPageShow() {
+    if (this.selectedIndex > 0) {
+      setTimeout(() => {
+        this.scroller.scrollTo({ xOffset: this.selectedIndex * 80, yOffset: 0 });
+      }, 50);
     }
   }
 

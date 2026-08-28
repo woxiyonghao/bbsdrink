@@ -1,7 +1,6 @@
 import router from '@ohos.router';
 import PreferencesUtil from '../../store/PreferencesUtil';
 import RdbHelper from '../../store/RdbHelper';
-import { SeedData } from '../../store/SeedData';
 
 const CALENDAR_QUOTES = [
   "每一个不曾起舞的日子，都是对生命的辜负。", "健康不是一切，但没有健康就没有一切。", "流水不腐，户枢不蠹，动也。", "投资健康，是回报率最高的一笔交易。", "你的身体是一座神庙，请好好供奉它。",
@@ -30,7 +29,10 @@ export struct CheckInCalendarPage {
   @State todayDay: number = new Date().getDate();
 
   async aboutToAppear() {
-    await SeedData.seedMockCheckIns();
+    const userId = await PreferencesUtil.getCurrentUserId();
+    if (userId > 0) {
+      await RdbHelper.deleteMockCheckIns(userId);
+    }
     this.generateCalendar();
     this.generateDailyQuote();
     await this.loadCheckInData();

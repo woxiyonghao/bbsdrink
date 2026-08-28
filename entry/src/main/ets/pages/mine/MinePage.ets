@@ -85,6 +85,17 @@ export struct MinePage {
     customStyle: true
   })
   
+  @Prop @Watch('onTabChange') currentTabIndex: number = 0;
+
+  async onTabChange() {
+    if (this.currentTabIndex === 2) {
+      const userId: number = await PreferencesUtil.getCurrentUserId();
+      if (userId > 0) {
+        this.currentUser = await RdbHelper.queryUserById(userId);
+      }
+    }
+  }
+
   async aboutToAppear() {
     const userId: number = await PreferencesUtil.getCurrentUserId();
     if (userId > 0) {
@@ -167,8 +178,8 @@ export struct MinePage {
         
         Row() {
           this.GridItem($r('app.media.ic_drink_record'), '喝水记录', () => { router.pushUrl({ url: 'pages/mine/DrinkHistoryPage' }); })
-          this.GridItem($r('app.media.ic_sit_record'), '久坐记录', () => { promptAction.showToast({message: '久坐记录待开发', bottom: 60}); })
-          this.GridItem($r('app.media.ic_check_record'), '打卡记录', () => { promptAction.showToast({message: '打卡记录待开发', bottom: 60}); })
+          this.GridItem($r('app.media.ic_sport_record'), '运动记录', () => { promptAction.showToast({ message: '暂无运动记录' }); })
+          this.GridItem($r('app.media.ic_check_record'), '打卡记录', () => { router.pushUrl({ url: 'pages/home/CheckInCalendarPage' }); })
         }
         .width('100%').padding({ top: 20, bottom: 20 })
       }

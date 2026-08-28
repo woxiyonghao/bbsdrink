@@ -1,44 +1,19 @@
 import router from '@ohos.router';
 import PreferencesUtil from '../../store/PreferencesUtil';
 import RdbHelper from '../../store/RdbHelper';
-import { CheckInRecord } from '../../types';
+import { CheckInRecord, DrinkOption, GLOBAL_DRINKS } from '../../types';
 
-class DrinkOption {
-  type: number;
-  name: string;
-  icon: Resource;
-  
-  constructor(type: number, name: string, icon: Resource) {
-    this.type = type;
-    this.name = name;
-    this.icon = icon;
-  }
-}
-
-interface GroupedRecord {
-  date: string;
-  records: CheckInRecord[];
-}
 
 @Entry
 @Component
 export struct DrinkHistoryPage {
+  private scroller: Scroller = new Scroller();
+  @State scrollY: number = 0;
+  @State listHeight: number = 0;
+
   @State records: CheckInRecord[] = [];
 
-  readonly DRINKS: DrinkOption[] = [
-    new DrinkOption(0, '水', $r('app.media.ic_drink_water')),
-    new DrinkOption(1, '咖啡', $r('app.media.ic_drink_coffee')),
-    new DrinkOption(2, '绿茶', $r('app.media.ic_drink_tea')),
-    new DrinkOption(3, '牛奶', $r('app.media.ic_drink_milk')),
-    new DrinkOption(4, '果汁', $r('app.media.ic_drink_juice')),
-    new DrinkOption(5, '柠檬茶', $r('app.media.ic_drink_lemon')),
-    new DrinkOption(6, '运动饮料', $r('app.media.ic_drink_sports')),
-    new DrinkOption(7, '气泡水', $r('app.media.ic_drink_sparkling')),
-    new DrinkOption(8, '椰子水', $r('app.media.ic_drink_coconut')),
-    new DrinkOption(9, '花茶', $r('app.media.ic_drink_herbal')),
-    new DrinkOption(10, '热可可', $r('app.media.ic_drink_cocoa')),
-    new DrinkOption(11, '补剂', $r('app.media.ic_drink_bottle'))
-  ];
+  readonly DRINKS: DrinkOption[] = GLOBAL_DRINKS;
 
   aboutToAppear() {
     this.loadData();
@@ -51,65 +26,61 @@ export struct DrinkHistoryPage {
     }
   }
 
-  getGroupedRecords(): GroupedRecord[] {
-    const map = new Map<string, CheckInRecord[]>();
-    for (const r of this.records) {
-      const d = new Date(r.timestamp);
-      const dateStr = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
-      if (!map.has(dateStr)) {
-        map.set(dateStr, []);
-      }
-      map.get(dateStr)!.push(r);
-    }
-    const result: GroupedRecord[] = [];
-    map.forEach((records, date) => {
-      result.push({ date, records });
-    });
-    return result;
-  }
-
   getDrinkInfo(type: number): DrinkOption {
     const found = this.DRINKS.find(d => d.type === type);
     return found || this.DRINKS[0]; // fallback
   }
 
-  @Builder itemHead(text: string) {
-    Row() {
-      Text(text)
-        .fontSize(16)
-        .fontWeight(FontWeight.Bold)
-        .fontColor('#666666')
-    }
-    .width('100%')
-    .padding({ left: 20, top: 20, bottom: 10 })
-    .backgroundColor('#F5F7FA')
+  formatDate(timestamp: number): string {
+    const d = new Date(timestamp);
+    const m = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day = d.getDate().toString().padStart(2, '0');
+    const h = d.getHours().toString().padStart(2, '0');
+    const min = d.getMinutes().toString().padStart(2, '0');
+    return `${m}-${day} ${h}:${min}`;
   }
 
-  @Builder RecordCard(item: CheckInRecord) {
-    Row() {
-      Text(`${this.getDrinkInfo(item.type).name} ${item.value}ml`)
-        .fontSize(22)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(Color.White)
-        .layoutWeight(1)
-        .margin({ left: 25 })
-      
-      Image(this.getDrinkInfo(item.type).icon)
-        .width(50)
-        .height(50)
-        .margin({ right: 25 })
-        .opacity(0.9)
-        .fillColor(Color.White)
-    }
-    .width('100%')
-    .height(100)
-    .borderRadius(20)
-    .linearGradient({
-      direction: GradientDirection.Right,
-      colors: [['#8ECAE6', 0.0], ['#219EBC', 1.0]] // 浅蓝色渐变 (同喝水卡片)
-    })
-    .shadow({ radius: 12, color: '#4D219EBC', offsetY: 6 })
-    .margin({ top: 10, bottom: 10 })
+  getTranslateY(index: number, scrollY: number, listHeight: number): number {
+    let cardTop = index * 120; // 100 height + 20 space
+    let cardBottom = cardTop + 100;
+    let deltaTop = scrollY - cardTop;
+    let deltaBottom = cardBottom - (scrollY + listHeight);
+
+    if (deltaTop > 0) return deltaTop * 0.9;
+    if (deltaBottom > 0 && listHeight > 0) return -deltaBottom * 0.9;
+    return 0;
+  }
+
+  getScale(index: number, scrollY: number, listHeight: number): number {
+    let cardTop = index * 120;
+    let cardBottom = cardTop + 100;
+    let deltaTop = scrollY - cardTop;
+    let deltaBottom = cardBottom - (scrollY + listHeight);
+
+    if (deltaTop > 0) return Math.max(0.8, 1 - deltaTop * 0.0005);
+    if (deltaBottom > 0 && listHeight > 0) return Math.max(0.8, 1 - deltaBottom * 0.0005);
+    return 1;
+  }
+
+  getOpacity(index: number, scrollY: number, listHeight: number): number {
+    let cardTop = index * 120;
+    let cardBottom = cardTop + 100;
+    let deltaTop = scrollY - cardTop;
+    let deltaBottom = cardBottom - (scrollY + listHeight);
+
+    if (deltaTop > 0) return Math.max(0, 1 - deltaTop * 0.002);
+    if (deltaBottom > 0 && listHeight > 0) return Math.max(0, 1 - deltaBottom * 0.002);
+    return 1;
+  }
+
+  getShadowRadius(index: number, scrollY: number, listHeight: number): number {
+    let cardTop = index * 120;
+    let cardBottom = cardTop + 100;
+    let deltaTop = scrollY - cardTop;
+    let deltaBottom = cardBottom - (scrollY + listHeight);
+
+    if (deltaTop > 0 || (deltaBottom > 0 && listHeight > 0)) return 20;
+    return 12;
   }
 
   build() {
@@ -131,24 +102,78 @@ export struct DrinkHistoryPage {
       .height(56)
       .padding({ left: 20, right: 20 })
 
-      List() {
-        ForEach(this.getGroupedRecords(), (group: GroupedRecord) => {
-          ListItemGroup({ header: this.itemHead(group.date) }) {
-            ForEach(group.records, (item: CheckInRecord) => {
-              ListItem() {
-                this.RecordCard(item)
+      List({ space: 20, scroller: this.scroller }) {
+        ForEach(this.records, (item: CheckInRecord, index: number) => {
+          ListItem() {
+            Row() {
+              Column() {
+                Text(`${this.getDrinkInfo(item.type).name} ${item.value}ml`)
+                  .fontSize(22)
+                  .fontWeight(FontWeight.Bold)
+                  .fontColor(Color.White)
+                
+                Text(this.formatDate(item.timestamp))
+                  .fontSize(14)
+                  .fontColor('rgba(255, 255, 255, 0.8)')
+                  .margin({ top: 8 })
               }
-              .padding({ left: 20, right: 20 })
-            }, (item: CheckInRecord) => item.id?.toString() || item.timestamp.toString())
+              .alignItems(HorizontalAlign.Start)
+              .layoutWeight(1)
+              .margin({ left: 25 })
+              
+              Image(this.getDrinkInfo(item.type).icon)
+                .width(50)
+                .height(50)
+                .margin({ right: 25 })
+                .opacity(0.9)
+                .fillColor(Color.White)
+            }
+            .width('100%')
+            .height(100)
+            .borderRadius(20)
+            .linearGradient({
+              direction: GradientDirection.Right,
+              colors: [['#8ECAE6', 0.0], ['#219EBC', 1.0]]
+            })
+            .shadow({ 
+               radius: this.getShadowRadius(index, this.scrollY, this.listHeight), 
+               color: this.getShadowRadius(index, this.scrollY, this.listHeight) > 12 ? 'rgba(0,0,0,0.3)' : '#4D219EBC', 
+               offsetY: this.getShadowRadius(index, this.scrollY, this.listHeight) > 12 ? 10 : 6 
+            })
           }
-        }, (group: GroupedRecord) => group.date)
+          .zIndex(index)
+          .translate({ y: this.getTranslateY(index, this.scrollY, this.listHeight) })
+          .scale({
+             x: this.getScale(index, this.scrollY, this.listHeight),
+             y: this.getScale(index, this.scrollY, this.listHeight)
+          })
+          .opacity(this.getOpacity(index, this.scrollY, this.listHeight))
+        }, (item: CheckInRecord) => item.id?.toString() || item.timestamp.toString())
       }
       .width('100%')
       .layoutWeight(1)
+      .padding({ left: 20, right: 20, bottom: 20, top: 10 })
       .scrollBar(BarState.Off)
+      .onAreaChange((oldValue: Area, newValue: Area) => {
+        this.listHeight = newValue.height as number;
+      })
+      .onScroll(() => {
+        this.scrollY = this.scroller.currentOffset().yOffset;
+      })
     }
     .width('100%')
     .height('100%')
     .backgroundColor('#F5F7FA')
+  }
+
+  // 页面转场动画定义
+  pageTransition() {
+    PageTransitionEnter({ type: RouteType.Push, duration: 400, curve: Curve.Linear })
+      .opacity(0)
+      .scale({ x: 1.0, y: 1.0 })
+    
+    PageTransitionExit({ type: RouteType.Pop, duration: 400, curve: Curve.Linear })
+      .opacity(0)
+      .scale({ x: 0.8, y: 0.8 })
   }
 }

@@ -33,6 +33,14 @@ export struct HomePage {
   
   private currentDate: string = '';
 
+  @Prop @Watch('onTabChange') currentTabIndex: number = 0;
+
+  onTabChange() {
+    if (this.currentTabIndex === 0) {
+      this.initData();
+    }
+  }
+
   onPageShow() {
     if (this.userId > 0) {
       // 每次页面展示时，重新查询当天的喝水量，确保打卡返回后能实时刷新

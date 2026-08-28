@@ -168,6 +168,8 @@ export class RdbHelper {
     let predicates = new relationalStore.RdbPredicates('record');
     predicates.equalTo('userId', userId)
       .and()
+      .equalTo('type', 0)
+      .and()
       .greaterThanOrEqualTo('timestamp', startOfDay)
       .and()
       .lessThanOrEqualTo('timestamp', endOfDay);
@@ -275,6 +277,23 @@ export class RdbHelper {
     }
     resultSet.close();
     return records;
+  }
+
+  // 删除假数据
+  public async deleteMockCheckIns(userId: number) {
+    if (!this.rdbStore) return;
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const daysToSeed = [1,2,3,4,5,6,7,8,9, 20,21,22,23,24,25,26,27,28];
+    for (let day of daysToSeed) {
+      const d = new Date(year, month, day, 10, 0, 0);
+      let predicates = new relationalStore.RdbPredicates('record');
+      predicates.equalTo('userId', userId);
+      predicates.equalTo('type', 4);
+      predicates.equalTo('timestamp', d.getTime());
+      await this.rdbStore.delete(predicates);
+    }
   }
 }
 

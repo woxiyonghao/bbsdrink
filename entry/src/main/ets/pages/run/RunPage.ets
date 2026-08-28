@@ -1,14 +1,5 @@
 import router from '@ohos.router';
-
-interface ActivityItem {
-  name: string;
-  duration: string;
-  color1: string;
-  color2: string;
-  progress: number;
-  icon: ResourceStr;
-  isEmoji?: boolean;
-}
+import { ActivityItem, GLOBAL_ACTIVITIES } from '../../types';
 
 @Entry
 @Component
@@ -17,23 +8,7 @@ export struct RunPage {
   @State scrollY: number = 0;
   @State listHeight: number = 0;
 
-  @State activities: ActivityItem[] = [
-    { name: '伸懒腰', duration: '1分钟', color1: '#FFB75E', color2: '#ED8F03', progress: 0, icon: '🙆', isEmoji: true },
-    { name: '接杯水', duration: '3分钟', color1: '#8ECAE6', color2: '#219EBC', progress: 0, icon: $r('app.media.ic_cup_water') },
-    { name: '颈椎操', duration: '5分钟', color1: '#A8E063', color2: '#56AB2F', progress: 0, icon: $r('app.media.ic_sit_record') },
-    { name: '喝杯咖啡', duration: '5分钟', color1: '#D4A373', color2: '#A98467', progress: 0, icon: $r('app.media.ic_drink_coffee') },
-    { name: '眼保健操', duration: '5分钟', color1: '#FFD166', color2: '#F4A261', progress: 0, icon: '💆', isEmoji: true },
-    { name: '吃点水果', duration: '5分钟', color1: '#EF476F', color2: '#D90429', progress: 0, icon: '🍎', isEmoji: true },
-    { name: '喝杯牛奶', duration: '3分钟', color1: '#8ECAE6', color2: '#0077B6', progress: 0, icon: $r('app.media.ic_drink_milk') },
-    { name: '眺望窗外', duration: '2分钟', color1: '#06D6A0', color2: '#00A896', progress: 0, icon: '🏞️', isEmoji: true },
-    { name: '闭目养神', duration: '3分钟', color1: '#FF758C', color2: '#FF7EB3', progress: 0, icon: '🧘', isEmoji: true },
-    { name: '喝杯果汁', duration: '3分钟', color1: '#FF9A9E', color2: '#FECFEF', progress: 0, icon: $r('app.media.ic_drink_juice') },
-    { name: '站起来动动', duration: '3分钟', color1: '#A8E063', color2: '#56AB2F', progress: 0, icon: '🤸', isEmoji: true },
-    { name: '深蹲一下', duration: '3分钟', color1: '#FFB75E', color2: '#ED8F03', progress: 0, icon: '🏋️', isEmoji: true },
-    { name: '楼下走走', duration: '10分钟', color1: '#06D6A0', color2: '#00A896', progress: 0, icon: $r('app.media.ic_sport_white') },
-    { name: '喝杯茶', duration: '10分钟', color1: '#90E0EF', color2: '#0077B6', progress: 0, icon: $r('app.media.ic_drink_tea') },
-    { name: '跑一下', duration: '15分钟', color1: '#118AB2', color2: '#073B4C', progress: 0, icon: $r('app.media.ic_sport_white') }
-  ];
+  @State activities: ActivityItem[] = GLOBAL_ACTIVITIES.map(item => item.clone());
 
   aboutToAppear() {
     setTimeout(() => {
@@ -150,7 +125,8 @@ export struct RunPage {
                   Image(item.icon)
                     .width(32)
                     .height(32)
-                    .fillColor(Color.White)
+                    .fillColor(item.noFill ? undefined : Color.White)
+                    .borderRadius(item.noFill ? 16 : 0)
                 }
               }
               .margin({ right: 25 })
@@ -180,9 +156,16 @@ export struct RunPage {
             })
             .animation({ duration: 200, curve: Curve.Friction })
             .onClick(() => {
-              animateTo({ duration: 500 }, () => {
-                this.activities[index].progress = 100;
-              })
+              if (item.drinkType !== undefined) {
+                router.pushUrl({
+                  url: 'pages/ding/DrinkRecordPage',
+                  params: { defaultType: item.drinkType }
+                });
+              } else {
+                animateTo({ duration: 500 }, () => {
+                  this.activities[index].progress = 100;
+                })
+              }
             })
           }
           .zIndex(index) // 保证层叠顺序正确
