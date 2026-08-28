@@ -175,14 +175,32 @@ export struct HomePage {
           .alignItems(HorizontalAlign.Start)
           Blank()
           
-          // 设置按钮
-          Image($r('app.media.ic_settings_white'))
-            .width(24)
-            .height(24)
-            .fillColor('#333333')
+          // 海报分享 & 成就墙 按钮
+          Row({ space: 12 }) {
+            // 成就墙按钮
+            Row() {
+              Text('🏆').fontSize(16)
+            }
+            .width(36).height(36)
+            .justifyContent(FlexAlign.Center)
+            .backgroundColor('#F5F7FA')
+            .borderRadius(18)
             .onClick(() => {
-              router.pushUrl({ url: 'pages/mine/SettingPage' });
+              promptAction.showToast({ message: '健康成就墙功能即将开放！' });
             })
+
+            // 分享海报按钮
+            Row() {
+              Text('📸').fontSize(16)
+            }
+            .width(36).height(36)
+            .justifyContent(FlexAlign.Center)
+            .backgroundColor('#F5F7FA')
+            .borderRadius(18)
+            .onClick(() => {
+              promptAction.showToast({ message: '每日健康海报功能即将开放！' });
+            })
+          }
         }
         .width('100%')
         .padding({ left: 24, right: 24, top: 20, bottom: 10 })
