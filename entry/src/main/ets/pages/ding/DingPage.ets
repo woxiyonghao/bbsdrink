@@ -4,12 +4,12 @@ import PreferencesUtil from '../../store/PreferencesUtil';
 import RdbHelper from '../../store/RdbHelper';
 
 class HabitTask {
-  title: string;
-  subtitle: string;
-  emoji: string;
-  colorStart: string;
-  colorEnd: string;
-  shadowColor: string;
+  title: string = '';
+  subtitle: string = '';
+  emoji: string = '';
+  colorStart: string = '';
+  colorEnd: string = '';
+  shadowColor: string = '';
 }
 
 const HABIT_TASKS: HabitTask[] = [
@@ -246,7 +246,7 @@ export struct DingPage {
                 .height(130)
                 .borderRadius(20)
                 .linearGradient({
-                  direction: GradientDirection.BottomRight,
+                  direction: GradientDirection.RightBottom,
                   colors: [[item.colorStart, 0.0], [item.colorEnd, 1.0]]
                 })
                 .shadow({ radius: 10, color: item.shadowColor, offsetY: 6 })
