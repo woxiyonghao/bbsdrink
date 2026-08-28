@@ -2,6 +2,7 @@ import promptAction from '@ohos.promptAction';
 import router from '@ohos.router';
 import PreferencesUtil from '../../store/PreferencesUtil';
 import RdbHelper from '../../store/RdbHelper';
+import { DrinkDialog } from './DrinkDialog';
 
 @Entry
 @Component
@@ -9,6 +10,17 @@ export struct DingPage {
   @State userId: number = -1;
   @State isCheckedIn: boolean = false;
   @State shakeAngle: number = 0;
+  
+  drinkDialogController: CustomDialogController = new CustomDialogController({
+    builder: DrinkDialog({
+      onConfirm: () => {
+        // 更新 UI 状态可以放在这里，如果需要的话
+      }
+    }),
+    alignment: DialogAlignment.Bottom,
+    customStyle: true,
+    offset: { dx: 0, dy: -20 }
+  });
   
   // 动效：泼洒飞溅的液滴 (更加写实的轨迹)
   @State splashLeftX: number = 0;
@@ -220,7 +232,7 @@ export struct DingPage {
         })
         .shadow({ radius: 12, color: '#4D219EBC', offsetY: 6 })
         .onClick(() => {
-          promptAction.showToast({ message: '功能未开发，请稍等。' });
+          this.drinkDialogController.open();
         })
 
         // 久坐运动卡片
