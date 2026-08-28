@@ -162,26 +162,21 @@ export struct DrinkRecordPage {
 
 
       // ==========================================
-      // 下半部分：底部水平变焦表盘 (半透明暗色模式)
+      // 下半部分：底部水平变焦表盘 (清透毛玻璃模式)
       // ==========================================
       Stack({ alignContent: Alignment.Bottom }) {
-        // 暗黑半圆形背景 (带透明度和毛玻璃)
+        // Tabs 同款毛玻璃半圆形背景
         Ellipse()
           .width('150%')
           .height(400)
-          .fill('rgba(0, 0, 0, 0.4)') // 黑色，透明度0.4
+          .fill('rgba(7, 193, 96, 0.15)') // 淡淡的主题绿色
+          .strokeWidth(0.5)
+          .stroke('rgba(255, 255, 255, 0.6)') // 边缘高光
           .backgroundBlurStyle(BlurStyle.Thin) // 毛玻璃效果
+          .backdropBlur(30) // 增强原生模糊
           .margin({ bottom: -120 })
 
         Column() {
-          // 中心白点指示器
-          Row()
-            .width(4)
-            .height(4)
-            .borderRadius(2)
-            .backgroundColor('#FFFFFF')
-            .margin({ bottom: 2 })
-
           // 水平滚轮列表
           List({ scroller: this.scroller }) {
             ListItem().width(140)
@@ -192,12 +187,12 @@ export struct DrinkRecordPage {
                   Image(item.icon)
                     .width(this.selectedIndex === index ? 32 : 20)
                     .height(this.selectedIndex === index ? 32 : 20)
-                    .fillColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.8)' : '#FFFFFF') // 选中淡淡微信绿，未选中白色
+                    .fillColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.8)' : '#999999') // 选中淡淡微信绿，未选中灰色
                     .animation({ duration: 200 })
 
                   Text(item.name)
                     .fontSize(this.selectedIndex === index ? 14 : 11)
-                    .fontColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.8)' : '#FFFFFF')
+                    .fontColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.8)' : '#999999')
                     .fontWeight(this.selectedIndex === index ? FontWeight.Bold : FontWeight.Normal)
                     .margin({ top: 8 })
                     .animation({ duration: 200 })
@@ -240,8 +235,9 @@ export struct DrinkRecordPage {
           }
           .width(72)
           .height(72)
-          .backgroundColor('rgba(7, 193, 96, 0.6)') // 底色是淡淡的微信绿
+          .backgroundColor('rgba(7, 193, 96, 0.8)') // 微信绿底色
           .margin({ top: 10, bottom: 30 })
+          .shadow({ radius: 10, color: 'rgba(7, 193, 96, 0.2)', offsetY: 4 })
           .onClick(() => {
             this.handleDrink();
           })
