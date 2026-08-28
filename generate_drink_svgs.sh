@@ -29,6 +29,3 @@ SVGEOF
 cat << 'SVGEOF' > $DIR/ic_drink_bottle.svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#333333"><path d="M17 10h-1V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v5H7c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-9c0-1.1-.9-2-2-2zM10 5h4v5h-4V5z"/></svg>
 SVGEOF
-
-chmod +x generate_drink_svgs.sh
-./generate_drink_svgs.sh
