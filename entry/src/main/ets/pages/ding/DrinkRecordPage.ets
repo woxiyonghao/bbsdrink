@@ -186,7 +186,7 @@ export struct DrinkRecordPage {
       // ==========================================
       // 右侧 iPhone 变焦滚轮 (绝对定位)
       // ==========================================
-      Stack({ alignContent: Alignment.CenterRight }) {
+      Stack({ alignContent: Alignment.End }) {
         // 绿色弧线轨道
         Path()
           .commands('M30,0 Q-30,150 30,300')
