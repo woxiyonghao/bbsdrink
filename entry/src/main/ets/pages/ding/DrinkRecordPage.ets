@@ -31,22 +31,12 @@ struct BubbleView {
   @Prop bubbleOpacity: number;
 
   build() {
-    Circle({ width: this.bubbleSize, height: this.bubbleSize })
-      .fill('transparent')
-      .stroke('rgba(255, 255, 255, 0.8)')
-      .strokeWidth(this.bubbleSize > 30 ? 1.5 : 1)
-      .radialGradient({
-        center: ['30%', '30%'],
-        radius: '70%',
-        colors: [
-          ['rgba(255, 255, 255, 0.9)', 0.0],
-          ['rgba(100, 255, 255, 0.2)', 0.2],
-          ['rgba(200, 150, 255, 0.3)', 0.7],
-          ['rgba(255, 255, 255, 0.8)', 1.0]
-        ]
-      })
+    Image($r('app.media.paopao'))
+      .width(this.bubbleSize)
+      .height(this.bubbleSize)
       .position({ x: `${this.x}%`, y: `${this.y}%` })
       .opacity(this.bubbleOpacity)
+      .blendMode(BlendMode.Multiply) // 如果是白底图片，Multiply可以让白色变透明！
       .hitTestBehavior(HitTestMode.None)
   }
 }
@@ -206,10 +196,15 @@ export struct DrinkRecordPage {
         .backgroundColor('#29C5F6')
 
       // 汽水气泡层
-      // 汽水气泡层 (升级为肥皂泡质感)
-      ForEach(this.bubbles, (b: Bubble) => {
-        BubbleView({ x: b.x, y: b.y, bubbleSize: b.size, bubbleOpacity: b.opacity })
-      }, (b: Bubble) => b.id.toString())
+      // 汽水气泡层 (全屏容器，确保百分比坐标正确)
+      Stack({ alignContent: Alignment.TopStart }) {
+        ForEach(this.bubbles, (b: Bubble) => {
+          BubbleView({ x: b.x, y: b.y, bubbleSize: b.size, bubbleOpacity: b.opacity })
+        }, (b: Bubble) => b.id.toString())
+      }
+      .width('100%')
+      .height('100%')
+      .hitTestBehavior(HitTestMode.None)
 
       Column() {
         // 顶部导航
