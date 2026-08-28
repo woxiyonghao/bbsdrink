@@ -175,35 +175,14 @@ export struct HomePage {
           .alignItems(HorizontalAlign.Start)
           Blank()
           
-          // 签到按钮
-          Row() {
-            Image($r('app.media.ic_check_record')).width(16).height(16).fillColor(this.hasCheckedIn ? '#FFFFFF' : '#07C160')
-            Text(this.hasCheckedIn ? '已签到' : '签到')
-              .fontSize(14)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(this.hasCheckedIn ? '#FFFFFF' : '#07C160')
-              .margin({ left: 4 })
-          }
-          .padding({ left: 12, right: 12, top: 8, bottom: 8 })
-          .backgroundColor(this.hasCheckedIn ? '#07C160' : 'rgba(7, 193, 96, 0.15)')
-          .borderRadius(16)
-          .onClick(async () => {
-            if (!this.hasCheckedIn) {
-              if (this.userId > 0) {
-                await RdbHelper.insertRecord({
-                  userId: this.userId,
-                  type: 4, // 每日签到
-                  value: 1,
-                  timestamp: new Date().getTime()
-                });
-              }
-              this.hasCheckedIn = true;
-              promptAction.showToast({ message: '签到成功！' });
-            } else {
-              // 已经签到了，跳到签到日历页
-              router.pushUrl({ url: 'pages/home/CheckInCalendarPage' });
-            }
-          })
+          // 设置按钮
+          Image($r('app.media.ic_settings_white'))
+            .width(24)
+            .height(24)
+            .fillColor('#333333')
+            .onClick(() => {
+              router.pushUrl({ url: 'pages/mine/SettingPage' });
+            })
         }
         .width('100%')
         .padding({ left: 24, right: 24, top: 20, bottom: 10 })
