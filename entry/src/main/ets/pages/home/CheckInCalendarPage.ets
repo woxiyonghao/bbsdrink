@@ -88,84 +88,92 @@ export struct CheckInCalendarPage {
       .padding({ left: 16, right: 16 })
       .backgroundColor('#FFFFFF')
 
-      // 日历卡片
-      Column() {
-        // 月份 Header
-        Row() {
-          Text(`${this.currentYear}年 ${this.currentMonth + 1}月`)
-            .fontSize(20)
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#333333')
-        }
-        .width('100%')
-        .padding({ left: 16, right: 16, top: 24, bottom: 20 })
-        .justifyContent(FlexAlign.Center)
+      Scroll() {
+        Column() {
+          // 日历卡片
+          Column() {
+            // 月份 Header
+            Row() {
+              Text(`${this.currentYear}年 ${this.currentMonth + 1}月`)
+                .fontSize(20)
+                .fontWeight(FontWeight.Bold)
+                .fontColor('#333333')
+            }
+            .width('100%')
+            .padding({ left: 16, right: 16, top: 24, bottom: 20 })
+            .justifyContent(FlexAlign.Center)
 
-        // 星期栏
-        Row() {
-          ForEach(['日', '一', '二', '三', '四', '五', '六'], (day: string) => {
-            Text(day)
-              .fontSize(14)
-              .fontColor('#999999')
-              .layoutWeight(1)
+            // 星期栏
+            Row() {
+              ForEach(['日', '一', '二', '三', '四', '五', '六'], (day: string) => {
+                Text(day)
+                  .fontSize(14)
+                  .fontColor('#999999')
+                  .layoutWeight(1)
+                  .textAlign(TextAlign.Center)
+              })
+            }.width('100%').margin({ bottom: 20 })
+
+            // 日期网格
+            Grid() {
+              // 填充第一周的空白天数
+              ForEach(new Array(this.firstDayOfWeek).fill(0), () => {
+                GridItem() {
+                  Text('').width(36).height(36)
+                }
+              })
+              
+              // 实际天数
+              ForEach(this.daysInMonth, (day: number) => {
+                GridItem() {
+                  Text(`${day}`)
+                    .width(36)
+                    .height(36)
+                    .fontSize(16)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor(this.checkInDays.has(day) ? '#FFFFFF' : '#333333')
+                    .backgroundColor(this.checkInDays.has(day) ? '#07C160' : 'transparent')
+                    .borderRadius(18)
+                    .textAlign(TextAlign.Center)
+                    .lineHeight(36)
+                }
+              })
+            }
+            .columnsTemplate('1fr 1fr 1fr 1fr 1fr 1fr 1fr')
+            .rowsGap(16)
+            .width('100%')
+            .height(300) // 固定日历的高度以防 Grid 无限拉伸
+            .padding({ left: 16, right: 16, bottom: 32 })
+          }
+          .width('90%')
+          .backgroundColor('#FFFFFF')
+          .borderRadius(24)
+          .margin({ top: 24, bottom: 30 })
+          .shadow({ radius: 20, color: 'rgba(0, 0, 0, 0.04)', offsetY: 8 })
+
+          // 每日金句
+          Column() {
+            Image($r('app.media.ic_about')) 
+              .width(24)
+              .height(24)
+              .fillColor('#D3D3D3')
+              .margin({ bottom: 12 })
+              
+            Text(this.dailyQuote)
+              .fontSize(16)
+              .fontColor('#666666')
+              .fontStyle(FontStyle.Italic)
               .textAlign(TextAlign.Center)
-          })
-        }.width('100%').margin({ bottom: 20 })
-
-        // 日期网格
-        Grid() {
-          // 填充第一周的空白天数
-          ForEach(new Array(this.firstDayOfWeek).fill(0), () => {
-            GridItem() {
-              Text('').width(36).height(36)
-            }
-          })
-          
-          // 实际天数
-          ForEach(this.daysInMonth, (day: number) => {
-            GridItem() {
-              Text(`${day}`)
-                .width(36)
-                .height(36)
-                .fontSize(16)
-                .fontWeight(FontWeight.Medium)
-                .fontColor(this.checkInDays.has(day) ? '#FFFFFF' : '#333333')
-                .backgroundColor(this.checkInDays.has(day) ? '#07C160' : 'transparent')
-                .borderRadius(18)
-                .textAlign(TextAlign.Center)
-                .lineHeight(36)
-            }
-          })
+              .lineHeight(26)
+              .padding({ left: 30, right: 30 })
+          }
+          .width('100%')
+          .margin({ top: 10, bottom: 40 })
         }
-        .columnsTemplate('1fr 1fr 1fr 1fr 1fr 1fr 1fr')
-        .rowsGap(16)
         .width('100%')
-        .padding({ left: 16, right: 16, bottom: 32 })
       }
-      .width('90%')
-      .backgroundColor('#FFFFFF')
-      .borderRadius(24)
-      .margin({ top: 24, bottom: 30 })
-      .shadow({ radius: 20, color: 'rgba(0, 0, 0, 0.04)', offsetY: 8 })
-
-      // 每日金句
-      Column() {
-        Image($r('app.media.ic_about')) // 可以用类似引号或者信息的图标，这里先借用一个
-          .width(24)
-          .height(24)
-          .fillColor('#D3D3D3')
-          .margin({ bottom: 12 })
-          
-        Text(this.dailyQuote)
-          .fontSize(16)
-          .fontColor('#666666')
-          .fontStyle(FontStyle.Italic)
-          .textAlign(TextAlign.Center)
-          .lineHeight(26)
-          .padding({ left: 30, right: 30 })
-      }
-      .width('100%')
-      .margin({ top: 20 })
+      .layoutWeight(1) // Scroll 占满剩余屏幕
+      .scrollBar(BarState.Off)
     }
     .width('100%')
     .height('100%')
