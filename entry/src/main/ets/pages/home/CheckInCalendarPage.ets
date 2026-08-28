@@ -1,6 +1,7 @@
 import router from '@ohos.router';
 import PreferencesUtil from '../../store/PreferencesUtil';
 import RdbHelper from '../../store/RdbHelper';
+import { SeedData } from '../../store/SeedData';
 
 const CALENDAR_QUOTES = [
   "每一个不曾起舞的日子，都是对生命的辜负。", "健康不是一切，但没有健康就没有一切。", "流水不腐，户枢不蠹，动也。", "投资健康，是回报率最高的一笔交易。", "你的身体是一座神庙，请好好供奉它。",
@@ -26,8 +27,10 @@ export struct CheckInCalendarPage {
   @State daysInMonth: number[] = [];
   @State firstDayOfWeek: number = 0; // 0 是周日
   @State dailyQuote: string = '';
+  @State todayDay: number = new Date().getDate();
 
   async aboutToAppear() {
+    await SeedData.seedMockCheckIns();
     this.generateCalendar();
     this.generateDailyQuote();
     await this.loadCheckInData();
@@ -126,16 +129,39 @@ export struct CheckInCalendarPage {
               // 实际天数
               ForEach(this.daysInMonth, (day: number) => {
                 GridItem() {
-                  Text(`${day}`)
-                    .width(36)
-                    .height(36)
-                    .fontSize(16)
-                    .fontWeight(FontWeight.Medium)
-                    .fontColor(this.checkInDays.has(day) ? '#FFFFFF' : '#333333')
-                    .backgroundColor(this.checkInDays.has(day) ? '#07C160' : 'transparent')
-                    .borderRadius(18)
-                    .textAlign(TextAlign.Center)
-                    .lineHeight(36)
+                  Stack() {
+                    // 连接条 (如果当前天已签到)
+                    if (this.checkInDays.has(day)) {
+                      Row() {
+                        // 左半边连线 (昨天也签到了并且自己不是周日第一列)
+                        Row()
+                          .width('50%')
+                          .height(36)
+                          .backgroundColor((day > 1 && this.checkInDays.has(day - 1) && ((this.firstDayOfWeek + day - 1) % 7 !== 0)) ? '#07C160' : 'transparent')
+                        // 右半边连线 (明天也签到了并且自己不是周六最后一列)
+                        Row()
+                          .width('50%')
+                          .height(36)
+                          .backgroundColor((day < this.daysInMonth.length && this.checkInDays.has(day + 1) && ((this.firstDayOfWeek + day - 1) % 7 !== 6)) ? '#07C160' : 'transparent')
+                      }
+                      .width('100%')
+                      .height(36)
+                    }
+
+                    // 圆形本体和文字
+                    Text(day === this.todayDay ? '今' : `${day}`)
+                      .width(36)
+                      .height(36)
+                      .fontSize(day === this.todayDay ? 14 : 16)
+                      .fontWeight(FontWeight.Medium)
+                      .fontColor(this.checkInDays.has(day) ? '#FFFFFF' : (day < this.todayDay ? '#CCCCCC' : '#333333'))
+                      .backgroundColor(this.checkInDays.has(day) ? '#07C160' : 'transparent')
+                      .borderRadius(18)
+                      .textAlign(TextAlign.Center)
+                      .lineHeight(36)
+                  }
+                  .width('100%')
+                  .height(36)
                 }
               })
             }
@@ -146,7 +172,8 @@ export struct CheckInCalendarPage {
             .padding({ left: 16, right: 16, bottom: 32 })
           }
           .width('90%')
-          .backgroundColor('#FFFFFF')
+          .backgroundColor('rgba(255, 255, 255, 0.65)')
+          .backgroundBlurStyle(BlurStyle.Thin)
           .borderRadius(24)
           .margin({ top: 24, bottom: 30 })
           .shadow({ radius: 20, color: 'rgba(0, 0, 0, 0.04)', offsetY: 8 })
