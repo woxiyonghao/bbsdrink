@@ -1,3 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#333333">
-  <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFFFFF">
+  <!-- Simple profile facing right -->
+  <path d="M11 2c-3.3 0-6 2.7-6 6 0 2 .9 3.7 2.4 4.8L8 20h6l.6-7.2c1.5-1.1 2.4-2.8 2.4-4.8 0-3.3-2.7-6-6-6z" opacity="0.6"/>
+  <!-- Tilted bottle near mouth -->
+  <path d="M22 10.5l-2-2V6h-2v2.5l-2 2V12h6v-1.5zM17 13h4v6c0 1.1-.9 2-2 2s-2-.9-2-2v-6z"/>
 </svg>

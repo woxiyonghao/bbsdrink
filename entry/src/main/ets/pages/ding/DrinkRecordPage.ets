@@ -187,12 +187,12 @@ export struct DrinkRecordPage {
                   Image(item.icon)
                     .width(28) 
                     .height(28)
-                    .fillColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.8)' : '#999999') // 浅色底座，所以未选中用灰色，选中用微信绿
+                    .fillColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.4)' : '#FFFFFF') // 选中更淡的绿，未选中白
                     .animation({ duration: 200 })
 
                   Text(item.name)
                     .fontSize(this.selectedIndex === index ? 14 : 11)
-                    .fontColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.8)' : '#999999')
+                    .fontColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.4)' : '#FFFFFF')
                     .fontWeight(this.selectedIndex === index ? FontWeight.Bold : FontWeight.Normal)
                     .margin({ top: 8 })
                     .animation({ duration: 200 })
@@ -235,9 +235,9 @@ export struct DrinkRecordPage {
           }
           .width(72)
           .height(72)
-          .linearGradient({ // 小小的渐变色
+          .linearGradient({ // 小小的淡绿渐变色
             direction: GradientDirection.Bottom,
-            colors: [['rgba(7, 193, 96, 0.2)', 0.0], ['rgba(7, 193, 96, 0.6)', 1.0]]
+            colors: [['rgba(7, 193, 96, 0.1)', 0.0], ['rgba(7, 193, 96, 0.5)', 1.0]]
           })
           .margin({ top: 10, bottom: 30 })
           .shadow({ radius: 10, color: 'rgba(7, 193, 96, 0.2)', offsetY: 4 })
