@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+svg = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <!-- Head -->
   <circle cx="9" cy="7" r="4" />
   <!-- Body -->
@@ -9,4 +9,7 @@
   <path d="M12 16.5 Q14.5 16.5 16.5 13" />
   <!-- Straw -->
   <path d="M15 8 L13 7.5" />
-</svg>
+</svg>"""
+
+with open("entry/src/main/resources/base/media/ic_action_drink2.svg", "w") as f:
+    f.write(svg)

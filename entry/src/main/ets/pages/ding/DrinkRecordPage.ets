@@ -234,7 +234,7 @@ export struct DrinkRecordPage {
           }
           .width(72)
           .height(72)
-          .backgroundColor('rgba(7, 193, 96, 0.2)') // 底座的淡绿作为背景色
+          .backgroundColor('rgba(7, 193, 96, 0.5)') // 背景色再绿一点
           .margin({ top: 10, bottom: 30 })
           .shadow({ radius: 10, color: 'rgba(7, 193, 96, 0.1)', offsetY: 4 })
           .onClick(() => {
