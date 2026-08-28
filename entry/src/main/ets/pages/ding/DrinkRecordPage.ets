@@ -32,12 +32,12 @@ export struct DrinkRecordPage {
     new DrinkOption(2, '绿茶', $r('app.media.ic_drink_tea')),
     new DrinkOption(3, '牛奶', $r('app.media.ic_drink_milk')),
     new DrinkOption(4, '果汁', $r('app.media.ic_drink_juice')),
-    new DrinkOption(5, '可乐', $r('app.media.ic_drink_cola')),
-    new DrinkOption(6, '啤酒', $r('app.media.ic_drink_beer')),
-    new DrinkOption(7, '红酒', $r('app.media.ic_drink_wine')),
-    new DrinkOption(8, '马黛茶', $r('app.media.ic_drink_mate')),
-    new DrinkOption(9, '鸡尾酒', $r('app.media.ic_drink_cocktail')),
-    new DrinkOption(10, '清酒', $r('app.media.ic_drink_sake')),
+    new DrinkOption(5, '柠檬茶', $r('app.media.ic_drink_lemon')),
+    new DrinkOption(6, '运动饮料', $r('app.media.ic_drink_sports')),
+    new DrinkOption(7, '气泡水', $r('app.media.ic_drink_sparkling')),
+    new DrinkOption(8, '椰子水', $r('app.media.ic_drink_coconut')),
+    new DrinkOption(9, '花茶', $r('app.media.ic_drink_herbal')),
+    new DrinkOption(10, '热可可', $r('app.media.ic_drink_cocoa')),
     new DrinkOption(11, '补剂', $r('app.media.ic_drink_bottle'))
   ];
 
@@ -165,15 +165,14 @@ export struct DrinkRecordPage {
       // 下半部分：底部水平变焦表盘 (清透毛玻璃模式)
       // ==========================================
       Stack({ alignContent: Alignment.Bottom }) {
-        // Tabs 同款毛玻璃半圆形背景
+        // 更淡的暗色毛玻璃半圆形背景
         Ellipse()
           .width('150%')
           .height(400)
-          .fill('rgba(7, 193, 96, 0.15)') // 淡淡的主题绿色
+          .fill('rgba(0, 0, 0, 0.15)') // 颜色更淡的黑底
           .strokeWidth(0.5)
           .stroke('rgba(255, 255, 255, 0.6)') // 边缘高光
           .backgroundBlurStyle(BlurStyle.Thin) // 毛玻璃效果
-          .backdropBlur(30) // 增强原生模糊
           .margin({ bottom: -120 })
 
         Column() {
@@ -185,14 +184,14 @@ export struct DrinkRecordPage {
               ListItem() {
                 Column() {
                   Image(item.icon)
-                    .width(this.selectedIndex === index ? 32 : 20)
-                    .height(this.selectedIndex === index ? 32 : 20)
-                    .fillColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.8)' : '#999999') // 选中淡淡微信绿，未选中灰色
+                    .width(28) // 移除缩放效果，固定尺寸
+                    .height(28)
+                    .fillColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.5)' : '#FFFFFF') // 未选中白色，选中很淡的微信绿
                     .animation({ duration: 200 })
 
                   Text(item.name)
                     .fontSize(this.selectedIndex === index ? 14 : 11)
-                    .fontColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.8)' : '#999999')
+                    .fontColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.5)' : '#FFFFFF')
                     .fontWeight(this.selectedIndex === index ? FontWeight.Bold : FontWeight.Normal)
                     .margin({ top: 8 })
                     .animation({ duration: 200 })
@@ -228,14 +227,17 @@ export struct DrinkRecordPage {
 
           // 底部圆形矢量图按钮 (喝)
           Button({ type: ButtonType.Circle }) {
-            Image($r('app.media.ic_action_drink'))
+            Image($r('app.media.ic_action_drink2')) // 新的喝水动作icon
               .width(36)
               .height(36)
               .fillColor('#FFFFFF') // 白色矢量图标
           }
           .width(72)
           .height(72)
-          .backgroundColor('rgba(7, 193, 96, 0.8)') // 微信绿底色
+          .linearGradient({ // 小小的渐变色
+            direction: GradientDirection.Bottom,
+            colors: [['rgba(7, 193, 96, 0.2)', 0.0], ['rgba(7, 193, 96, 0.6)', 1.0]]
+          })
           .margin({ top: 10, bottom: 30 })
           .shadow({ radius: 10, color: 'rgba(7, 193, 96, 0.2)', offsetY: 4 })
           .onClick(() => {
