@@ -162,28 +162,28 @@ export struct DrinkRecordPage {
 
 
       // ==========================================
-      // 下半部分：底部水平变焦表盘 (纯黑暗色模式，复刻相机)
+      // 下半部分：底部水平变焦表盘 (半透明暗色模式)
       // ==========================================
       Stack({ alignContent: Alignment.Bottom }) {
-        // 暗黑半圆形背景
+        // 暗黑半圆形背景 (带透明度和毛玻璃)
         Ellipse()
           .width('150%')
           .height(400)
-          .fill('#111111') // 极暗的黑灰色
-          .margin({ bottom: -120 }) // 让椭圆沉入屏幕下方
+          .fill('rgba(0, 0, 0, 0.4)') // 黑色，透明度0.4
+          .backgroundBlurStyle(BlurStyle.Thin) // 毛玻璃效果
+          .margin({ bottom: -120 })
 
         Column() {
-          // 中心红点/红线指示器 (对准中央轨道)
+          // 中心白点指示器
           Row()
             .width(4)
             .height(4)
             .borderRadius(2)
             .backgroundColor('#FFFFFF')
-            .margin({ bottom: 2 }) // 小白点指示器，类似相机中心点
+            .margin({ bottom: 2 })
 
           // 水平滚轮列表
           List({ scroller: this.scroller }) {
-            // 占位
             ListItem().width(140)
             
             ForEach(this.DRINKS, (item: DrinkOption, index: number) => {
@@ -192,12 +192,12 @@ export struct DrinkRecordPage {
                   Image(item.icon)
                     .width(this.selectedIndex === index ? 32 : 20)
                     .height(this.selectedIndex === index ? 32 : 20)
-                    .fillColor(this.selectedIndex === index ? '#07C160' : '#888888')
+                    .fillColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.8)' : '#FFFFFF') // 选中淡淡微信绿，未选中白色
                     .animation({ duration: 200 })
 
                   Text(item.name)
                     .fontSize(this.selectedIndex === index ? 14 : 11)
-                    .fontColor(this.selectedIndex === index ? '#07C160' : '#888888')
+                    .fontColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.8)' : '#FFFFFF')
                     .fontWeight(this.selectedIndex === index ? FontWeight.Bold : FontWeight.Normal)
                     .margin({ top: 8 })
                     .animation({ duration: 200 })
@@ -205,7 +205,6 @@ export struct DrinkRecordPage {
                 .width(80)
                 .height(80)
                 .justifyContent(FlexAlign.Center)
-                // 抛物线上凸：中间靠上 (y小)，两侧下沉 (y大)
                 .translate({ y: 0.002 * Math.pow(index * 80 - this.currentXOffset, 2) })
               }
               .onClick(() => {
@@ -214,7 +213,6 @@ export struct DrinkRecordPage {
               })
             })
             
-            // 占位
             ListItem().width(140)
           }
           .listDirection(Axis.Horizontal)
@@ -233,19 +231,20 @@ export struct DrinkRecordPage {
             this.scroller.scrollTo({ xOffset: this.selectedIndex * 80, yOffset: 0, animation: { duration: 200, curve: Curve.EaseOut } });
           })
 
-          // 底部空心绿框“喝”按钮 (复刻截图)
-          Button('喝')
-            .width(220)
-            .height(54)
-            .backgroundColor('transparent')
-            .border({ width: 2, color: '#07C160', radius: 8 })
-            .fontColor('#07C160')
-            .fontSize(22)
-            .fontWeight(FontWeight.Bold)
-            .margin({ top: 20, bottom: 40 })
-            .onClick(() => {
-              this.handleDrink();
-            })
+          // 底部圆形矢量图按钮 (喝)
+          Button({ type: ButtonType.Circle }) {
+            Image($r('app.media.ic_action_drink'))
+              .width(36)
+              .height(36)
+              .fillColor('#FFFFFF') // 白色矢量图标
+          }
+          .width(72)
+          .height(72)
+          .backgroundColor('rgba(7, 193, 96, 0.6)') // 底色是淡淡的微信绿
+          .margin({ top: 10, bottom: 30 })
+          .onClick(() => {
+            this.handleDrink();
+          })
         }
       }
       .width('100%')
