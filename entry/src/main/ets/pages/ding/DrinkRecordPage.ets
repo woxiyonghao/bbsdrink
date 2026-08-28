@@ -165,14 +165,15 @@ export struct DrinkRecordPage {
       // 下半部分：底部水平变焦表盘 (清透毛玻璃模式)
       // ==========================================
       Stack({ alignContent: Alignment.Bottom }) {
-        // 更淡的暗色毛玻璃半圆形背景
+        // Tabs 同款浅绿毛玻璃半圆形背景
         Ellipse()
           .width('150%')
           .height(400)
-          .fill('rgba(0, 0, 0, 0.15)') // 颜色更淡的黑底
+          .fill('rgba(7, 193, 96, 0.15)') // Tabs的绿色底座
           .strokeWidth(0.5)
           .stroke('rgba(255, 255, 255, 0.6)') // 边缘高光
-          .backgroundBlurStyle(BlurStyle.Thin) // 毛玻璃效果
+          .backgroundBlurStyle(BlurStyle.Thin) 
+          .backdropBlur(30) // 毛玻璃效果
           .margin({ bottom: -120 })
 
         Column() {
@@ -184,14 +185,14 @@ export struct DrinkRecordPage {
               ListItem() {
                 Column() {
                   Image(item.icon)
-                    .width(28) // 移除缩放效果，固定尺寸
+                    .width(28) 
                     .height(28)
-                    .fillColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.5)' : '#FFFFFF') // 未选中白色，选中很淡的微信绿
+                    .fillColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.8)' : '#999999') // 浅色底座，所以未选中用灰色，选中用微信绿
                     .animation({ duration: 200 })
 
                   Text(item.name)
                     .fontSize(this.selectedIndex === index ? 14 : 11)
-                    .fontColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.5)' : '#FFFFFF')
+                    .fontColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.8)' : '#999999')
                     .fontWeight(this.selectedIndex === index ? FontWeight.Bold : FontWeight.Normal)
                     .margin({ top: 8 })
                     .animation({ duration: 200 })
