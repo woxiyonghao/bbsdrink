@@ -20,7 +20,13 @@ class DrinkOption {
 export struct DrinkRecordPage {
   @State selectedIndex: number = 0;
   @State currentAmount: number = 250;
-  @State waveOffsetX: number = 0;
+    @State waveOffsetX: number = 0;
+  
+  // 动画状态
+  @State flyY: number = 0;
+  @State flyScale: number = 1;
+  @State flyRotate: number = 0;
+  @State flyOpacity: number = 0;
   @State isAdjusting: boolean = false; 
   @State currentXOffset: number = 0; 
   
@@ -51,6 +57,42 @@ export struct DrinkRecordPage {
     })
   }
 
+
+  async playDrinkAnimation() {
+    this.flyOpacity = 1;
+    this.flyY = 0;
+    this.flyScale = 1;
+    this.flyRotate = 0;
+
+    // 1. 0-0.6秒 慢慢变大，往屏幕中间靠近，最大跟屏幕宽度一致 (放大10倍)
+    animateTo({ duration: 600, curve: Curve.EaseOut }, () => {
+      this.flyY = -350; // 屏幕中间
+      this.flyScale = 10;
+    });
+
+    await new Promise<void>(resolve => setTimeout(resolve, 600));
+
+    // 2. 0.6-1秒 抖动 (类似Ding模块0.4秒)
+    animateTo({ duration: 100, curve: Curve.Linear }, () => { this.flyRotate = 15; });
+    await new Promise<void>(resolve => setTimeout(resolve, 100));
+    animateTo({ duration: 100, curve: Curve.Linear }, () => { this.flyRotate = -15; });
+    await new Promise<void>(resolve => setTimeout(resolve, 100));
+    animateTo({ duration: 100, curve: Curve.Linear }, () => { this.flyRotate = 15; });
+    await new Promise<void>(resolve => setTimeout(resolve, 100));
+    animateTo({ duration: 100, curve: Curve.Linear }, () => { this.flyRotate = 0; });
+    await new Promise<void>(resolve => setTimeout(resolve, 100));
+
+    // 3. 1-1.6秒 原路返回
+    animateTo({ duration: 600, curve: Curve.EaseIn }, () => {
+      this.flyY = 0;
+      this.flyScale = 1;
+      this.flyOpacity = 0;
+    });
+
+    await new Promise<void>(resolve => setTimeout(resolve, 600));
+    this.flyOpacity = 0;
+  }
+
   async handleDrink() {
     const userId = await PreferencesUtil.getCurrentUserId();
     const drink = this.DRINKS[this.selectedIndex];
@@ -62,7 +104,7 @@ export struct DrinkRecordPage {
         timestamp: new Date().getTime()
       });
       promptAction.showToast({ message: `吨吨吨！成功记录 ${this.currentAmount}ml ${drink.name}！` });
-      router.back();
+      this.playDrinkAnimation();
     } else {
       promptAction.showToast({ message: '请先登录' });
     }
@@ -161,9 +203,10 @@ export struct DrinkRecordPage {
 
           // 底部圆形矢量图按钮 (喝)
           Button({ type: ButtonType.Circle }) {
-            Image($r('app.media.ic_action_drink2')) // 极简抽象喝水侧颜
+            Image(this.DRINKS[this.selectedIndex].icon) // 喝的icon换成是当前选择的
               .width(36)
               .height(36)
+              .fillColor('#FFFFFF')
           }
           .width(72)
           .height(72)
@@ -179,6 +222,19 @@ export struct DrinkRecordPage {
     } // 结束 Column (nav + dial)
     .width('100%')
     .height('100%') // 关键：让这个Column撑满屏幕，Blank才能生效
+
+    // 悬浮飞出动画层
+    if (this.flyOpacity > 0) {
+      Image(this.DRINKS[this.selectedIndex].icon)
+        .width(36)
+        .height(36)
+        .fillColor('#FFFFFF')
+        .margin({ bottom: 48 }) // 与底部Button的中心对齐 (30 + 72/2 - 36/2 = 48)
+        .translate({ y: this.flyY })
+        .scale({ x: this.flyScale, y: this.flyScale })
+        .rotate({ angle: this.flyRotate })
+        .opacity(this.flyOpacity)
+    }
   } // 结束 Stack (全局根组件)
   .width('100%')
   .height('100%')
