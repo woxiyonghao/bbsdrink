@@ -145,7 +145,7 @@ export struct DrinkRecordPage {
           .offset({ x: this.waveOffsetX, y: 0 })
       }
       .width('400%')
-      .height(`${Math.min(100, (this.todayCategoryAmount / 2000) * 100)}%`) // 随喝水量上涨
+      .height(`${35 + Math.min(65, (this.todayCategoryAmount / 2000) * 65)}%`) // 随喝水量上涨
       .animation({ duration: 800, curve: Curve.EaseInOut })
       .align(Alignment.BottomStart) // 波浪贴紧底部开始
 
@@ -193,8 +193,6 @@ export struct DrinkRecordPage {
           .width('150%')
           .height(400)
           .fill('rgba(80, 180, 255, 0.35)') // 更蓝一点
-          .strokeWidth(0.5)
-          .stroke('rgba(255, 255, 255, 0.8)') // 边缘高光
           .backgroundBlurStyle(BlurStyle.Thin) 
           .backdropBlur(40) // 增强原生模糊效果，模糊背景的波浪
           .margin({ bottom: -120 })
@@ -282,6 +280,7 @@ export struct DrinkRecordPage {
       .scale({ x: this.flyScale, y: this.flyScale })
       .rotate({ angle: this.flyRotate })
       .opacity(this.flyOpacity)
+      .hitTestBehavior(HitTestMode.None) // 防止隐形图标拦截底部按钮的点击事件！
   } // 结束 Stack (全局根组件)
   .width('100%')
   .height('100%')
