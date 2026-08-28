@@ -34,8 +34,7 @@ export struct StretchPage {
       }
     }
   }
-  }
-  
+
   formatTime(ms: number): string {
     let totalSeconds = Math.floor(ms / 1000);
     let mm = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
