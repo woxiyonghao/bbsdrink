@@ -15,28 +15,55 @@ class DrinkOption {
   }
 }
 
-interface Bubble {
+@Observed
+class Bubble {
   id: number;
   x: number;
   y: number;
   size: number;
   opacity: number;
+  duration: number;
+  constructor(id: number, x: number, y: number, size: number, opacity: number, duration: number) {
+    this.id = id;
+    this.x = x;
+    this.y = y;
+    this.size = size;
+    this.opacity = opacity;
+    this.duration = duration;
+  }
 }
 
 @Component
 struct BubbleView {
-  @Prop x: number;
-  @Prop y: number;
-  @Prop bubbleSize: number;
-  @Prop bubbleOpacity: number;
+  @ObjectLink bubble: Bubble;
+  @State wobbleX: number = 0;
+
+  aboutToAppear() {
+    // 左右摇摆的随机幅度与周期
+    const wobbleDistance = Math.random() * 30 + 10; // 10到40 vp
+    const wobbleSpeed = Math.random() * 800 + 800; // 800到1600 ms
+
+    // 初始随机偏移，打乱摇摆相位
+    this.wobbleX = -wobbleDistance / 2;
+    setTimeout(() => {
+      animateTo({ duration: wobbleSpeed, curve: Curve.EaseInOut, iterations: -1, playMode: PlayMode.Alternate }, () => {
+        this.wobbleX = wobbleDistance / 2;
+      });
+    }, Math.random() * 500); // 随机延迟启动
+  }
 
   build() {
     Image($r('app.media.paopao'))
-      .width(this.bubbleSize)
-      .height(this.bubbleSize)
-      .position({ x: `${this.x}%`, y: `${this.y}%` })
-      .opacity(this.bubbleOpacity)
-      .blendMode(BlendMode.MULTIPLY) // 如果是白底图片，Multiply可以让白色变透明！
+      .width(this.bubble.size)
+      .height(this.bubble.size)
+      .position({ x: `${this.bubble.x}%`, y: `${this.bubble.y}%` })
+      .opacity(this.bubble.opacity)
+      .animation({
+        duration: this.bubble.duration,
+        curve: Curve.EaseOut // 或者 Curve.Linear
+      })
+      .translate({ x: this.wobbleX })
+      .backgroundColor(Color.Transparent)
       .hitTestBehavior(HitTestMode.None)
   }
 }
@@ -100,33 +127,55 @@ export struct DrinkRecordPage {
 
 
   spawnBubbles() {
-    const newBubbles: Bubble[] = [];
-    const now = Date.now();
-    for (let i = 0; i < 20; i++) {
-      newBubbles.push({
-        id: now + i,
-        x: Math.random() * 90 + 5, // 5% 到 95%
-        y: 100, // 从底部开始
-        size: Math.random() * 40 + 15,
-        opacity: Math.random() * 0.4 + 0.3
-      });
-    }
-    this.bubbles = this.bubbles.concat(newBubbles);
+    let spawnCount = 0;
+    const maxSpawns = 12; // 总共生成12批次气泡
     
-    setTimeout(() => {
-      animateTo({ duration: 2500, curve: Curve.EaseOut }, () => {
-        this.bubbles = this.bubbles.map(b => {
-          if (b.id >= now) {
-            return { id: b.id, x: b.x, y: -20, size: b.size, opacity: b.opacity }; // 飘出屏幕顶部
-          }
-          return b;
-        });
-      });
+    const intervalId = setInterval(() => {
+      spawnCount++;
+      if (spawnCount > maxSpawns) {
+        clearInterval(intervalId);
+        return;
+      }
+
+      // 每次随机生成 2 到 8 个气泡
+      const count = Math.floor(Math.random() * 7) + 2; 
+      const newBubbles: Bubble[] = [];
+      const now = Date.now();
       
+      for (let i = 0; i < count; i++) {
+        const size = Math.random() * 70 + 8; // 尺寸 8 到 78，扩大大小的随机范围
+        const depthFactor = (size - 8) / 70; // 0.0(最小) 到 1.0(最大)
+        
+        // 层次感：大的一般上浮快一点，小的一般上浮慢一点
+        const duration = 4000 + (1 - depthFactor) * 3500; // 4秒 到 7.5秒
+        const opacity = 0.25 + depthFactor * 0.55; // 0.25 到 0.8
+        
+        newBubbles.push(new Bubble(
+          now + i + Math.random(), // 确保ID唯一
+          Math.random() * 90 + 5, // X轴：5% 到 95%
+          110, // Y轴：从屏幕下方开始
+          size,
+          opacity,
+          duration
+        ));
+      }
+      
+      this.bubbles = this.bubbles.concat(newBubbles);
+      
+      // 等待组件挂载后，触发属性动画使其飘到屏幕外
       setTimeout(() => {
-        this.bubbles = this.bubbles.filter(b => b.id < now || b.id >= now + 20);
-      }, 3000);
-    }, 50);
+        newBubbles.forEach(b => {
+          b.y = -20; // 目标位置：屏幕上方外侧
+        });
+      }, 50);
+
+      // 动画结束后清理对应批次的气泡
+      setTimeout(() => {
+        const idsToRemove = new Set(newBubbles.map(b => b.id));
+        this.bubbles = this.bubbles.filter(b => !idsToRemove.has(b.id));
+      }, 8500); 
+      
+    }, 400); // 每 400 毫秒生成一批气泡
   }
 
   async playDrinkAnimation() {
@@ -180,7 +229,7 @@ export struct DrinkRecordPage {
       });
       
       promptAction.showToast({ message: `吨吨吨！成功记录 ${this.currentAmount}ml ${drink.name}！` });
-      this.playDrinkAnimation();
+      await this.playDrinkAnimation();
       this.spawnBubbles();
     } else {
       promptAction.showToast({ message: '请先登录' });
@@ -199,12 +248,13 @@ export struct DrinkRecordPage {
       // 汽水气泡层 (全屏容器，确保百分比坐标正确)
       Stack({ alignContent: Alignment.TopStart }) {
         ForEach(this.bubbles, (b: Bubble) => {
-          BubbleView({ x: b.x, y: b.y, bubbleSize: b.size, bubbleOpacity: b.opacity })
+          BubbleView({ bubble: b })
         }, (b: Bubble) => b.id.toString())
       }
       .width('100%')
       .height('100%')
       .hitTestBehavior(HitTestMode.None)
+      .zIndex(999)
 
       Column() {
         // 顶部导航
