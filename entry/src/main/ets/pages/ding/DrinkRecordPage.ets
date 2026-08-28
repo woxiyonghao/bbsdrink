@@ -22,7 +22,7 @@ export struct DrinkRecordPage {
   @State currentAmount: number = 250;
   @State waveOffsetX: number = 0;
   @State isAdjusting: boolean = false; 
-  @State currentYOffset: number = 0; 
+  @State currentXOffset: number = 0; 
   
   private scroller: Scroller = new Scroller();
 
@@ -69,13 +69,10 @@ export struct DrinkRecordPage {
   }
 
   build() {
-    Stack() {
-      // 整体白底色
-      Column()
-        .width('100%')
-        .height('100%')
-        .backgroundColor('#FFFFFF')
-
+    Column() {
+      // ==========================================
+      // 上半部分：导航、杯子和滑块 (白色背景)
+      // ==========================================
       Column() {
         // 顶部导航
         Row() {
@@ -95,9 +92,16 @@ export struct DrinkRecordPage {
         .height(56)
         .padding({ left: 20, right: 20 })
 
-        // 刻度和杯子区域
-        Row() {
-          // 中央杯子容器
+        // 中央杯子区域
+        Column() {
+          // 顶部显示的容量文本
+          Text(`${this.currentAmount} ml`)
+            .fontColor('#333333')
+            .fontSize(24)
+            .fontWeight(FontWeight.Bold)
+            .margin({ bottom: 16 })
+
+          // 玻璃杯
           Stack({ alignContent: Alignment.Bottom }) {
             // 背景
             Column().width('100%').height('100%').backgroundColor('#F5F7FA')
@@ -118,35 +122,24 @@ export struct DrinkRecordPage {
             .height(`${Math.max(10, (this.currentAmount / 1000) * 100)}%`)
             .animation({ duration: 800, curve: Curve.FastOutSlowIn })
 
-            // 顶部显示的容量文本
-            Text(`${this.currentAmount} ml`)
-              .fontColor('#333333')
-              .fontSize(18)
-              .fontWeight(FontWeight.Bold)
-              .margin({ bottom: '100%' })
-
             // 中央显示的当前饮品图标
             Image(this.DRINKS[this.selectedIndex].icon)
               .width(60)
               .height(60)
               .fillColor('#333333')
               .opacity(0.8)
-              .margin({ bottom: 100 })
-
+              .margin({ bottom: 80 })
           }
-          .width(180)
-          .height(320)
+          .width(160)
+          .layoutWeight(1) // 自动伸展高度
           .border({ width: 3, color: '#E0E0E0', radius: 10 })
           .clip(true)
-          .margin({ left: 40 })
-          
-          Blank()
-          
         }
         .width('100%')
-        .margin({ top: 40 })
+        .layoutWeight(1)
+        .margin({ top: 20, bottom: 20 })
 
-        // 底部容量滑块
+        // 容量滑块
         Slider({
           value: this.currentAmount,
           min: 50,
@@ -161,117 +154,104 @@ export struct DrinkRecordPage {
         .onChange((value: number) => {
           this.currentAmount = value;
         })
-        .margin({ top: 60, left: 30, right: 30 })
-
-        Blank()
-
-        // 底部“喝”按钮
-        Button('喝')
-          .width(240)
-          .height(70)
-          .backgroundColor('#07C160')
-          .fontColor('#FFFFFF')
-          .fontSize(28)
-          .fontWeight(FontWeight.Bold)
-          .margin({ bottom: 40 })
-          .shadow({ radius: 15, color: 'rgba(7,193,96,0.3)', offsetY: 8 })
-          .onClick(() => {
-            this.handleDrink();
-          })
-
+        .margin({ left: 30, right: 30, bottom: 20 })
       }
       .width('100%')
-      .height('100%')
+      .layoutWeight(1)
+      .backgroundColor('#FFFFFF')
+
 
       // ==========================================
-      // 右侧相机级变焦滚轮 (绝对定位，靠右居中)
+      // 下半部分：底部水平变焦表盘 (纯黑暗色模式，复刻相机)
       // ==========================================
-      Stack({ alignContent: Alignment.End }) {
-        // 调焦时的黑色半透明毛玻璃底板
-        if (this.isAdjusting) {
-          Ellipse()
-            .width(240)
-            .height(480) // 上下长度大幅度增加，包住所有图标
-            .fill('rgba(0, 0, 0, 0.1)')
-            .backgroundBlurStyle(BlurStyle.Thin)
-            .opacity(0.7)
-            .margin({ right: -120 })
-            .animation({ duration: 200 })
-        }
+      Stack({ alignContent: Alignment.Bottom }) {
+        // 暗黑半圆形背景
+        Ellipse()
+          .width('150%')
+          .height(400)
+          .fill('#111111') // 极暗的黑灰色
+          .margin({ bottom: -120 }) // 让椭圆沉入屏幕下方
 
-        // 中心红线指示器
-        Row()
-          .width(16)
-          .height(2)
-          .backgroundColor('#FF6B6B')
-          .margin({ right: 80 })
-          .opacity(this.isAdjusting ? 1 : 0)
-          .animation({ duration: 200 })
+        Column() {
+          // 中心红点/红线指示器 (对准中央轨道)
+          Row()
+            .width(4)
+            .height(4)
+            .borderRadius(2)
+            .backgroundColor('#FFFFFF')
+            .margin({ bottom: 2 }) // 小白点指示器，类似相机中心点
 
-        // 垂直滚轮列表
-        List({ scroller: this.scroller }) {
-          // 顶部占位 110px
-          ListItem().height(110)
-          
-          ForEach(this.DRINKS, (item: DrinkOption, index: number) => {
-            ListItem() {
-              Column() {
-                Image(item.icon)
-                  .width(this.selectedIndex === index ? 36 : 24)
-                  .height(this.selectedIndex === index ? 36 : 24)
-                  .fillColor(this.selectedIndex === index ? '#07C160' : '#888888')
-                  .animation({ duration: 200 })
+          // 水平滚轮列表
+          List({ scroller: this.scroller }) {
+            // 占位
+            ListItem().width(140)
+            
+            ForEach(this.DRINKS, (item: DrinkOption, index: number) => {
+              ListItem() {
+                Column() {
+                  Image(item.icon)
+                    .width(this.selectedIndex === index ? 32 : 20)
+                    .height(this.selectedIndex === index ? 32 : 20)
+                    .fillColor(this.selectedIndex === index ? '#07C160' : '#888888')
+                    .animation({ duration: 200 })
 
-                // 调焦时或选中时显示文字
-                if (this.isAdjusting || this.selectedIndex === index) {
                   Text(item.name)
                     .fontSize(this.selectedIndex === index ? 14 : 11)
-                    .fontColor(this.selectedIndex === index ? '#07C160' : '#999999')
-                    .margin({ top: 4 })
-                    .transition({ type: TransitionType.All, opacity: 0 })
+                    .fontColor(this.selectedIndex === index ? '#07C160' : '#888888')
+                    .fontWeight(this.selectedIndex === index ? FontWeight.Bold : FontWeight.Normal)
+                    .margin({ top: 8 })
+                    .animation({ duration: 200 })
                 }
+                .width(80)
+                .height(80)
+                .justifyContent(FlexAlign.Center)
+                // 抛物线上凸：中间靠上 (y小)，两侧下沉 (y大)
+                .translate({ y: 0.002 * Math.pow(index * 80 - this.currentXOffset, 2) })
               }
-              .width(80)
-              .height(80)
-              .justifyContent(FlexAlign.Center)
-              .translate({ x: 0.0015 * Math.pow(index * 80 - this.currentYOffset, 2) - 10 })
-            }
-            .onClick(() => {
-              this.scroller.scrollTo({ xOffset: 0, yOffset: index * 80, animation: { duration: 300, curve: Curve.EaseInOut } });
-              this.selectedIndex = index;
+              .onClick(() => {
+                this.scroller.scrollTo({ xOffset: index * 80, yOffset: 0, animation: { duration: 300, curve: Curve.EaseInOut } });
+                this.selectedIndex = index;
+              })
             })
-          })
-          
-          // 底部占位 110px
-          ListItem().height(110)
-        }
-        .width(120)
-        .height(300)
-        .scrollBar(BarState.Off)
-        .onScrollStart(() => {
-          animateTo({ duration: 200 }, () => {
-            this.isAdjusting = true;
-          })
-        })
-        .onScroll(() => {
-          const yOffset = this.scroller.currentOffset().yOffset;
-          this.currentYOffset = yOffset;
-          const index = Math.round(yOffset / 80);
-          if (index !== this.selectedIndex && index >= 0 && index < this.DRINKS.length) {
-            this.selectedIndex = index;
+            
+            // 占位
+            ListItem().width(140)
           }
-        })
-        .onScrollStop(() => {
-          animateTo({ duration: 200 }, () => {
-            this.isAdjusting = false;
+          .listDirection(Axis.Horizontal)
+          .width('100%')
+          .height(100)
+          .scrollBar(BarState.Off)
+          .onScroll(() => {
+            const xOffset = this.scroller.currentOffset().xOffset;
+            this.currentXOffset = xOffset;
+            const index = Math.round(xOffset / 80);
+            if (index !== this.selectedIndex && index >= 0 && index < this.DRINKS.length) {
+              this.selectedIndex = index;
+            }
           })
-          this.scroller.scrollTo({ xOffset: 0, yOffset: this.selectedIndex * 80, animation: { duration: 200, curve: Curve.EaseOut } });
-        })
-      }
-      .width(120)
-      .height(300)
-      .position({ right: -30, top: 150 }) // 整体向屏幕右侧缩进 30px
+          .onScrollStop(() => {
+            this.scroller.scrollTo({ xOffset: this.selectedIndex * 80, yOffset: 0, animation: { duration: 200, curve: Curve.EaseOut } });
+          })
 
+          // 底部空心绿框“喝”按钮 (复刻截图)
+          Button('喝')
+            .width(220)
+            .height(54)
+            .backgroundColor('transparent')
+            .border({ width: 2, color: '#07C160', radius: 8 })
+            .fontColor('#07C160')
+            .fontSize(22)
+            .fontWeight(FontWeight.Bold)
+            .margin({ top: 20, bottom: 40 })
+            .onClick(() => {
+              this.handleDrink();
+            })
+        }
+      }
+      .width('100%')
+      .backgroundColor('#FFFFFF') // 防止 Stack 外部漏出底色
     }
+    .width('100%')
+    .height('100%')
   }
 }
