@@ -14,6 +14,7 @@ export struct HomePage {
   @State todayDrank: number = 0;
   @State dailyGoal: number = 2000; // 默认2000ml
   @State hasCheckedIn: boolean = false;
+  @State currentArticlePage: number = 0;
   
   private currentDate: string = '';
 
@@ -189,14 +190,24 @@ export struct HomePage {
               .fontWeight(FontWeight.Bold)
               .fontColor('#333333')
             Blank()
-            Text('查看更多')
-              .fontSize(13)
-              .fontColor('#999999')
+            Row() {
+              Image($r('app.media.ic_refresh')).width(14).height(14).fillColor('#999999').margin({ right: 4 })
+              Text('换一批')
+                .fontSize(13)
+                .fontColor('#999999')
+            }
+            .onClick(() => {
+              if ((this.currentArticlePage + 1) * 10 >= HEALTH_ARTICLES.length) {
+                this.currentArticlePage = 0;
+              } else {
+                this.currentArticlePage++;
+              }
+            })
           }
           .width('100%')
           .padding({ left: 24, right: 24, bottom: 16, top: 20 })
           
-          ForEach(HEALTH_ARTICLES, (article: HealthArticle) => {
+          ForEach(HEALTH_ARTICLES.slice(this.currentArticlePage * 10, (this.currentArticlePage + 1) * 10), (article: HealthArticle) => {
             Row() {
               Column() {
                 Text(article.title)
