@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+import math
+
+svg = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
   <!-- Hair and back of head -->
   <path d="M11 2 C 7 2, 4 5, 4 10 C 4 14, 5 18, 8 20" />
   
@@ -16,4 +18,7 @@
   
   <!-- Closed eye (blissful) -->
   <path d="M10 7.5 Q 11 8.5 12 7.5" />
-</svg>
+</svg>"""
+
+with open("entry/src/main/resources/base/media/ic_action_drink2.svg", "w") as f:
+    f.write(svg)

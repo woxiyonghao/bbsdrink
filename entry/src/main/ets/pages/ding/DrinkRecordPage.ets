@@ -228,10 +228,9 @@ export struct DrinkRecordPage {
 
           // 底部圆形矢量图按钮 (喝)
           Button({ type: ButtonType.Circle }) {
-            Image($r('app.media.ic_action_drink2')) // 新的喝水动作icon
+            Image($r('app.media.ic_action_drink2')) // 极简抽象喝水侧颜
               .width(36)
               .height(36)
-              .fillColor('#FFFFFF') // 白色矢量图标
           }
           .width(72)
           .height(72)
