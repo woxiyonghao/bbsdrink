@@ -187,23 +187,24 @@ export struct DrinkRecordPage {
       // 右侧相机级变焦滚轮 (绝对定位，靠右居中)
       // ==========================================
       Stack({ alignContent: Alignment.End }) {
-        // 调焦时的浅灰色半圆形毛玻璃底板 (隐藏右半部分，只露出左半部分)
+        // 调焦时的黑色半透明毛玻璃底板
         if (this.isAdjusting) {
           Ellipse()
-            .width(200)
-            .height(300)
-            .fill('rgba(230, 230, 230, 0.5)')
-            .backgroundBlurStyle(BlurStyle.Thin)
-            .margin({ right: -100 }) // 右移 100，让椭圆一半在屏幕外，形成半圆
+            .width(240)
+            .height(280)
+            .fill('rgba(0, 0, 0, 0.1)') // 黑色，0.1透明度
+            .backgroundBlurStyle(BlurStyle.Thin) // 毛玻璃效果
+            .opacity(0.7) // 整体带有一定透明度以达到0.3效果
+            .margin({ right: -120 }) // 藏一半，露出一个120宽的半圆
             .animation({ duration: 200 })
         }
 
-        // 中心红线指示器 (模仿相机的准星)
+        // 中心红线指示器
         Row()
           .width(16)
           .height(2)
           .backgroundColor('#FF6B6B')
-          .margin({ right: 90 }) // 将准星推向弧线峰值
+          .margin({ right: 80 }) // 完美对准处于最高点的图标中心
           .opacity(this.isAdjusting ? 1 : 0)
           .animation({ duration: 200 })
 
@@ -233,8 +234,8 @@ export struct DrinkRecordPage {
               .width(80)
               .height(80)
               .justifyContent(FlexAlign.Center)
-              // 关键抛物线向左凸：中心 x 较小（向左偏移），两侧 x 较大（靠右）
-              .translate({ x: 0.003 * Math.pow(index * 80 - this.currentYOffset, 2) - 40 })
+              // 关键抛物线向左凸：减小幅度，确保图标始终在黑色圆盘内
+              .translate({ x: 0.0015 * Math.pow(index * 80 - this.currentYOffset, 2) - 10 })
             }
             .onClick(() => {
               this.scroller.scrollTo({ xOffset: 0, yOffset: index * 80, animation: { duration: 300, curve: Curve.EaseInOut } });
@@ -245,7 +246,7 @@ export struct DrinkRecordPage {
           // 底部占位 110px
           ListItem().height(110)
         }
-        .width(180)
+        .width(120) // 收窄 List 宽度，使其位于圆盘内部
         .height(300)
         .scrollBar(BarState.Off)
         .onScrollStart(() => {
@@ -268,7 +269,7 @@ export struct DrinkRecordPage {
           this.scroller.scrollTo({ xOffset: 0, yOffset: this.selectedIndex * 80, animation: { duration: 200, curve: Curve.EaseOut } });
         })
       }
-      .width(180)
+      .width(120) // Stack 容器宽度
       .height(300)
       .position({ right: 0, top: 150 })
 
