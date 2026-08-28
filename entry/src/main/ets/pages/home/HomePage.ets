@@ -24,6 +24,12 @@ export struct HomePage {
   @State hasCheckedIn: boolean = false;
   @State currentArticlePage: number = 0;
   @State dailyQuote: string = '';
+  @State lastWaterTime: number = 0;
+  @State waterReminderMsg: string = '正在加载水分数据...';
+  @State waterReminderColor: string = '#07C160';
+  @State waterReminderBg: string = 'rgba(7, 193, 96, 0.1)';
+  @State weekCheckInStatus: boolean[] = [false, false, false, false, false, false, false];
+  @State weekCheckInCount: number = 0;
   
   private currentDate: string = '';
 
@@ -43,7 +49,59 @@ export struct HomePage {
       }
       this.todayDrank = await RdbHelper.queryTodayWaterTotal(this.userId);
       this.hasCheckedIn = await RdbHelper.hasCheckedInToday(this.userId);
+      this.lastWaterTime = await RdbHelper.queryLatestWaterRecordTime(this.userId);
+      this.updateWaterReminder();
+      await this.loadWeeklyTrend();
     }
+  }
+
+  updateWaterReminder() {
+    if (this.lastWaterTime === 0) {
+      this.waterReminderMsg = '新的一天，快喝下第一杯水吧！';
+      this.waterReminderColor = '#FF5C5C'; // 红色
+      this.waterReminderBg = 'rgba(255, 92, 92, 0.1)';
+      return;
+    }
+    const now = new Date().getTime();
+    const diffMins = Math.floor((now - this.lastWaterTime) / 1000 / 60);
+    const interval = 60; // 建议 60 分钟喝一次
+    if (diffMins >= interval) {
+      this.waterReminderMsg = `已经 ${diffMins} 分钟没喝水了，快补充水分！`;
+      this.waterReminderColor = '#FF5C5C'; // 淡红系
+      this.waterReminderBg = 'rgba(255, 92, 92, 0.1)';
+    } else {
+      const wait = interval - diffMins;
+      this.waterReminderMsg = `已喝水，建议 ${wait} 分钟后再次补水`;
+      this.waterReminderColor = '#07C160'; // 绿色
+      this.waterReminderBg = 'rgba(7, 193, 96, 0.1)';
+    }
+  }
+
+  async loadWeeklyTrend() {
+    const timestamps = await RdbHelper.queryAllCheckInTimestamps(this.userId);
+    const now = new Date();
+    const currentDayOfWeek = now.getDay() === 0 ? 7 : now.getDay();
+    now.setHours(0,0,0,0);
+    const mondayTime = now.getTime() - (currentDayOfWeek - 1) * 24 * 60 * 60 * 1000;
+    
+    let status = [false, false, false, false, false, false, false];
+    let count = 0;
+    for (const ts of timestamps) {
+      if (ts >= mondayTime) {
+        const d = new Date(ts);
+        const dayIdx = d.getDay() === 0 ? 6 : d.getDay() - 1;
+        if (dayIdx >= 0 && dayIdx < 7 && !status[dayIdx]) {
+          status[dayIdx] = true;
+          count++;
+        }
+      }
+    }
+    if (this.hasCheckedIn && !status[currentDayOfWeek - 1]) {
+      status[currentDayOfWeek - 1] = true;
+      count++;
+    }
+    this.weekCheckInStatus = status;
+    this.weekCheckInCount = count;
   }
 
   async addWater(amount: number) {
@@ -53,12 +111,15 @@ export struct HomePage {
       this.todayDrank += amount;
     });
     // 入库
+    const now = new Date().getTime();
     await RdbHelper.insertRecord({
       userId: this.userId,
       type: 0, // 0 表示喝水
       value: amount,
-      timestamp: new Date().getTime()
+      timestamp: now
     });
+    this.lastWaterTime = now;
+    this.updateWaterReminder();
   }
 
   @Builder QuickAddWaterBtn(label: string, amount: number) {
@@ -193,11 +254,15 @@ export struct HomePage {
 
           // 智能提醒状态
           Row() {
-            Image($r('app.media.ic_ding_filled')).width(14).height(14).fillColor('#B0B0B0').margin({ right: 6 })
-            Text('距离下次推荐补水还有 45 分钟')
+            Image($r('app.media.ic_ding_filled')).width(14).height(14).fillColor(this.waterReminderColor).margin({ right: 6 })
+            Text(this.waterReminderMsg)
               .fontSize(12)
-              .fontColor('#A0A0A0')
+              .fontWeight(FontWeight.Medium)
+              .fontColor(this.waterReminderColor)
           }
+          .padding({ left: 12, right: 12, top: 6, bottom: 6 })
+          .backgroundColor(this.waterReminderBg)
+          .borderRadius(12)
         }
         .width('90%')
         .padding({ top: 32, bottom: 24 })
@@ -217,16 +282,20 @@ export struct HomePage {
         // 3.1 微型周报趋势图 (Weekly Trend)
         Column() {
           Row() {
-            Text('本周达标情况').fontSize(14).fontWeight(FontWeight.Medium).fontColor('#333')
+            Text('本周签到情况').fontSize(14).fontWeight(FontWeight.Medium).fontColor('#333')
             Blank()
-            Text('4/7 天').fontSize(12).fontColor('#07C160')
+            Text(`${this.weekCheckInCount}/7 天`).fontSize(12).fontColor('#07C160')
           }.width('100%').margin({ bottom: 16 })
           
           Row() {
             ForEach(['一', '二', '三', '四', '五', '六', '日'], (day: string, index: number) => {
               Column() {
-                Circle().width(14).height(14).fill(index < 4 ? '#07C160' : '#F0F0F0').margin({ bottom: 8 })
-                Text(day).fontSize(12).fontColor(index < 4 ? '#333' : '#999')
+                Circle()
+                  .width(14)
+                  .height(14)
+                  .fill(this.weekCheckInStatus[index] ? '#07C160' : '#F0F0F0')
+                  .margin({ bottom: 8 })
+                Text(day).fontSize(12).fontColor(this.weekCheckInStatus[index] ? '#333' : '#999')
               }.layoutWeight(1)
             })
           }.width('100%')
