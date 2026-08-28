@@ -6,6 +6,14 @@ import { User } from '../../types';
 
 import { HealthArticle, HEALTH_ARTICLES } from '../../store/MockArticles';
 
+const DAILY_QUOTES = [
+  "今天也要好好照顾自己哦 ✨",
+  "流水不腐，多喝水能保持年轻 💧",
+  "每一次起身，都是对身体的温柔 🚶",
+  "健康是一场马拉松，享受当下的每一步 🏃",
+  "好身体是最高级的奢侈品 🌿"
+];
+
 @Entry
 @Component
 export struct HomePage {
@@ -15,12 +23,14 @@ export struct HomePage {
   @State dailyGoal: number = 2000; // 默认2000ml
   @State hasCheckedIn: boolean = false;
   @State currentArticlePage: number = 0;
+  @State dailyQuote: string = '';
   
   private currentDate: string = '';
 
   aboutToAppear() {
     const date = new Date();
     this.currentDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+    this.dailyQuote = DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)];
     this.initData();
   }
 
@@ -92,7 +102,7 @@ export struct HomePage {
         // 1. 顶部 Header (问候与签到)
         Row() {
           Column() {
-            Text(`早上好，${this.nickname}`)
+            Text(`您好，${this.nickname}`)
               .fontSize(22)
               .fontWeight(FontWeight.Bold)
               .fontColor('#333333')
@@ -135,7 +145,18 @@ export struct HomePage {
           })
         }
         .width('100%')
-        .padding({ left: 24, right: 24, top: 20, bottom: 20 })
+        .padding({ left: 24, right: 24, top: 20, bottom: 10 })
+
+        // 每日健康金句
+        Row() {
+          Text(this.dailyQuote)
+            .fontSize(14)
+            .fontColor('#999999')
+            .fontStyle(FontStyle.Italic)
+        }
+        .width('100%')
+        .padding({ left: 24, right: 24, bottom: 20 })
+        .justifyContent(FlexAlign.Start)
 
         // 2. 核心大盘：喝水进度环
         Column() {
@@ -166,9 +187,20 @@ export struct HomePage {
             this.QuickAddWaterBtn('+250ml', 250)
             this.QuickAddWaterBtn('+500ml', 500)
           }
+          .margin({ bottom: 24 })
+
+          Divider().color('#F5F5F5').width('80%').margin({ bottom: 16 })
+
+          // 智能提醒状态
+          Row() {
+            Image($r('app.media.ic_ding_filled')).width(14).height(14).fillColor('#B0B0B0').margin({ right: 6 })
+            Text('距离下次推荐补水还有 45 分钟')
+              .fontSize(12)
+              .fontColor('#A0A0A0')
+          }
         }
         .width('90%')
-        .padding({ top: 24, bottom: 24 })
+        .padding({ top: 32, bottom: 24 })
         .backgroundColor('#FFFFFF')
         .borderRadius(24)
         .shadow({ radius: 20, color: 'rgba(0, 0, 0, 0.04)', offsetY: 8 })
@@ -180,7 +212,31 @@ export struct HomePage {
           this.HealthCard('今日步数', '0', '步', $r('app.media.ic_check_record')) // 暂用 check 图标
         }
         .width('90%')
+        .margin({ bottom: 20 })
+
+        // 3.1 微型周报趋势图 (Weekly Trend)
+        Column() {
+          Row() {
+            Text('本周达标情况').fontSize(14).fontWeight(FontWeight.Medium).fontColor('#333')
+            Blank()
+            Text('4/7 天').fontSize(12).fontColor('#07C160')
+          }.width('100%').margin({ bottom: 16 })
+          
+          Row() {
+            ForEach(['一', '二', '三', '四', '五', '六', '日'], (day: string, index: number) => {
+              Column() {
+                Circle().width(14).height(14).fill(index < 4 ? '#07C160' : '#F0F0F0').margin({ bottom: 8 })
+                Text(day).fontSize(12).fontColor(index < 4 ? '#333' : '#999')
+              }.layoutWeight(1)
+            })
+          }.width('100%')
+        }
+        .width('90%')
+        .padding(20)
+        .backgroundColor('#FFFFFF')
+        .borderRadius(20)
         .margin({ bottom: 32 })
+        .shadow({ radius: 15, color: 'rgba(0, 0, 0, 0.03)', offsetY: 6 })
 
         // 4. 图文并茂的健康知识栏目
         Column() {
