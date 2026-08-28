@@ -7,6 +7,7 @@
     "pages/mine/MinePage",
     "pages/mine/SettingPage",
     "pages/mine/AboutPage",
-    "pages/home/ArticleDetailPage"
+    "pages/home/ArticleDetailPage",
+    "pages/home/CheckInCalendarPage"
   ]
 }

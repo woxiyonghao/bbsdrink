@@ -154,6 +154,48 @@ export class RdbHelper {
     resultSet.close();
     return total;
   }
+
+  /**
+   * 查询指定用户今天是否已经签到 (type=4)
+   */
+  public async hasCheckedInToday(userId: number): Promise<boolean> {
+    if (!this.rdbStore) return false;
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const startOfDay = now.getTime();
+    now.setHours(23, 59, 59, 999);
+    const endOfDay = now.getTime();
+
+    let predicates = new relationalStore.RdbPredicates('record');
+    predicates.equalTo('userId', userId)
+      .and()
+      .equalTo('type', 4)
+      .and()
+      .greaterThanOrEqualTo('timestamp', startOfDay)
+      .and()
+      .lessThanOrEqualTo('timestamp', endOfDay);
+      
+    let resultSet = await this.rdbStore.query(predicates, ['id']);
+    const hasRecord = resultSet.rowCount > 0;
+    resultSet.close();
+    return hasRecord;
+  }
+
+  /**
+   * 查询指定用户所有的签到记录时间戳
+   */
+  public async queryAllCheckInTimestamps(userId: number): Promise<number[]> {
+    if (!this.rdbStore) return [];
+    let predicates = new relationalStore.RdbPredicates('record');
+    predicates.equalTo('userId', userId).and().equalTo('type', 4);
+    let resultSet = await this.rdbStore.query(predicates, ['timestamp']);
+    let timestamps: number[] = [];
+    while (resultSet.goToNextRow()) {
+      timestamps.push(resultSet.getLong(resultSet.getColumnIndex('timestamp')));
+    }
+    resultSet.close();
+    return timestamps;
+  }
 }
 
 export default RdbHelper.getInstance();

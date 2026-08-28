@@ -31,7 +31,7 @@ export struct HomePage {
         this.nickname = user.nickname;
       }
       this.todayDrank = await RdbHelper.queryTodayWaterTotal(this.userId);
-      // 检查今日是否已签到等逻辑后续可补充
+      this.hasCheckedIn = await RdbHelper.hasCheckedInToday(this.userId);
     }
   }
 
@@ -52,13 +52,14 @@ export struct HomePage {
 
   @Builder QuickAddWaterBtn(label: string, amount: number) {
     Button(label)
-      .width(80)
+      .width(86)
       .height(36)
       .fontSize(14)
       .fontWeight(FontWeight.Medium)
       .fontColor('#07C160')
       .backgroundColor('rgba(7, 193, 96, 0.1)')
       .borderRadius(18)
+      .padding(0) // 移除内边距防止文字被截断
       .onClick(() => this.addWater(amount))
   }
 
@@ -114,10 +115,21 @@ export struct HomePage {
           .padding({ left: 12, right: 12, top: 8, bottom: 8 })
           .backgroundColor(this.hasCheckedIn ? '#07C160' : 'rgba(7, 193, 96, 0.15)')
           .borderRadius(16)
-          .onClick(() => {
+          .onClick(async () => {
             if (!this.hasCheckedIn) {
+              if (this.userId > 0) {
+                await RdbHelper.insertRecord({
+                  userId: this.userId,
+                  type: 4, // 每日签到
+                  value: 1,
+                  timestamp: new Date().getTime()
+                });
+              }
               this.hasCheckedIn = true;
               promptAction.showToast({ message: '签到成功！' });
+            } else {
+              // 已经签到了，跳到签到日历页
+              router.pushUrl({ url: 'pages/home/CheckInCalendarPage' });
             }
           })
         }
