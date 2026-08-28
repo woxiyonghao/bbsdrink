@@ -36,7 +36,7 @@ struct BubbleView {
       .height(this.bubbleSize)
       .position({ x: `${this.x}%`, y: `${this.y}%` })
       .opacity(this.bubbleOpacity)
-      .blendMode(BlendMode.Multiply) // 如果是白底图片，Multiply可以让白色变透明！
+      .blendMode(BlendMode.MULTIPLY) // 如果是白底图片，Multiply可以让白色变透明！
       .hitTestBehavior(HitTestMode.None)
   }
 }
