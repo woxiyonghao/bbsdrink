@@ -1,4 +1,5 @@
 import router from '@ohos.router';
+import promptAction from '@ohos.promptAction';
 import { ActivityItem } from '../../types';
 import RdbHelper from '../../store/RdbHelper';
 import PreferencesUtil from '../../store/PreferencesUtil';
@@ -50,14 +51,39 @@ export struct StretchPage {
     
     this.timerId = setInterval(() => {
       this.milliseconds = Date.now() - this.startTime;
-      if (this.milliseconds >= this.targetSeconds * 1000) {
-        this.milliseconds = this.targetSeconds * 1000;
-        this.stopTimer();
-      }
-    }, 10); // Update every 10ms for smooth millisecond display
+      // No automatic stop! User must click stop.
+    }, 10);
   }
 
-  async stopTimer() {
+  handleStopClick() {
+    if (this.milliseconds < this.targetSeconds * 1000) {
+      // Early stop
+      promptAction.showDialog({
+        title: '提示',
+        message: '运动进行中，确认停止吗？',
+        buttons: [
+          { text: '取消', color: '#999999' },
+          { text: '确认', color: '#FF5E5E' }
+        ]
+      }).then(data => {
+        if (data.index === 1) {
+          // Confirm stop -> Reset
+          if (this.timerId !== -1) {
+            clearInterval(this.timerId);
+            this.timerId = -1;
+          }
+          this.isRunning = false;
+          this.isFinished = false;
+          this.milliseconds = 0;
+        }
+      });
+    } else {
+      // Finished
+      this.finishTimer();
+    }
+  }
+
+  async finishTimer() {
     if (this.timerId !== -1) {
       clearInterval(this.timerId);
       this.timerId = -1;
@@ -66,12 +92,11 @@ export struct StretchPage {
     this.isFinished = true;
     this.showFirework = true;
     
-    // 记录到数据库
     if (this.userId > 0) {
       await RdbHelper.insertRecord({
         userId: this.userId,
         type: 5,
-        value: this.targetSeconds,
+        value: Math.floor(this.milliseconds / 1000), // save actual elapsed seconds
         timestamp: Date.now()
       });
     }
@@ -109,19 +134,22 @@ export struct StretchPage {
             .height(24)
             .fillColor(Color.Black)
             .onClick(() => {
-              if (this.isRunning) {
-                // Cannot stop while running
-                return;
-              }
+              if (this.isRunning) return;
               router.back();
             })
-          Blank()
-        }.width('100%').padding({ left: 20, right: 20, top: 40 })
-
-        Text(this.activityName)
-          .fontSize(24)
-          .fontWeight(FontWeight.Bold)
-          .margin({ top: 20, bottom: 40 })
+          
+          Text(this.activityName)
+            .fontSize(20)
+            .fontWeight(FontWeight.Bold)
+            
+          Blank().width(24) // To balance the back icon for absolute center
+        }
+        .width('100%')
+        .padding({ left: 20, right: 20, top: 50, bottom: 20 })
+        .justifyContent(FlexAlign.SpaceBetween)
+        .alignItems(VerticalAlign.Center)
+        
+        Blank().height(40)
 
         // Center Icon
         Stack() {
@@ -157,23 +185,28 @@ export struct StretchPage {
           .fontColor('#333333')
           .margin({ top: 40, bottom: 60 })
 
-        // Start Button
-        Button(this.isRunning ? '进行中...' : (this.isFinished ? '已完成' : '开始'))
+        // Action Button
+        Button(this.isRunning ? '停止' : (this.isFinished ? '已完成' : '开始'))
           .width(200)
           .height(50)
           .backgroundColor(Color.Transparent)
           .linearGradient({
             direction: GradientDirection.Right,
-            colors: [['#8ECAE6', 0.0], ['#219EBC', 1.0]]
+            colors: this.isRunning 
+              ? [['#FFB6C1', 0.0], ['#FF9AA2', 1.0]] as [ResourceColor, number][] // Light Pink for Stop
+              : (this.isFinished 
+                  ? [['#A8E063', 0.0], ['#56AB2F', 1.0]] as [ResourceColor, number][] // Light Green for Completed
+                  : [['#8ECAE6', 0.0], ['#219EBC', 1.0]] as [ResourceColor, number][]) // Light Blue for Start
           })
           .fontColor(Color.White)
           .fontSize(18)
           .fontWeight(FontWeight.Bold)
           .type(ButtonType.Capsule)
-          .opacity(this.isRunning || this.isFinished ? 0.6 : 1.0)
           .onClick(() => {
             if (!this.isRunning && !this.isFinished) {
               this.startTimer();
+            } else if (this.isRunning) {
+              this.handleStopClick();
             }
           })
       }
