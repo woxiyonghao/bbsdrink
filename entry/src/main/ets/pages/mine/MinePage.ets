@@ -5,12 +5,85 @@ import { User } from '../../types';
 import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
 
+@CustomDialog
+export struct LogoutDialog {
+  controller: CustomDialogController
+  cancel: () => void = () => {}
+  confirm: () => void = () => {}
+
+  build() {
+    Column() {
+      Text('退出登录')
+        .fontSize(18)
+        .fontWeight(FontWeight.Medium)
+        .fontColor('#333333')
+        .margin({ top: 24, bottom: 12 })
+      
+      Text('确认要退出当前账号吗？')
+        .fontSize(15)
+        .fontColor('#666666')
+        .margin({ bottom: 24 })
+
+      Divider().color('rgba(0, 0, 0, 0.05)')
+
+      Row() {
+        Text('取消')
+          .fontSize(16)
+          .fontColor('#888888')
+          .layoutWeight(1)
+          .textAlign(TextAlign.Center)
+          .onClick(() => {
+            this.controller.close()
+            this.cancel()
+          })
+        
+        Divider().vertical(true).height('100%').color('rgba(0, 0, 0, 0.05)')
+        
+        Text('退出')
+          .fontSize(16)
+          .fontColor('#ff4d4f')
+          .fontWeight(FontWeight.Medium)
+          .layoutWeight(1)
+          .textAlign(TextAlign.Center)
+          .onClick(() => {
+            this.controller.close()
+            this.confirm()
+          })
+      }
+      .width('100%')
+      .height(50)
+    }
+    .width(280)
+    .backgroundColor('rgba(255, 255, 255, 0.6)') // 液态毛玻璃背景，较低透明度
+    .backgroundBlurStyle(BlurStyle.Thin)
+    .borderRadius(20)
+  }
+}
+
 @Entry
 @Component
 export struct MinePage {
   @State currentUser: User | null = null;
   @State scaleValue: number = 1;
   @State opacityValue: number = 1;
+
+  dialogController: CustomDialogController = new CustomDialogController({
+    builder: LogoutDialog({
+      cancel: () => {},
+      confirm: () => {
+        animateTo({ duration: 400, curve: Curve.EaseInOut }, () => {
+          this.scaleValue = 0.8;
+          this.opacityValue = 0;
+        });
+        setTimeout(async () => {
+          await PreferencesUtil.setCurrentUserId(-1);
+          router.replaceUrl({ url: 'pages/login/LoginPage' });
+        }, 400);
+      }
+    }),
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  })
   
   async aboutToAppear() {
     const userId: number = await PreferencesUtil.getCurrentUserId();
@@ -93,7 +166,7 @@ export struct MinePage {
         Divider().color('#F5F5F5').margin({ left: 15, right: 15 })
         
         Row() {
-          this.GridItem($r('app.media.ic_drink_record'), '喝水记录', () => { promptAction.showToast({message: '喝水记录待开发', bottom: 60}); })
+          this.GridItem($r('app.media.ic_drink_record'), '喝水记录', () => { router.pushUrl({ url: 'pages/mine/DrinkHistoryPage' }); })
           this.GridItem($r('app.media.ic_sit_record'), '久坐记录', () => { promptAction.showToast({message: '久坐记录待开发', bottom: 60}); })
           this.GridItem($r('app.media.ic_check_record'), '打卡记录', () => { promptAction.showToast({message: '打卡记录待开发', bottom: 60}); })
         }
@@ -105,31 +178,14 @@ export struct MinePage {
 
       // 3. 列表菜单区
       Column() {
-        this.ListItem($r('app.media.ic_about'), '关于', () => { promptAction.showToast({message: '关于健康打卡 v1.0.0', bottom: 60}); })
+        this.ListItem($r('app.media.ic_about'), '关于', () => { 
+          router.pushUrl({ url: 'pages/mine/AboutPage' }) 
+        })
         
         Divider().color('#F5F5F5').margin({ left: 45 })
         
         this.ListItem($r('app.media.ic_logout'), '退出登录', () => {
-          promptAction.showDialog({
-            title: '退出登录',
-            message: '确认要退出当前账号吗？',
-            buttons: [
-              { text: '取消', color: '#888888' },
-              { text: '退出', color: '#ff4d4f' }
-            ]
-          }).then(async (data: promptAction.ShowDialogSuccessResponse) => {
-            if (data.index === 1) { // 确认退出
-              animateTo({ duration: 400, curve: Curve.EaseInOut }, () => {
-                this.scaleValue = 0.8;
-                this.opacityValue = 0;
-              });
-              
-              setTimeout(async () => {
-                await PreferencesUtil.setCurrentUserId(-1);
-                router.replaceUrl({ url: 'pages/login/LoginPage' });
-              }, 400);
-            }
-          })
+          this.dialogController.open()
         })
       }
       .width('100%')

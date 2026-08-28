@@ -4,8 +4,13 @@
     "pages/tabs/TabsPage",
     "pages/home/HomePage",
     "pages/ding/DingPage",
+    "pages/ding/DrinkRecordPage",
     "pages/mine/MinePage",
     "pages/mine/SettingPage",
-    "pages/run/RunPage"
+    "pages/run/RunPage",
+    "pages/mine/AboutPage",
+    "pages/home/ArticleDetailPage",
+    "pages/home/CheckInCalendarPage",
+    "pages/mine/DrinkHistoryPage"
   ]
 }

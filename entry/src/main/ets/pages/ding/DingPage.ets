@@ -1,8 +1,11 @@
 import promptAction from '@ohos.promptAction';
 import router from '@ohos.router';
+import PreferencesUtil from '../../store/PreferencesUtil';
+import RdbHelper from '../../store/RdbHelper';
 @Entry
 @Component
 export struct DingPage {
+  @State userId: number = -1;
   @State isCheckedIn: boolean = false;
   @State shakeAngle: number = 0;
   
@@ -17,7 +20,11 @@ export struct DingPage {
   
   private shakeInterval: number = -1;
 
-  aboutToAppear() {
+  async aboutToAppear() {
+    this.userId = await PreferencesUtil.getCurrentUserId();
+    if (this.userId > 0) {
+      this.isCheckedIn = await RdbHelper.hasCheckedInToday(this.userId);
+    }
     this.startShakeAnimation();
   }
 
@@ -107,8 +114,16 @@ export struct DingPage {
     }
   }
 
-  handleCheckIn() {
+  async handleCheckIn() {
     if (!this.isCheckedIn) {
+      if (this.userId > 0) {
+        await RdbHelper.insertRecord({
+          userId: this.userId,
+          type: 4, // 每日签到
+          value: 1,
+          timestamp: new Date().getTime()
+        });
+      }
       this.isCheckedIn = true;
       this.stopShakeAnimation();
       animateTo({ duration: 300, curve: Curve.Friction }, () => {
@@ -116,7 +131,9 @@ export struct DingPage {
         this.splashLeftOpacity = 0;
         this.splashRightOpacity = 0;
       })
-      promptAction.showToast({ message: '今日打卡成功！' });
+      promptAction.showToast({ message: '今日签到成功！' });
+    } else {
+      router.pushUrl({ url: 'pages/home/CheckInCalendarPage' });
     }
   }
 
@@ -202,7 +219,7 @@ export struct DingPage {
         })
         .shadow({ radius: 12, color: '#4D219EBC', offsetY: 6 })
         .onClick(() => {
-          promptAction.showToast({ message: '功能未开发，请稍等。' });
+          router.pushUrl({ url: 'pages/ding/DrinkRecordPage' });
         })
 
         // 久坐运动卡片
