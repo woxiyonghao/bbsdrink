@@ -69,24 +69,24 @@ export struct DrinkRecordPage {
   }
 
   build() {
-    Stack({ alignContent: Alignment.Top }) {
+    Stack({ alignContent: Alignment.Bottom }) {
       // 全局背景：包含底部的动态水波纹
-      Stack({ alignContent: Alignment.Bottom }) {
+      Stack({ alignContent: Alignment.BottomStart }) {
         Column().width('100%').height('100%').backgroundColor('#F5F7FA')
 
         // 动态波浪水位 (放在整个页面的背景)
-        Stack({ alignContent: Alignment.Bottom }) {
+        Stack({ alignContent: Alignment.BottomStart }) {
           Path()
-            .commands('M0,30 Q50,0 100,30 T200,30 T300,30 T400,30 L400,1000 L0,1000 Z')
-            .fill('rgba(33, 158, 188, 0.3)')
+            .commands('M0,30 Q50,0 100,30 T200,30 T300,30 T400,30 T500,30 T600,30 T700,30 T800,30 T900,30 T1000,30 T1100,30 T1200,30 T1300,30 T1400,30 L1400,1000 L0,1000 Z')
+            .fill('rgba(33, 158, 188, 0.2)')
             .offset({ x: this.waveOffsetX, y: 0 })
           
           Path()
-            .commands('M0,30 Q50,60 100,30 T200,30 T300,30 T400,30 L400,1000 L0,1000 Z')
-            .fill('rgba(142, 202, 230, 0.5)')
+            .commands('M0,30 Q50,60 100,30 T200,30 T300,30 T400,30 T500,30 T600,30 T700,30 T800,30 T900,30 T1000,30 T1100,30 T1200,30 T1300,30 T1400,30 L1400,1000 L0,1000 Z')
+            .fill('rgba(142, 202, 230, 0.4)')
             .offset({ x: this.waveOffsetX * 1.5, y: 0 })
         }
-        .width('300%')
+        .width('400%') // 足够宽以配合动画
         .height('60%') // 占据页面下半部分，供毛玻璃去模糊
         .animation({ duration: 800, curve: Curve.FastOutSlowIn })
       }
@@ -111,15 +111,15 @@ export struct DrinkRecordPage {
         .width('100%')
         .height(56)
         .padding({ left: 20, right: 20 })
-      }
-      .width('100%')
 
-      // ==========================================
-      // 下半部分：底部水平变焦表盘 (清透毛玻璃模式)
-      // ==========================================
-      Stack({ alignContent: Alignment.Bottom }) {
-        // 更蓝的毛玻璃半圆形背景
-        Ellipse()
+        Blank() // 核心改动：把下面的底座狠狠推到底部！
+
+        // ==========================================
+        // 下半部分：底部水平变焦表盘 (清透毛玻璃模式)
+        // ==========================================
+        Stack({ alignContent: Alignment.Bottom }) {
+          // 更蓝的毛玻璃半圆形背景
+          Ellipse()
           .width('150%')
           .height(400)
           .fill('rgba(80, 180, 255, 0.35)') // 更蓝一点
@@ -196,6 +196,7 @@ export struct DrinkRecordPage {
         }
       }
       .width('100%')
+      .height('100%') // 确保 Column 占满全屏，这样 Blank 才能把底座推到底部
     }
     .width('100%')
     .height('100%')
