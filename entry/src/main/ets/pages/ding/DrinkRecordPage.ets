@@ -193,12 +193,14 @@ export struct DrinkRecordPage {
           .onClick(() => {
             this.handleDrink();
           })
-        }
-      }
+        } // 结束 Column (dial items)
+      } // 结束 Stack (dial)
       .width('100%')
-      .height('100%') // 确保 Column 占满全屏，这样 Blank 才能把底座推到底部
-    }
+    } // 结束 Column (nav + dial)
     .width('100%')
-    .height('100%')
-  }
-}
+    .height('100%') // 关键：让这个Column撑满屏幕，Blank才能生效
+  } // 结束 Stack (全局根组件)
+  .width('100%')
+  .height('100%')
+} // 结束 build()
+} // 结束 struct
