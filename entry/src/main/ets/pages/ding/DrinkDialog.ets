@@ -2,6 +2,18 @@ import promptAction from '@ohos.promptAction';
 import RdbHelper from '../../store/RdbHelper';
 import PreferencesUtil from '../../store/PreferencesUtil';
 
+class DrinkOption {
+  type: number;
+  name: string;
+  icon: Resource;
+  
+  constructor(type: number, name: string, icon: Resource) {
+    this.type = type;
+    this.name = name;
+    this.icon = icon;
+  }
+}
+
 @CustomDialog
 export struct DrinkDialog {
   controller: CustomDialogController;
@@ -9,15 +21,15 @@ export struct DrinkDialog {
   @State selectedAmount: number = 250;
   private onConfirm?: () => void;
 
-  readonly DRINKS = [
-    { type: 0, name: '白开水', icon: $r('app.media.ic_drink_water') },
-    { type: 1, name: '咖啡', icon: $r('app.media.ic_drink_coffee') },
-    { type: 2, name: '茶', icon: $r('app.media.ic_drink_tea') },
-    { type: 3, name: '牛奶', icon: $r('app.media.ic_drink_milk') },
-    { type: 5, name: '果汁', icon: $r('app.media.ic_drink_juice') }
+  readonly DRINKS: DrinkOption[] = [
+    new DrinkOption(0, '白开水', $r('app.media.ic_drink_water')),
+    new DrinkOption(1, '咖啡', $r('app.media.ic_drink_coffee')),
+    new DrinkOption(2, '茶', $r('app.media.ic_drink_tea')),
+    new DrinkOption(3, '牛奶', $r('app.media.ic_drink_milk')),
+    new DrinkOption(5, '果汁', $r('app.media.ic_drink_juice'))
   ];
 
-  readonly AMOUNTS = [150, 250, 350, 500, 750];
+  readonly AMOUNTS: number[] = [150, 250, 350, 500, 750];
 
   async saveRecord() {
     const userId = await PreferencesUtil.getCurrentUserId();
@@ -49,7 +61,7 @@ export struct DrinkDialog {
       // 饮品类型选择
       Text('选择饮品').fontSize(14).fontColor('#666').width('100%').margin({ bottom: 12 })
       Row({ space: 12 }) {
-        ForEach(this.DRINKS, (item: any) => {
+        ForEach(this.DRINKS, (item: DrinkOption) => {
           Column() {
             Row() {
               Image(item.icon)
