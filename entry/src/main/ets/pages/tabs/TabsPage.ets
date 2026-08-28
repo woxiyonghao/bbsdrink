@@ -11,7 +11,7 @@ export struct TabsPage {
   private tabsController: TabsController = new TabsController();
 
   private primaryColor: string = THEME_COLOR;
-  private unselectedColor: string = '#8A8A8A';
+  private unselectedColor: string = '#999999';
 
   @Builder
   TabBarBuilder(title: string, targetIndex: number, selectedImg: Resource, normalImg: Resource) {
@@ -21,6 +21,8 @@ export struct TabsPage {
         .height(22)
         .margin({ bottom: 4 })
         .fillColor(this.currentIndex === targetIndex ? this.primaryColor : this.unselectedColor)
+        .scale({ x: this.currentIndex === targetIndex ? 1.35 : 1, y: this.currentIndex === targetIndex ? 1.35 : 1 })
+        .animation({ duration: 300, curve: Curve.Friction })
       
       Text(title)
         .fontSize(10)
@@ -62,16 +64,35 @@ export struct TabsPage {
 
       // 2. iOS 胶囊形毛玻璃自定义 TabBar
       if (this.isTabBarShow) {
-        Row() {
-          this.TabBarBuilder('首页', 0, $r('app.media.ic_home_filled'), $r('app.media.ic_home'))
-          this.TabBarBuilder('打卡', 1, $r('app.media.ic_ding_filled'), $r('app.media.ic_ding'))
-          this.TabBarBuilder('我的', 2, $r('app.media.ic_mine_filled'), $r('app.media.ic_mine'))
+        Stack({ alignContent: Alignment.Center }) {
+          Stack({ alignContent: Alignment.Start }) {
+            // 液态滑动玻璃指示器 (修复位置与透明度)
+            Row()
+              .width('33.333%')
+              .height('100%')
+              .borderRadius(28)
+              .backgroundColor('rgba(255, 255, 255, 0.35)') // 增加透明度，呈现更真实的毛玻璃反光
+              .shadow({ radius: 8, color: 'rgba(0, 0, 0, 0.04)', offsetY: 2 })
+              .position({ x: `${this.currentIndex * 33.333}%`, y: 0 }) // 使用精确的父组件绝对定位
+              .animation({ duration: 350, curve: Curve.Friction })
+
+            Row() {
+              this.TabBarBuilder('首页', 0, $r('app.media.ic_home_filled'), $r('app.media.ic_home'))
+              this.TabBarBuilder('打卡', 1, $r('app.media.ic_ding_filled'), $r('app.media.ic_ding'))
+              this.TabBarBuilder('我的', 2, $r('app.media.ic_mine_filled'), $r('app.media.ic_mine'))
+            }
+            .width('100%')
+            .height('100%')
+          }
+          .width('100%')
+          .height('100%')
+          .padding(4)
         }
         .width('80%') // 胶囊宽度，两边留白
         .height(64) // 胶囊高度
         .margin({ bottom: 24 }) // 悬浮于底部
         .borderRadius(32) // 完全圆角，形成胶囊形状
-        .backgroundColor('rgba(255, 255, 255, 0.4)') // 增加透明度以增强毛玻璃质感
+        .backgroundColor('rgba(7, 193, 96, 0.15)') // 淡淡的主题绿色，增加毛玻璃的通透感
         .backdropBlur(30) // 原生的强背景模糊（毛玻璃核心）
         .shadow({ radius: 15, color: 'rgba(0, 0, 0, 0.08)', offsetY: 5 }) // 悬浮阴影
         .border({ width: 0.5, color: 'rgba(255, 255, 255, 0.6)' }) // 边缘高光边框

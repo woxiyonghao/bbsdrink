@@ -5,14 +5,87 @@ import { User } from '../../types';
 import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
 
+@CustomDialog
+export struct LogoutDialog {
+  controller: CustomDialogController
+  cancel: () => void = () => {}
+  confirm: () => void = () => {}
+
+  build() {
+    Column() {
+      Text('退出登录')
+        .fontSize(18)
+        .fontWeight(FontWeight.Medium)
+        .fontColor('#333333')
+        .margin({ top: 24, bottom: 12 })
+      
+      Text('确认要退出当前账号吗？')
+        .fontSize(15)
+        .fontColor('#666666')
+        .margin({ bottom: 24 })
+
+      Divider().color('rgba(0, 0, 0, 0.05)')
+
+      Row() {
+        Text('取消')
+          .fontSize(16)
+          .fontColor('#888888')
+          .layoutWeight(1)
+          .textAlign(TextAlign.Center)
+          .onClick(() => {
+            this.controller.close()
+            this.cancel()
+          })
+        
+        Divider().vertical(true).height('100%').color('rgba(0, 0, 0, 0.05)')
+        
+        Text('退出')
+          .fontSize(16)
+          .fontColor('#ff4d4f')
+          .fontWeight(FontWeight.Medium)
+          .layoutWeight(1)
+          .textAlign(TextAlign.Center)
+          .onClick(() => {
+            this.controller.close()
+            this.confirm()
+          })
+      }
+      .width('100%')
+      .height(50)
+    }
+    .width(280)
+    .backgroundColor('rgba(255, 255, 255, 0.6)') // 液态毛玻璃背景，较低透明度
+    .backgroundBlurStyle(BlurStyle.Thin)
+    .borderRadius(20)
+  }
+}
+
 @Entry
 @Component
 export struct MinePage {
   @State currentUser: User | null = null;
   @State scaleValue: number = 1;
   @State opacityValue: number = 1;
+
+  dialogController: CustomDialogController = new CustomDialogController({
+    builder: LogoutDialog({
+      cancel: () => {},
+      confirm: () => {
+        animateTo({ duration: 400, curve: Curve.EaseInOut }, () => {
+          this.scaleValue = 0.8;
+          this.opacityValue = 0;
+        });
+        setTimeout(async () => {
+          await PreferencesUtil.setCurrentUserId(-1);
+          router.replaceUrl({ url: 'pages/login/LoginPage' });
+        }, 400);
+      }
+    }),
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  })
   
-  async onPageShow() {
+  async aboutToAppear() {
     const userId: number = await PreferencesUtil.getCurrentUserId();
     if (userId > 0) {
       this.currentUser = await RdbHelper.queryUserById(userId);
@@ -110,26 +183,7 @@ export struct MinePage {
         Divider().color('#F5F5F5').margin({ left: 45 })
         
         this.ListItem($r('app.media.ic_logout'), '退出登录', () => {
-          promptAction.showDialog({
-            title: '退出登录',
-            message: '确认要退出当前账号吗？',
-            buttons: [
-              { text: '取消', color: '#888888' },
-              { text: '退出', color: '#ff4d4f' }
-            ]
-          }).then(async (data: promptAction.ShowDialogSuccessResponse) => {
-            if (data.index === 1) { // 确认退出
-              animateTo({ duration: 400, curve: Curve.EaseInOut }, () => {
-                this.scaleValue = 0.8;
-                this.opacityValue = 0;
-              });
-              
-              setTimeout(async () => {
-                await PreferencesUtil.setCurrentUserId(-1);
-                router.replaceUrl({ url: 'pages/login/LoginPage' });
-              }, 400);
-            }
-          })
+          this.dialogController.open()
         })
       }
       .width('100%')
