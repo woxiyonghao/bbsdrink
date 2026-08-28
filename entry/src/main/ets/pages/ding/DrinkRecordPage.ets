@@ -22,6 +22,7 @@ export struct DrinkRecordPage {
   @State currentAmount: number = 250;
   @State waveOffsetX: number = 0;
   @State isAdjusting: boolean = false; // 调焦 (滚动) 状态
+  @State currentYOffset: number = 0; // 实时滚动偏移，用于计算曲线轨道
   
   private scroller: Scroller = new Scroller();
 
@@ -189,11 +190,11 @@ export struct DrinkRecordPage {
       Stack({ alignContent: Alignment.End }) {
         // 绿色弧线轨道
         Path()
-          .commands('M30,0 Q-30,150 30,300')
+          .commands('M30,0 Q-90,150 30,300')
           .stroke('#07C160')
           .strokeWidth(3)
           .fill('transparent')
-          .width(40)
+          .width(100)
           .height(300)
           .margin({ right: 30 })
 
@@ -233,6 +234,7 @@ export struct DrinkRecordPage {
               .height(60)
               .justifyContent(FlexAlign.End)
               .padding({ right: 20 }) // 让 icon 贴近右侧
+              .translate({ x: 0.001333 * Math.pow(index * 60 - this.currentYOffset, 2) - 30 }) // 抛物线偏移，模拟弧形轨道
             }
             .onClick(() => {
               // 点击直接滚动到对应位置
@@ -253,8 +255,9 @@ export struct DrinkRecordPage {
           })
         })
         .onScroll(() => {
-          // 实时更新当前选中的 index
+          // 实时更新当前选中的 index 和滚动偏移
           const yOffset = this.scroller.currentOffset().yOffset;
+          this.currentYOffset = yOffset;
           const index = Math.round(yOffset / 60);
           if (index !== this.selectedIndex && index >= 0 && index < this.DRINKS.length) {
             this.selectedIndex = index;
