@@ -6,39 +6,39 @@ import PreferencesUtil from '../../store/PreferencesUtil';
 class DrinkOption {
   type: number;
   name: string;
-  emoji: string;
+  icon: Resource;
   
-  constructor(type: number, name: string, emoji: string) {
+  constructor(type: number, name: string, icon: Resource) {
     this.type = type;
     this.name = name;
-    this.emoji = emoji;
+    this.icon = icon;
   }
 }
 
 @Entry
 @Component
 export struct DrinkRecordPage {
-  @State selectedIndex: number = 0; // 当前选中的饮品索引
+  @State selectedIndex: number = 0;
   @State currentAmount: number = 250;
   @State waveOffsetX: number = 0;
-  @State isAdjusting: boolean = false; // 调焦 (滚动) 状态
-  @State currentYOffset: number = 0; // 实时滚动偏移，用于计算曲线轨道
+  @State isAdjusting: boolean = false; 
+  @State currentYOffset: number = 0; 
   
   private scroller: Scroller = new Scroller();
 
   readonly DRINKS: DrinkOption[] = [
-    new DrinkOption(0, '水', '💧'),
-    new DrinkOption(1, '咖啡', '☕'),
-    new DrinkOption(2, '绿茶', '🍵'),
-    new DrinkOption(3, '牛奶', '🥛'),
-    new DrinkOption(4, '果汁', '🧃'),
-    new DrinkOption(5, '可乐', '🥤'),
-    new DrinkOption(6, '啤酒', '🍺'),
-    new DrinkOption(7, '红酒', '🍷'),
-    new DrinkOption(8, '马黛茶', '🧉'),
-    new DrinkOption(9, '鸡尾酒', '🍹'),
-    new DrinkOption(10, '清酒', '🍶'),
-    new DrinkOption(11, '补剂', '🍼')
+    new DrinkOption(0, '水', $r('app.media.ic_drink_water')),
+    new DrinkOption(1, '咖啡', $r('app.media.ic_drink_coffee')),
+    new DrinkOption(2, '绿茶', $r('app.media.ic_drink_tea')),
+    new DrinkOption(3, '牛奶', $r('app.media.ic_drink_milk')),
+    new DrinkOption(4, '果汁', $r('app.media.ic_drink_juice')),
+    new DrinkOption(5, '可乐', $r('app.media.ic_drink_cola')),
+    new DrinkOption(6, '啤酒', $r('app.media.ic_drink_beer')),
+    new DrinkOption(7, '红酒', $r('app.media.ic_drink_wine')),
+    new DrinkOption(8, '马黛茶', $r('app.media.ic_drink_mate')),
+    new DrinkOption(9, '鸡尾酒', $r('app.media.ic_drink_cocktail')),
+    new DrinkOption(10, '清酒', $r('app.media.ic_drink_sake')),
+    new DrinkOption(11, '补剂', $r('app.media.ic_drink_bottle'))
   ];
 
   aboutToAppear() {
@@ -46,9 +46,8 @@ export struct DrinkRecordPage {
   }
 
   startWaveAnimation() {
-    // 匀速无限循环平移，制造波浪流动感
     animateTo({ duration: 3000, curve: Curve.Linear, iterations: -1 }, () => {
-      this.waveOffsetX = -200; // 对应波浪路径的一个完整周期
+      this.waveOffsetX = -200;
     })
   }
 
@@ -58,7 +57,7 @@ export struct DrinkRecordPage {
     if (userId > 0) {
       await RdbHelper.insertRecord({
         userId: userId,
-        type: 0, // 底层统称为喝水，后续可根据 drink.type 细化
+        type: 0,
         value: this.currentAmount,
         timestamp: new Date().getTime()
       });
@@ -103,34 +102,34 @@ export struct DrinkRecordPage {
             // 背景
             Column().width('100%').height('100%').backgroundColor('#F5F7FA')
 
-            // 动态波浪水位 (根据容量计算高度比例)
+            // 动态波浪水位
             Stack({ alignContent: Alignment.Bottom }) {
-              // 后置浅色波浪
               Path()
                 .commands('M0,30 Q50,0 100,30 T200,30 T300,30 T400,30 L400,500 L0,500 Z')
                 .fill('rgba(33, 158, 188, 0.5)')
                 .offset({ x: this.waveOffsetX, y: 0 })
               
-              // 前置深色波浪
               Path()
                 .commands('M0,30 Q50,60 100,30 T200,30 T300,30 T400,30 L400,500 L0,500 Z')
                 .fill('rgba(142, 202, 230, 0.8)')
                 .offset({ x: this.waveOffsetX * 1.5, y: 0 })
             }
-            .width('300%') // 足够宽以平移
+            .width('300%')
             .height(`${Math.max(10, (this.currentAmount / 1000) * 100)}%`)
             .animation({ duration: 800, curve: Curve.FastOutSlowIn })
 
-            // 顶部显示的容量文本 (紧贴水位上方)
+            // 顶部显示的容量文本
             Text(`${this.currentAmount} ml`)
               .fontColor('#333333')
               .fontSize(18)
               .fontWeight(FontWeight.Bold)
-              .margin({ bottom: '100%' }) // 让它飘在顶部附近
+              .margin({ bottom: '100%' })
 
-            // 中央显示的当前饮品 Emoji
-            Text(this.DRINKS[this.selectedIndex].emoji)
-              .fontSize(60)
+            // 中央显示的当前饮品图标
+            Image(this.DRINKS[this.selectedIndex].icon)
+              .width(60)
+              .height(60)
+              .fillColor('#333333')
               .opacity(0.8)
               .margin({ bottom: 100 })
 
@@ -139,7 +138,7 @@ export struct DrinkRecordPage {
           .height(320)
           .border({ width: 3, color: '#E0E0E0', radius: 10 })
           .clip(true)
-          .margin({ left: 40 }) // 让杯子稍微偏左，给右侧滚轮留空间
+          .margin({ left: 40 })
           
           Blank()
           
@@ -188,22 +187,12 @@ export struct DrinkRecordPage {
       // 右侧 iPhone 变焦滚轮 (绝对定位)
       // ==========================================
       Stack({ alignContent: Alignment.End }) {
-        // 绿色弧线轨道
-        Path()
-          .commands('M30,0 Q-90,150 30,300')
-          .stroke('#07C160')
-          .strokeWidth(3)
-          .fill('transparent')
-          .width(100)
-          .height(300)
-          .margin({ right: 30 })
-
-        // 调焦时的毛玻璃椭圆特效
+        // 调焦时的浅灰色毛玻璃椭圆特效
         if (this.isAdjusting) {
           Ellipse()
-            .width(100)
+            .width(110)
             .height(180)
-            .fill('rgba(255, 255, 255, 0.65)')
+            .fill('rgba(230, 230, 230, 0.5)')
             .backgroundBlurStyle(BlurStyle.Thin)
             .margin({ right: 5 })
             .animation({ duration: 200 })
@@ -211,42 +200,42 @@ export struct DrinkRecordPage {
 
         // 滚轮列表
         List({ scroller: this.scroller }) {
-          // 顶部占位 120px，使第0个元素正好居中 (300/2 - 60/2)
-          ListItem().height(120)
+          // 顶部占位 110px，使第0个元素正好居中 (300/2 - 80/2)
+          ListItem().height(110)
           
           ForEach(this.DRINKS, (item: DrinkOption, index: number) => {
             ListItem() {
-              Row() {
-                // 只有在调焦时，或者被选中时，才显示文字
+              Column() {
+                Image(item.icon)
+                  .width(this.selectedIndex === index ? 36 : 24)
+                  .height(this.selectedIndex === index ? 36 : 24)
+                  .fillColor(this.selectedIndex === index ? '#07C160' : '#888888')
+                  .animation({ duration: 200 })
+
+                // 调焦时或选中时显示文字，避免拥挤
                 if (this.isAdjusting || this.selectedIndex === index) {
                   Text(item.name)
-                    .fontSize(this.selectedIndex === index ? 16 : 12)
-                    .fontColor(this.selectedIndex === index ? '#07C160' : '#999')
-                    .margin({ right: 12 })
-                    .transition({ type: TransitionType.All, opacity: 0, translate: { x: 20 } })
+                    .fontSize(this.selectedIndex === index ? 14 : 11)
+                    .fontColor(this.selectedIndex === index ? '#07C160' : '#999999')
+                    .margin({ top: 4 })
+                    .transition({ type: TransitionType.All, opacity: 0 })
                 }
-
-                Text(item.emoji)
-                  .fontSize(this.selectedIndex === index ? 40 : 24)
-                  .animation({ duration: 200 })
               }
-              .width(140)
-              .height(60)
-              .justifyContent(FlexAlign.End)
-              .padding({ right: 20 }) // 让 icon 贴近右侧
-              .translate({ x: 0.001333 * Math.pow(index * 60 - this.currentYOffset, 2) - 30 }) // 抛物线偏移，模拟弧形轨道
+              .width(80)
+              .height(80) // 增大 item 高度为 80，容纳上下排布
+              .justifyContent(FlexAlign.Center)
+              .translate({ x: 0.001 * Math.pow(index * 80 - this.currentYOffset, 2) - 30 }) // 稍微减小平移幅度系数
             }
             .onClick(() => {
-              // 点击直接滚动到对应位置
-              this.scroller.scrollTo({ xOffset: 0, yOffset: index * 60, animation: { duration: 300, curve: Curve.EaseInOut } });
+              this.scroller.scrollTo({ xOffset: 0, yOffset: index * 80, animation: { duration: 300, curve: Curve.EaseInOut } });
               this.selectedIndex = index;
             })
           })
           
-          // 底部占位 120px
-          ListItem().height(120)
+          // 底部占位 110px
+          ListItem().height(110)
         }
-        .width(140)
+        .width(180) // 加宽防止文字被截断
         .height(300)
         .scrollBar(BarState.Off)
         .onScrollStart(() => {
@@ -255,10 +244,9 @@ export struct DrinkRecordPage {
           })
         })
         .onScroll(() => {
-          // 实时更新当前选中的 index 和滚动偏移
           const yOffset = this.scroller.currentOffset().yOffset;
           this.currentYOffset = yOffset;
-          const index = Math.round(yOffset / 60);
+          const index = Math.round(yOffset / 80); // 改为 80
           if (index !== this.selectedIndex && index >= 0 && index < this.DRINKS.length) {
             this.selectedIndex = index;
           }
@@ -267,11 +255,10 @@ export struct DrinkRecordPage {
           animateTo({ duration: 200 }, () => {
             this.isAdjusting = false;
           })
-          // 吸附到最近的元素
-          this.scroller.scrollTo({ xOffset: 0, yOffset: this.selectedIndex * 60, animation: { duration: 200, curve: Curve.EaseOut } });
+          this.scroller.scrollTo({ xOffset: 0, yOffset: this.selectedIndex * 80, animation: { duration: 200, curve: Curve.EaseOut } });
         })
       }
-      .width(140)
+      .width(180)
       .height(300)
       .position({ right: 0, top: 150 })
 
