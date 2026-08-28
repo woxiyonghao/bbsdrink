@@ -295,6 +295,21 @@ export class RdbHelper {
       await this.rdbStore.delete(predicates);
     }
   }
+
+  // 查询某类型的最后一次记录时间
+  public async queryLastRecordTime(userId: number, type: number): Promise<number> {
+    if (!this.rdbStore) return 0;
+    let predicates = new relationalStore.RdbPredicates('record');
+    predicates.equalTo('userId', userId).and().equalTo('type', type);
+    predicates.orderByDesc('timestamp');
+    let resultSet = await this.rdbStore.query(predicates, ['timestamp']);
+    let lastTime = 0;
+    if (resultSet.goToFirstRow()) {
+      lastTime = resultSet.getLong(resultSet.getColumnIndex('timestamp'));
+    }
+    resultSet.close();
+    return lastTime;
+  }
 }
 
 export default RdbHelper.getInstance();

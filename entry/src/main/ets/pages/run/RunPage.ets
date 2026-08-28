@@ -162,9 +162,13 @@ export struct RunPage {
                   params: { defaultType: item.drinkType }
                 });
               } else {
-                animateTo({ duration: 500 }, () => {
-                  this.activities[index].progress = 100;
-                })
+                router.pushUrl({
+                  url: 'pages/run/StretchPage',
+                  params: {
+                    activityName: item.name,
+                    targetSeconds: item.targetSeconds || 60
+                  }
+                });
               }
             })
           }

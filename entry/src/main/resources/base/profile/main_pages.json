@@ -8,6 +8,7 @@
     "pages/mine/MinePage",
     "pages/mine/SettingPage",
     "pages/run/RunPage",
+    "pages/run/StretchPage",
     "pages/mine/AboutPage",
     "pages/home/ArticleDetailPage",
     "pages/home/CheckInCalendarPage",
