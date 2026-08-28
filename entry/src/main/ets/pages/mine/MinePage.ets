@@ -178,7 +178,9 @@ export struct MinePage {
 
       // 3. 列表菜单区
       Column() {
-        this.ListItem($r('app.media.ic_about'), '关于', () => { promptAction.showToast({message: '关于健康打卡 v1.0.0', bottom: 60}); })
+        this.ListItem($r('app.media.ic_about'), '关于', () => { 
+          router.pushUrl({ url: 'pages/mine/AboutPage' }) 
+        })
         
         Divider().color('#F5F5F5').margin({ left: 45 })
         

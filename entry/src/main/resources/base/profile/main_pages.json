@@ -5,6 +5,7 @@
     "pages/home/HomePage",
     "pages/ding/DingPage",
     "pages/mine/MinePage",
-    "pages/mine/SettingPage"
+    "pages/mine/SettingPage",
+    "pages/mine/AboutPage"
   ]
 }
