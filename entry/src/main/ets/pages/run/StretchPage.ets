@@ -216,12 +216,22 @@ export struct StretchPage {
 
       // 3. Firework overlay
       if (this.showFirework) {
-        Image($r('app.media.firework'))
-          .width('100%')
-          .height(400)
-          .blendMode(BlendMode.SCREEN)
-          .objectFit(ImageFit.Cover)
-          .hitTestBehavior(HitTestMode.None)
+        Stack() {
+          // 黑色半透明蒙层
+          Column()
+            .width('100%')
+            .height('100%')
+            .backgroundColor('rgba(0, 0, 0, 0.6)')
+            
+          Image($r('app.media.firework'))
+            .width('100%')
+            .height('100%')
+            .blendMode(BlendMode.SCREEN)
+            .objectFit(ImageFit.Cover)
+        }
+        .width('100%')
+        .height('100%')
+        .hitTestBehavior(HitTestMode.None)
       }
     }
     .width('100%')
