@@ -15,6 +15,14 @@ class DrinkOption {
   }
 }
 
+interface Bubble {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  opacity: number;
+}
+
 @Entry
 @Component
 export struct DrinkRecordPage {
@@ -22,6 +30,7 @@ export struct DrinkRecordPage {
   @State currentAmount: number = 250;
     @State waveOffsetX: number = 0;
   
+  @State bubbles: Bubble[] = [];
   @State todayCategoryAmount: number = 0;
   
   // 动画状态
@@ -71,6 +80,36 @@ export struct DrinkRecordPage {
     })
   }
 
+
+  spawnBubbles() {
+    const newBubbles: Bubble[] = [];
+    const now = Date.now();
+    for (let i = 0; i < 20; i++) {
+      newBubbles.push({
+        id: now + i,
+        x: Math.random() * 90 + 5, // 5% 到 95%
+        y: 100, // 从底部开始
+        size: Math.random() * 15 + 10,
+        opacity: Math.random() * 0.4 + 0.3
+      });
+    }
+    this.bubbles = [...this.bubbles, ...newBubbles];
+    
+    setTimeout(() => {
+      animateTo({ duration: 2500, curve: Curve.EaseOut }, () => {
+        this.bubbles = this.bubbles.map(b => {
+          if (b.id >= now) {
+            return { ...b, y: -20 }; // 飘出屏幕顶部
+          }
+          return b;
+        });
+      });
+      
+      setTimeout(() => {
+        this.bubbles = this.bubbles.filter(b => b.id > now + 30);
+      }, 3000);
+    }, 50);
+  }
 
   async playDrinkAnimation() {
     this.flyOpacity = 1;
@@ -124,6 +163,7 @@ export struct DrinkRecordPage {
       
       promptAction.showToast({ message: `吨吨吨！成功记录 ${this.currentAmount}ml ${drink.name}！` });
       this.playDrinkAnimation();
+      this.spawnBubbles();
     } else {
       promptAction.showToast({ message: '请先登录' });
     }
@@ -131,23 +171,19 @@ export struct DrinkRecordPage {
 
   build() {
     Stack({ alignContent: Alignment.Bottom }) {
-      // 1. 全局背景：浅蓝色 (未喝水)
+      // 全局纯色背景
       Column()
         .width('100%')
         .height('100%')
         .backgroundColor('#29C5F6')
 
-      // 2. 波浪 (已喝水)，深蓝色
-      Stack({ alignContent: Alignment.Top }) {
-        Path()
-          .commands('M0,30 Q50,0 100,30 T200,30 T300,30 T400,30 T500,30 T600,30 T700,30 T800,30 T900,30 T1000,30 T1100,30 T1200,30 T1300,30 T1400,30 L1400,2000 L0,2000 Z')
-          .fill('#00A3FF')
-          .offset({ x: this.waveOffsetX, y: 0 })
-      }
-      .width('400%')
-      .height(`${35 + Math.min(65, (this.todayCategoryAmount / 2000) * 65)}%`) // 随喝水量上涨
-      .animation({ duration: 800, curve: Curve.EaseInOut })
-      .align(Alignment.BottomStart) // 波浪贴紧底部开始
+      // 汽水气泡层
+      ForEach(this.bubbles, (b: Bubble) => {
+        Circle({ width: b.size, height: b.size })
+          .fill('rgba(255, 255, 255, 0.6)') // 白色气泡
+          .position({ x: `${b.x}%`, y: `${b.y}%` })
+          .opacity(b.opacity)
+      }, (b: Bubble) => b.id.toString())
 
       Column() {
         // 顶部导航
@@ -206,14 +242,14 @@ export struct DrinkRecordPage {
               ListItem() {
                 Column() {
                   Image(item.icon)
-                    .width(28) 
-                    .height(28)
-                    .fillColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.6)' : '#FFFFFF') // 选中更淡的绿，未选中白
+                    .width(this.selectedIndex === index ? 44 : 28) 
+                    .height(this.selectedIndex === index ? 44 : 28)
+                    .fillColor(this.selectedIndex === index ? '#80FFBB' : 'rgba(255, 255, 255, 0.6)') // 选中大+淡绿色，未选中半透明白
                     .animation({ duration: 200 })
 
                   Text(item.name)
-                    .fontSize(this.selectedIndex === index ? 14 : 11)
-                    .fontColor(this.selectedIndex === index ? 'rgba(7, 193, 96, 0.6)' : '#FFFFFF')
+                    .fontSize(this.selectedIndex === index ? 16 : 12)
+                    .fontColor(this.selectedIndex === index ? '#80FFBB' : 'rgba(255, 255, 255, 0.6)')
                     .fontWeight(this.selectedIndex === index ? FontWeight.Bold : FontWeight.Normal)
                     .margin({ top: 8 })
                     .animation({ duration: 200 })
