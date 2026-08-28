@@ -58,6 +58,7 @@ struct BubbleView {
       .height(this.bubble.size)
       .position({ x: `${this.bubble.x}%`, y: `${this.bubble.y}%` })
       .opacity(this.bubble.opacity)
+      .blendMode(BlendMode.LIGHTEN) // 关键：使用 LIGHTEN 模式，因为底图不是纯黑，LIGHTEN 可以完美过滤掉比背景暗的像素，只保留高光气泡
       .animation({
         duration: this.bubble.duration,
         curve: Curve.EaseOut // 或者 Curve.Linear
