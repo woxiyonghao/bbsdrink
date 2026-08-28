@@ -165,11 +165,11 @@ export struct DrinkRecordPage {
       // 下半部分：底部水平变焦表盘 (清透毛玻璃模式)
       // ==========================================
       Stack({ alignContent: Alignment.Bottom }) {
-        // Tabs 同款浅绿毛玻璃半圆形背景
+        // 天空淡蓝毛玻璃半圆形背景
         Ellipse()
           .width('150%')
           .height(400)
-          .fill('rgba(7, 193, 96, 0.15)') // Tabs的绿色底座
+          .fill('rgba(135, 206, 235, 0.2)') // 天空淡蓝
           .strokeWidth(0.5)
           .stroke('rgba(255, 255, 255, 0.6)') // 边缘高光
           .backgroundBlurStyle(BlurStyle.Thin) 
@@ -235,12 +235,9 @@ export struct DrinkRecordPage {
           }
           .width(72)
           .height(72)
-          .linearGradient({ // 小小的淡绿渐变色
-            direction: GradientDirection.Bottom,
-            colors: [['rgba(7, 193, 96, 0.1)', 0.0], ['rgba(7, 193, 96, 0.5)', 1.0]]
-          })
+          .backgroundColor('rgba(7, 193, 96, 0.2)') // 底座的淡绿作为背景色
           .margin({ top: 10, bottom: 30 })
-          .shadow({ radius: 10, color: 'rgba(7, 193, 96, 0.2)', offsetY: 4 })
+          .shadow({ radius: 10, color: 'rgba(7, 193, 96, 0.1)', offsetY: 4 })
           .onClick(() => {
             this.handleDrink();
           })
