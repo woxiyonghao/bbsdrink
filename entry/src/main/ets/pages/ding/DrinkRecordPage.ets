@@ -191,11 +191,11 @@ export struct DrinkRecordPage {
         if (this.isAdjusting) {
           Ellipse()
             .width(240)
-            .height(280)
-            .fill('rgba(0, 0, 0, 0.1)') // 黑色，0.1透明度
-            .backgroundBlurStyle(BlurStyle.Thin) // 毛玻璃效果
-            .opacity(0.7) // 整体带有一定透明度以达到0.3效果
-            .margin({ right: -120 }) // 藏一半，露出一个120宽的半圆
+            .height(480) // 上下长度大幅度增加，包住所有图标
+            .fill('rgba(0, 0, 0, 0.1)')
+            .backgroundBlurStyle(BlurStyle.Thin)
+            .opacity(0.7)
+            .margin({ right: -120 })
             .animation({ duration: 200 })
         }
 
@@ -204,7 +204,7 @@ export struct DrinkRecordPage {
           .width(16)
           .height(2)
           .backgroundColor('#FF6B6B')
-          .margin({ right: 80 }) // 完美对准处于最高点的图标中心
+          .margin({ right: 80 })
           .opacity(this.isAdjusting ? 1 : 0)
           .animation({ duration: 200 })
 
@@ -234,7 +234,6 @@ export struct DrinkRecordPage {
               .width(80)
               .height(80)
               .justifyContent(FlexAlign.Center)
-              // 关键抛物线向左凸：减小幅度，确保图标始终在黑色圆盘内
               .translate({ x: 0.0015 * Math.pow(index * 80 - this.currentYOffset, 2) - 10 })
             }
             .onClick(() => {
@@ -246,7 +245,7 @@ export struct DrinkRecordPage {
           // 底部占位 110px
           ListItem().height(110)
         }
-        .width(120) // 收窄 List 宽度，使其位于圆盘内部
+        .width(120)
         .height(300)
         .scrollBar(BarState.Off)
         .onScrollStart(() => {
@@ -269,9 +268,9 @@ export struct DrinkRecordPage {
           this.scroller.scrollTo({ xOffset: 0, yOffset: this.selectedIndex * 80, animation: { duration: 200, curve: Curve.EaseOut } });
         })
       }
-      .width(120) // Stack 容器宽度
+      .width(120)
       .height(300)
-      .position({ right: 0, top: 150 })
+      .position({ right: -30, top: 150 }) // 整体向屏幕右侧缩进 30px
 
     }
   }
