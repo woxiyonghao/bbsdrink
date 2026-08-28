@@ -176,27 +176,31 @@ export struct HomePage {
           Blank()
           
           // 海报分享 & 成就墙 按钮
-          Row({ space: 12 }) {
+          Row({ space: 14 }) {
             // 成就墙按钮
             Row() {
-              Text('🏆').fontSize(16)
+              Image($r('app.media.ic_trophy'))
+                .width(24).height(24)
+                .fillColor('#333333')
             }
-            .width(36).height(36)
+            .width(42).height(42)
             .justifyContent(FlexAlign.Center)
             .backgroundColor('#F5F7FA')
-            .borderRadius(18)
+            .borderRadius(21)
             .onClick(() => {
               promptAction.showToast({ message: '健康成就墙功能即将开放！' });
             })
 
             // 分享海报按钮
             Row() {
-              Text('📸').fontSize(16)
+              Image($r('app.media.ic_camera'))
+                .width(24).height(24)
+                .fillColor('#333333')
             }
-            .width(36).height(36)
+            .width(42).height(42)
             .justifyContent(FlexAlign.Center)
             .backgroundColor('#F5F7FA')
-            .borderRadius(18)
+            .borderRadius(21)
             .onClick(() => {
               promptAction.showToast({ message: '每日健康海报功能即将开放！' });
             })
