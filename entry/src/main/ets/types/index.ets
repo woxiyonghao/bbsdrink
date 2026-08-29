@@ -131,9 +131,9 @@ export const GLOBAL_ACTIVITIES: ActivityItem[] = [
   new ActivityItem('吃点水果',   '5分钟',  '#EF476F', '#D90429', 0, $r('app.media.fruit'),             204, 300, undefined, true, 'pages/run/FruitPage'),
   new ActivityItem('眺望窗外',   '2分钟',  '#06D6A0', '#00A896', 0, $r('app.media.window'),            205, 120, undefined, true, 'pages/run/WindowPage'),
   new ActivityItem('闭目养神',   '3分钟',  '#FF758C', '#FF7EB3', 0, $r('app.media.rest'),              206, 180, undefined, true, 'pages/run/RestPage'),
-  new ActivityItem('站起来动动', '3分钟',  '#A8E063', '#56AB2F', 0, '🤸',                            207, 180, true),
+  new ActivityItem('站起来动动', '3分钟',  '#A8E063', '#56AB2F', 0, $r('app.media.stand'),            207, 180, undefined, true, 'pages/run/StandPage'),
   new ActivityItem('深蹲一下',   '3分钟',  '#FFB75E', '#ED8F03', 0, $r('app.media.squat'),           208, 180, undefined, true, 'pages/run/SquatPage'),
-  new ActivityItem('楼下走走',   '10分钟', '#06D6A0', '#00A896', 0, $r('app.media.ic_sport_white'), 209, 600),
-  new ActivityItem('跑一下',     '15分钟', '#118AB2', '#073B4C', 0, $r('app.media.ic_sport_white'), 210, 900),
+  new ActivityItem('楼下走走',   '10分钟', '#06D6A0', '#00A896', 0, $r('app.media.walk'),             209, 600, undefined, true, 'pages/run/WalkPage'),
+  new ActivityItem('跑一下',     '15分钟', '#118AB2', '#073B4C', 0, $r('app.media.run'),              210, 900, undefined, true, 'pages/run/JogPage'),
 ];
 
