@@ -62,35 +62,49 @@ export struct ActivityRecordPage {
     return `${yyyy}-${mm}-${dd} ${HH}:${MM}:${SS}`;
   }
 
+  getActivityColors(type: number): [string, string] {
+    const activity = GLOBAL_ACTIVITIES.find(a => a.activityType === type);
+    return activity ? [activity.color1, activity.color2] : ['#A8E063', '#56AB2F'];
+  }
+
   getCardScale(index: number): number {
     let relIndex = index - this.currentIndex;
-    if (relIndex === 0) return 1;
-    let progress = Math.min(Math.abs(this.offsetX) / 200, 1);
-    if (relIndex === 1) return 0.9 + 0.1 * progress;
-    if (relIndex === 2) return 0.8 + 0.1 * progress;
+    if (relIndex <= 0) return 1;
+    let progress = Math.min(Math.abs(this.offsetX) / 150, 1);
+    if (relIndex === 1) return 0.95 + 0.05 * progress;
+    if (relIndex === 2) return 0.90 + 0.05 * progress;
     return 0;
   }
 
   getCardTranslateY(index: number): number {
     let relIndex = index - this.currentIndex;
-    if (relIndex === 0) return this.offsetY;
-    let progress = Math.min(Math.abs(this.offsetX) / 200, 1);
-    if (relIndex === 1) return 40 - 40 * progress;
-    if (relIndex === 2) return 80 - 40 * progress;
+    if (relIndex <= 0) return this.offsetY;
+    let progress = Math.min(Math.abs(this.offsetX) / 150, 1);
+    if (relIndex === 1) return 20 - 20 * progress;
+    if (relIndex === 2) return 40 - 20 * progress;
     return 0;
   }
 
   @Builder CardItem(record: CheckInRecord, index: number) {
     if (index - this.currentIndex >= 0 && index - this.currentIndex < 3) {
       Column() {
-        // 顶部图片（第一帧）
-        Image(this.getStaticIconForType(record.type))
-          .width('100%')
-          .aspectRatio(1)
-          .objectFit(ImageFit.Contain)
-          .backgroundColor('rgba(7, 193, 96, 0.05)')
-          .borderRadius({ topLeft: 24, topRight: 24 })
-          .padding(20)
+        // 顶部图片（第一帧）带有对应渐变背景
+        Stack() {
+          Image(this.getStaticIconForType(record.type))
+            .width('80%')
+            .aspectRatio(1)
+            .objectFit(ImageFit.Contain)
+        }
+        .width('100%')
+        .aspectRatio(1)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            [this.getActivityColors(record.type)[0], 0.0],
+            [this.getActivityColors(record.type)[1], 1.0]
+          ]
+        })
+        .borderRadius({ topLeft: 24, topRight: 24 })
         
         // 下方信息
         Column() {
@@ -124,33 +138,37 @@ export struct ActivityRecordPage {
         x: (index - this.currentIndex) === 0 ? this.offsetX : 0, 
         y: this.getCardTranslateY(index)
       })
-      .rotate({ z: 1, angle: (index - this.currentIndex) === 0 ? (this.offsetX / 15) : 0 })
+      .rotate({ z: 1, angle: (index - this.currentIndex) === 0 ? (this.offsetX / 20) : 0 })
       .gesture(
-        (index - this.currentIndex) === 0 ? PanGesture()
+        PanGesture()
           .onActionUpdate((event: GestureEvent) => {
-            this.offsetX = event.offsetX;
-            this.offsetY = event.offsetY;
+            if (index === this.currentIndex) {
+              this.offsetX = event.offsetX;
+              this.offsetY = event.offsetY;
+            }
           })
           .onActionEnd((event: GestureEvent) => {
-            if (Math.abs(this.offsetX) > 120) {
-              // 飞出屏幕并切换下一张
-              let sign = this.offsetX > 0 ? 1 : -1;
-              animateTo({ duration: 250, curve: Curve.EaseOut, onFinish: () => {
-                this.currentIndex++;
-                this.offsetX = 0;
-                this.offsetY = 0;
-              }}, () => {
-                this.offsetX = sign * 600;
-                this.offsetY = this.offsetY + (event.offsetY > 0 ? 200 : -200);
-              });
-            } else {
-              // 弹回原位
-              animateTo({ duration: 300, curve: Curve.EaseOut }, () => {
-                this.offsetX = 0;
-                this.offsetY = 0;
-              });
+            if (index === this.currentIndex) {
+              if (Math.abs(this.offsetX) > 120) {
+                // 飞出屏幕并切换下一张
+                let sign = this.offsetX > 0 ? 1 : -1;
+                animateTo({ duration: 300, curve: Curve.EaseOut, onFinish: () => {
+                  this.currentIndex++;
+                  this.offsetX = 0;
+                  this.offsetY = 0;
+                }}, () => {
+                  this.offsetX = sign * 600;
+                  this.offsetY = this.offsetY + (event.offsetY > 0 ? 100 : -100);
+                });
+              } else {
+                // 弹回原位
+                animateTo({ duration: 300, curve: Curve.EaseOut }, () => {
+                  this.offsetX = 0;
+                  this.offsetY = 0;
+                });
+              }
             }
-          }) : undefined
+          })
       )
     }
   }
