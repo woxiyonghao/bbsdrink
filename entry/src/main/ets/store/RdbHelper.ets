@@ -293,7 +293,53 @@ export class RdbHelper {
         id: resultSet.getLong(resultSet.getColumnIndex('id')),
         userId: resultSet.getLong(resultSet.getColumnIndex('userId')),
         type: resultSet.getLong(resultSet.getColumnIndex('type')),
-        value: resultSet.getLong(resultSet.getColumnIndex('value')), // 运动的秒数
+        value: resultSet.getLong(resultSet.getColumnIndex('value')),
+        timestamp: resultSet.getLong(resultSet.getColumnIndex('timestamp'))
+      });
+    }
+    resultSet.close();
+    return records;
+  }
+
+  public async queryTodayActivityCount(userId: number): Promise<number> {
+    if (!this.rdbStore) return 0;
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const startOfDay = now.getTime();
+    now.setHours(23, 59, 59, 999);
+    const endOfDay = now.getTime();
+
+    let predicates = new relationalStore.RdbPredicates('record');
+    predicates.equalTo('userId', userId)
+      .and()
+      .greaterThanOrEqualTo('type', 201)
+      .and()
+      .greaterThanOrEqualTo('timestamp', startOfDay)
+      .and()
+      .lessThanOrEqualTo('timestamp', endOfDay);
+      
+    let resultSet = await this.rdbStore.query(predicates, ['id']);
+    const count = resultSet.rowCount;
+    resultSet.close();
+    return count > 0 ? count : 0;
+  }
+
+  public async queryActivityRecordsByRange(userId: number, startTimestamp: number, endTimestamp: number): Promise<CheckInRecord[]> {
+    if (!this.rdbStore) return [];
+    let predicates = new relationalStore.RdbPredicates('record');
+    predicates.equalTo('userId', userId)
+              .and().greaterThanOrEqualTo('type', 201)
+              .and().greaterThanOrEqualTo('timestamp', startTimestamp)
+              .and().lessThanOrEqualTo('timestamp', endTimestamp)
+              .orderByDesc('timestamp');
+    let resultSet = await this.rdbStore.query(predicates, ['id', 'userId', 'type', 'value', 'timestamp']);
+    let records: CheckInRecord[] = [];
+    while (resultSet.goToNextRow()) {
+      records.push({
+        id: resultSet.getLong(resultSet.getColumnIndex('id')),
+        userId: resultSet.getLong(resultSet.getColumnIndex('userId')),
+        type: resultSet.getLong(resultSet.getColumnIndex('type')),
+        value: resultSet.getLong(resultSet.getColumnIndex('value')),
         timestamp: resultSet.getLong(resultSet.getColumnIndex('timestamp'))
       });
     }

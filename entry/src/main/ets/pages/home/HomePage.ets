@@ -31,6 +31,8 @@ export struct HomePage {
   @State weekCheckInStatus: boolean[] = [false, false, false, false, false, false, false];
   @State weekCheckInCount: number = 0;
   
+  @State todayActivityCount: number = 0;
+
   private currentDate: string = '';
 
   @Prop @Watch('onTabChange') currentTabIndex: number = 0;
@@ -43,9 +45,11 @@ export struct HomePage {
 
   onPageShow() {
     if (this.userId > 0) {
-      // 每次页面展示时，重新查询当天的喝水量，确保打卡返回后能实时刷新
       RdbHelper.queryTodayWaterTotal(this.userId).then(total => {
         this.todayDrank = total;
+      });
+      RdbHelper.queryTodayActivityCount(this.userId).then(count => {
+        this.todayActivityCount = count;
       });
     }
   }
@@ -64,8 +68,8 @@ export struct HomePage {
       if (user) {
         this.nickname = user.nickname;
       }
-      // 每次页面展示时，重新查询当天的喝水量，确保打卡返回后能实时刷新
       this.todayDrank = await RdbHelper.queryTodayWaterTotal(this.userId);
+      this.todayActivityCount = await RdbHelper.queryTodayActivityCount(this.userId);
       this.hasCheckedIn = await RdbHelper.hasCheckedInToday(this.userId);
       this.lastWaterTime = await RdbHelper.queryLatestWaterRecordTime(this.userId);
       this.updateWaterReminder();
@@ -153,7 +157,7 @@ export struct HomePage {
       .onClick(() => this.addWater(amount))
   }
 
-  @Builder HealthCard(title: string, value: string, unit: string, icon: Resource, bgColor: string = '#FFF') {
+  @Builder HealthCard(title: string, value: string, unit: string, icon: Resource, bgColor: string = '#FFF', onClickAction?: () => void) {
     Column() {
       Row() {
         Image(icon).width(20).height(20).fillColor('#07C160')
@@ -172,7 +176,13 @@ export struct HomePage {
     .backgroundColor(bgColor)
     .borderRadius(20)
     .shadow({ radius: 10, color: 'rgba(0, 0, 0, 0.03)', offsetY: 4 })
-    .onClick(() => { promptAction.showToast({ message: `${title}功能开发中` }) })
+    .onClick(() => { 
+      if (onClickAction) {
+        onClickAction();
+      } else {
+        promptAction.showToast({ message: `${title}功能开发中` });
+      }
+    })
   }
 
   build() {
@@ -292,7 +302,9 @@ export struct HomePage {
 
         // 3. 健康双卡片 (防久坐 & 步数)
         Row({ space: 16 }) {
-          this.HealthCard('今日活动', '0', '次', $r('app.media.ic_sit_record'))
+          this.HealthCard('今日运动', `${this.todayActivityCount}`, '次', $r('app.media.ic_sit_record'), '#FFF', () => {
+            router.pushUrl({ url: 'pages/mine/ActivityRecordPage' })
+          })
           this.HealthCard('今日步数', '0', '步', $r('app.media.ic_check_record')) // 暂用 check 图标
         }
         .width('90%')
