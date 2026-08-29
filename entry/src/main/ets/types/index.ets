@@ -126,7 +126,7 @@ export class ActivityItem {
  */
 export const GLOBAL_ACTIVITIES: ActivityItem[] = [
   new ActivityItem('伸懒腰',     '1分钟',  '#FFB75E', '#ED8F03', 0, $r('app.media.stretch'),        201, 60),
-  new ActivityItem('颈椎操',     '5分钟',  '#A8E063', '#56AB2F', 0, $r('app.media.ic_sit_record'),  202, 300),
+  new ActivityItem('颈椎操',     '5分钟',  '#A8E063', '#56AB2F', 0, $r('app.media.neck'),           202, 300, undefined, true, 'pages/run/NeckPage'),
   new ActivityItem('眼保健操',   '5分钟',  '#FFD166', '#F4A261', 0, '💆',                            203, 300, true),
   new ActivityItem('吃点水果',   '5分钟',  '#EF476F', '#D90429', 0, '🍎',                            204, 300, true),
   new ActivityItem('眺望窗外',   '2分钟',  '#06D6A0', '#00A896', 0, '🏞️',                           205, 120, true),
