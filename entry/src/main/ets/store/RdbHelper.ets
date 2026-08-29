@@ -257,13 +257,14 @@ export class RdbHelper {
   public async queryDrinkRecords(userId: number): Promise<CheckInRecord[]> {
     if (!this.rdbStore) return [];
     let predicates = new relationalStore.RdbPredicates('record');
-    predicates.equalTo('userId', userId).orderByDesc('timestamp');
+    predicates.equalTo('userId', userId)
+              .and().lessThan('type', 200) // 饮水和旧记录 type<200
+              .orderByDesc('timestamp');
     let resultSet = await this.rdbStore.query(predicates, ['id', 'userId', 'type', 'value', 'timestamp']);
     let records: CheckInRecord[] = [];
     while (resultSet.goToNextRow()) {
       const type = resultSet.getLong(resultSet.getColumnIndex('type'));
       const value = resultSet.getLong(resultSet.getColumnIndex('value'));
-      // 过滤掉签到记录(type=4, value=1)，其他的认为是喝水记录
       if (type === 4 && value === 1) {
         continue;
       }
@@ -272,6 +273,27 @@ export class RdbHelper {
         userId: resultSet.getLong(resultSet.getColumnIndex('userId')),
         type: type,
         value: value,
+        timestamp: resultSet.getLong(resultSet.getColumnIndex('timestamp'))
+      });
+    }
+    resultSet.close();
+    return records;
+  }
+
+  public async queryActivityRecords(userId: number): Promise<CheckInRecord[]> {
+    if (!this.rdbStore) return [];
+    let predicates = new relationalStore.RdbPredicates('record');
+    predicates.equalTo('userId', userId)
+              .and().greaterThanOrEqualTo('type', 201)
+              .orderByDesc('timestamp');
+    let resultSet = await this.rdbStore.query(predicates, ['id', 'userId', 'type', 'value', 'timestamp']);
+    let records: CheckInRecord[] = [];
+    while (resultSet.goToNextRow()) {
+      records.push({
+        id: resultSet.getLong(resultSet.getColumnIndex('id')),
+        userId: resultSet.getLong(resultSet.getColumnIndex('userId')),
+        type: resultSet.getLong(resultSet.getColumnIndex('type')),
+        value: resultSet.getLong(resultSet.getColumnIndex('value')), // 运动的秒数
         timestamp: resultSet.getLong(resultSet.getColumnIndex('timestamp'))
       });
     }

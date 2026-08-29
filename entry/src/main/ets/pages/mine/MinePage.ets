@@ -170,7 +170,7 @@ export struct MinePage {
         Row() {
           Image($r('app.media.ic_check_record')).width(20).height(20).margin({ right: 10 })
           Text('健康记录').fontSize(15).fontWeight(FontWeight.Medium).fontColor('#333333').layoutWeight(1)
-          Image($r('app.media.ic_arrow_right')).width(16).height(16)
+          // 移除了这里的向右箭头
         }
         .width('100%').height(50).padding({ left: 15, right: 15 })
         
@@ -178,7 +178,7 @@ export struct MinePage {
         
         Row() {
           this.GridItem($r('app.media.ic_drink_record'), '喝水记录', () => { router.pushUrl({ url: 'pages/mine/DrinkHistoryPage' }); })
-          this.GridItem($r('app.media.ic_sport_record'), '运动记录', () => { promptAction.showToast({ message: '暂无运动记录' }); })
+          this.GridItem($r('app.media.ic_sport_record'), '运动记录', () => { router.pushUrl({ url: 'pages/mine/ActivityRecordPage' }); })
           this.GridItem($r('app.media.ic_check_record'), '打卡记录', () => { router.pushUrl({ url: 'pages/home/CheckInCalendarPage' }); })
         }
         .width('100%').padding({ top: 20, bottom: 20 })

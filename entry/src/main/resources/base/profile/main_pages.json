@@ -18,6 +18,7 @@
     "pages/run/StandPage",
     "pages/run/WalkPage",
     "pages/run/JogPage",
+    "pages/mine/ActivityRecordPage",
     "pages/mine/AboutPage",
     "pages/home/ArticleDetailPage",
     "pages/home/CheckInCalendarPage",
