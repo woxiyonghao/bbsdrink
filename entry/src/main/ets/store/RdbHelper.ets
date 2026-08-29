@@ -195,11 +195,8 @@ export class RdbHelper {
 
     let predicates = new relationalStore.RdbPredicates('record');
     predicates.equalTo('userId', userId)
-      .and()
       .equalTo('type', 0) // 0: 喝水
-      .and()
       .greaterThanOrEqualTo('timestamp', startOfDay)
-      .and()
       .lessThanOrEqualTo('timestamp', endOfDay)
       .orderByDesc('timestamp');
       
@@ -311,11 +308,8 @@ export class RdbHelper {
 
     let predicates = new relationalStore.RdbPredicates('record');
     predicates.equalTo('userId', userId)
-      .and()
       .greaterThanOrEqualTo('type', 201)
-      .and()
       .greaterThanOrEqualTo('timestamp', startOfDay)
-      .and()
       .lessThanOrEqualTo('timestamp', endOfDay);
       
     let resultSet = await this.rdbStore.query(predicates, ['id']);
@@ -337,11 +331,8 @@ export class RdbHelper {
 
     let predicates = new relationalStore.RdbPredicates('record');
     predicates.equalTo('userId', userId)
-      .and()
       .greaterThanOrEqualTo('type', 201)
-      .and()
       .greaterThanOrEqualTo('timestamp', startOfDay)
-      .and()
       .lessThanOrEqualTo('timestamp', endOfDay);
       
     let resultSet = await this.rdbStore.query(predicates, ['value']);
@@ -358,9 +349,9 @@ export class RdbHelper {
     if (!this.rdbStore) return [];
     let predicates = new relationalStore.RdbPredicates('record');
     predicates.equalTo('userId', userId)
-              .and().greaterThanOrEqualTo('type', 201)
-              .and().greaterThanOrEqualTo('timestamp', startTimestamp)
-              .and().lessThanOrEqualTo('timestamp', endTimestamp)
+              .greaterThanOrEqualTo('type', 201)
+              .greaterThanOrEqualTo('timestamp', startTimestamp)
+              .lessThanOrEqualTo('timestamp', endTimestamp)
               .orderByDesc('timestamp');
     let resultSet = await this.rdbStore.query(predicates, ['id', 'userId', 'type', 'value', 'timestamp']);
     let records: CheckInRecord[] = [];
@@ -398,7 +389,7 @@ export class RdbHelper {
   public async queryLastRecordTime(userId: number, type: number): Promise<number> {
     if (!this.rdbStore) return 0;
     let predicates = new relationalStore.RdbPredicates('record');
-    predicates.equalTo('userId', userId).and().equalTo('type', type);
+    predicates.equalTo('userId', userId).equalTo('type', type);
     predicates.orderByDesc('timestamp');
     let resultSet = await this.rdbStore.query(predicates, ['timestamp']);
     let lastTime = 0;
@@ -424,7 +415,7 @@ export class RdbHelper {
     if (!this.rdbStore) return 0;
     let predicates = new relationalStore.RdbPredicates('record');
     predicates.equalTo('userId', userId)
-              .and().greaterThanOrEqualTo('type', 201)
+              .greaterThanOrEqualTo('type', 201)
               .orderByAsc('timestamp');
     let resultSet = await this.rdbStore.query(predicates, ['timestamp']);
     let oldest = 0;
