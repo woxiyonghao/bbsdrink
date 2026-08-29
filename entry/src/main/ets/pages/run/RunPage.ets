@@ -13,39 +13,39 @@ export struct RunPage {
   @State activities: ActivityItem[] = GLOBAL_ACTIVITIES.map(item => item.clone());
 
   /**
-   * 页面显示时从数据库查询各运动的真实完成状态
-   * 60 分钟内完成过 → 进度 100%，否则 → 0%
+   * 从数据库查询各运动真实完成状态，整体替换数组触发 UI 刷新
+   * ArkTS @State 数组：直接修改元素属性不触发更新，必须替换整个数组
    */
-  async aboutToAppear() {
+  async loadProgress() {
     const userId = await PreferencesUtil.getCurrentUserId();
     if (userId <= 0) return;
 
+    // 逐项查询完成状态
+    const progressList: number[] = [];
     for (let i = 0; i < this.activities.length; i++) {
       const done = await RdbHelper.queryActivityDoneInLastHour(userId, this.activities[i].activityType);
-      const targetProgress = done ? 100 : 0;
-      // 延迟一小段再启动动画，保持卡片入场的层叠效果
-      const delay = i * 80;
-      setTimeout(() => {
-        animateTo({ duration: 800, curve: Curve.EaseOut }, () => {
-          this.activities[i].progress = targetProgress;
-        });
-      }, 300 + delay);
+      progressList.push(done ? 100 : 0);
     }
+
+    // 整体替换数组，ArkTS 才能感知变化并刷新 UI
+    animateTo({ duration: 600, curve: Curve.EaseOut }, () => {
+      this.activities = this.activities.map((item, i) => {
+        const updated = item.clone();
+        updated.progress = progressList[i];
+        return updated;
+      });
+    });
+  }
+
+  async aboutToAppear() {
+    await this.loadProgress();
   }
 
   /**
-   * 从运动页面返回时刷新进度（onPageShow 每次显示都触发）
+   * 从运动页面返回时刷新进度（每次页面显示都触发）
    */
   async onPageShow() {
-    const userId = await PreferencesUtil.getCurrentUserId();
-    if (userId <= 0) return;
-
-    for (let i = 0; i < this.activities.length; i++) {
-      const done = await RdbHelper.queryActivityDoneInLastHour(userId, this.activities[i].activityType);
-      animateTo({ duration: 600, curve: Curve.EaseOut }, () => {
-        this.activities[i].progress = done ? 100 : 0;
-      });
-    }
+    await this.loadProgress();
   }
 
   getTranslateY(index: number, scrollY: number, listHeight: number): number {
