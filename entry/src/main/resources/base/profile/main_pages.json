@@ -11,6 +11,7 @@
     "pages/run/StretchPage",
     "pages/run/SquatPage",
     "pages/run/NeckPage",
+    "pages/run/EyePage",
     "pages/mine/AboutPage",
     "pages/home/ArticleDetailPage",
     "pages/home/CheckInCalendarPage",
