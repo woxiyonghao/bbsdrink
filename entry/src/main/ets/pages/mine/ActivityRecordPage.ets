@@ -62,30 +62,26 @@ export struct ActivityRecordPage {
     return `${yyyy}-${mm}-${dd} ${HH}:${MM}:${SS}`;
   }
 
-  @Builder CardItem(record: CheckInRecord, index: number) {
+  getCardScale(index: number): number {
     let relIndex = index - this.currentIndex;
-    let isTop = relIndex === 0;
-    
-    // 计算缩放和位移（最多显示后面两张牌）
-    let progress = Math.min(Math.abs(this.offsetX) / 200, 1); // 滑动进度 0~1
-    
-    let scaleVal = 1;
-    let transY = 0;
-    
-    if (relIndex === 0) {
-      scaleVal = 1;
-      transY = 0;
-    } else if (relIndex === 1) {
-      scaleVal = 0.9 + 0.1 * progress;
-      transY = 40 - 40 * progress;
-    } else if (relIndex === 2) {
-      scaleVal = 0.8 + 0.1 * progress;
-      transY = 80 - 40 * progress;
-    } else {
-      scaleVal = 0;
-    }
+    if (relIndex === 0) return 1;
+    let progress = Math.min(Math.abs(this.offsetX) / 200, 1);
+    if (relIndex === 1) return 0.9 + 0.1 * progress;
+    if (relIndex === 2) return 0.8 + 0.1 * progress;
+    return 0;
+  }
 
-    if (relIndex >= 0 && relIndex < 3) {
+  getCardTranslateY(index: number): number {
+    let relIndex = index - this.currentIndex;
+    if (relIndex === 0) return this.offsetY;
+    let progress = Math.min(Math.abs(this.offsetX) / 200, 1);
+    if (relIndex === 1) return 40 - 40 * progress;
+    if (relIndex === 2) return 80 - 40 * progress;
+    return 0;
+  }
+
+  @Builder CardItem(record: CheckInRecord, index: number) {
+    if (index - this.currentIndex >= 0 && index - this.currentIndex < 3) {
       Column() {
         // 顶部图片（第一帧）
         Image(this.getStaticIconForType(record.type))
@@ -122,15 +118,15 @@ export struct ActivityRecordPage {
       .backgroundColor('#FFFFFF')
       .borderRadius(24)
       .shadow({ radius: 20, color: 'rgba(0,0,0,0.1)', offsetY: 8 })
-      .zIndex(100 - relIndex)
-      .scale({ x: scaleVal, y: scaleVal })
+      .zIndex(100 - (index - this.currentIndex))
+      .scale({ x: this.getCardScale(index), y: this.getCardScale(index) })
       .translate({ 
-        x: isTop ? this.offsetX : 0, 
-        y: (isTop ? this.offsetY : 0) + transY 
+        x: (index - this.currentIndex) === 0 ? this.offsetX : 0, 
+        y: this.getCardTranslateY(index)
       })
-      .rotate({ z: 1, angle: isTop ? (this.offsetX / 15) : 0 })
+      .rotate({ z: 1, angle: (index - this.currentIndex) === 0 ? (this.offsetX / 15) : 0 })
       .gesture(
-        isTop ? PanGesture()
+        (index - this.currentIndex) === 0 ? PanGesture()
           .onActionUpdate((event: GestureEvent) => {
             this.offsetX = event.offsetX;
             this.offsetY = event.offsetY;
@@ -149,7 +145,7 @@ export struct ActivityRecordPage {
               });
             } else {
               // 弹回原位
-              animateTo({ duration: 300, curve: Curve.Spring }, () => {
+              animateTo({ duration: 300, curve: Curve.EaseOut }, () => {
                 this.offsetX = 0;
                 this.offsetY = 0;
               });
