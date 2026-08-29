@@ -1,5 +1,5 @@
 import router from '@ohos.router';
-import promptAction from '@ohos.promptAction';
+import { IBestDialogUtil } from '@ibestservices/ibest-ui';
 import { ActivityItem } from '../../types';
 import RdbHelper from '../../store/RdbHelper';
 import PreferencesUtil from '../../store/PreferencesUtil';
@@ -58,16 +58,14 @@ export struct StretchPage {
   handleStopClick() {
     if (this.milliseconds < this.targetSeconds * 1000) {
       // Early stop
-      promptAction.showDialog({
+      IBestDialogUtil.open({
         title: '提示',
         message: '运动进行中，确认停止吗？',
-        buttons: [
-          { text: '取消', color: '#999999' },
-          { text: '确认', color: '#FF5E5E' }
-        ]
-      }).then(data => {
-        if (data.index === 1) {
-          // Confirm stop -> Reset
+        showCancelButton: true,
+        cancelButtonText: '取消',
+        confirmButtonText: '确认',
+        confirmButtonColor: '#FF5E5E',
+        onConfirm: () => {
           if (this.timerId !== -1) {
             clearInterval(this.timerId);
             this.timerId = -1;

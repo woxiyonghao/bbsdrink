@@ -3,6 +3,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import PreferencesUtil from '../store/PreferencesUtil';
 import RdbHelper from '../store/RdbHelper';
+import { IBestInit } from '@ibestservices/ibest-ui';
 
 const DOMAIN = 0x0000;
 
@@ -23,6 +24,9 @@ export default class EntryAbility extends UIAbility {
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+
+    // IBest UI 初始化
+    IBestInit(windowStage, this.context);
 
     // 初始化基础组件
     await PreferencesUtil.init(this.context);
