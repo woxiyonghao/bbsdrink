@@ -6,7 +6,7 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "@ibestservices/ibest-ui": "^2.2.7"
+    "@ibestservices/ibest-ui": "2.1.2"
   },
   "devDependencies": {},
   "dynamicDependencies": {}
