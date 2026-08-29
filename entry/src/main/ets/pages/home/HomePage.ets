@@ -327,13 +327,30 @@ export struct HomePage {
         // 2. 核心大盘：喝水进度环
         Column() {
           Stack() {
+            // 内部水位线（根据进度上升）
+            Stack({ alignContent: Alignment.Bottom }) {
+              Column()
+                .width('100%')
+                .height(`${Math.min(this.todayDrank / this.dailyGoal, 1) * 100}%`)
+                .linearGradient({
+                  direction: GradientDirection.Top,
+                  colors: [['#8ECAE6', 0.0], ['#219EBC', 1.0]] // 参照 drink 模块渐变色
+                })
+                .opacity(0.35) // 增加透明度确保上方文字依然清晰可读
+                .animation({ duration: 800, curve: Curve.FastOutSlowIn })
+            }
+            .width(148) // 180 (总宽) - 16*2 (环粗) = 148
+            .height(148)
+            .borderRadius(74)
+            .clip(true)
+
             Progress({ value: this.todayDrank, total: this.dailyGoal, type: ProgressType.Ring })
               .width(180)
               .height(180)
               .color('#07C160')
               .backgroundColor('#F5F7FA')
               .style({ strokeWidth: 16 })
-              .animation({ duration: 800, curve: Curve.FastOutSlowIn }) // 喝水时的圆环动画
+              .animation({ duration: 800, curve: Curve.FastOutSlowIn })
             
             Column() {
               Image($r('app.media.ic_drink_water')).width(28).height(28).fillColor('#07C160').margin({ bottom: 4 })
