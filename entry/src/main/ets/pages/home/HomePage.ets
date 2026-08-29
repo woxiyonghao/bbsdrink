@@ -149,77 +149,6 @@ export struct HomePage {
     this.updateWaterReminder();
   }
 
-  @Builder HealthRingsCard() {
-    Row() {
-      // 3 rings stack
-      Stack() {
-        // Outer (Water)
-        Progress({ value: this.todayDrank, total: this.dailyGoal, type: ProgressType.Ring })
-          .width(140).height(140)
-          .color('#07C160').backgroundColor('rgba(7, 193, 96, 0.15)')
-          .style({ strokeWidth: 14 })
-          .animation({ duration: 800, curve: Curve.FastOutSlowIn })
-        
-        // Middle (Duration)
-        Progress({ value: this.todayActivityDuration, total: 30, type: ProgressType.Ring })
-          .width(110).height(110)
-          .color('#34C759').backgroundColor('rgba(52, 199, 89, 0.15)')
-          .style({ strokeWidth: 14 })
-          .animation({ duration: 800, curve: Curve.FastOutSlowIn })
-
-        // Inner (Count)
-        Progress({ value: this.todayActivityCount, total: 3, type: ProgressType.Ring })
-          .width(80).height(80)
-          .color('#30D158').backgroundColor('rgba(48, 209, 88, 0.15)')
-          .style({ strokeWidth: 14 })
-          .animation({ duration: 800, curve: Curve.FastOutSlowIn })
-      }
-      .width(140)
-      
-      // Stats on the right
-      Column({ space: 14 }) {
-        // Water
-        Column() {
-          Text('喝水').fontSize(14).fontWeight(FontWeight.Medium).fontColor('#FFFFFF')
-          Row() {
-            Text(`${this.todayDrank}`).fontSize(20).fontWeight(FontWeight.Bold).fontColor('#07C160')
-            Text(`/${this.dailyGoal}ml`).fontSize(12).fontColor('#07C160').margin({ left: 2, bottom: 3 })
-          }.alignItems(VerticalAlign.Bottom).margin({ top: 4 })
-        }.alignItems(HorizontalAlign.Start)
-
-        // Duration
-        Column() {
-          Text('锻炼时长').fontSize(14).fontWeight(FontWeight.Medium).fontColor('#FFFFFF')
-          Row() {
-            Text(`${this.todayActivityDuration}`).fontSize(20).fontWeight(FontWeight.Bold).fontColor('#34C759')
-            Text(`/30分`).fontSize(12).fontColor('#34C759').margin({ left: 2, bottom: 3 })
-          }.alignItems(VerticalAlign.Bottom).margin({ top: 4 })
-        }.alignItems(HorizontalAlign.Start)
-
-        // Count
-        Column() {
-          Text('活动次数').fontSize(14).fontWeight(FontWeight.Medium).fontColor('#FFFFFF')
-          Row() {
-            Text(`${this.todayActivityCount}`).fontSize(20).fontWeight(FontWeight.Bold).fontColor('#30D158')
-            Text(`/3次`).fontSize(12).fontColor('#30D158').margin({ left: 2, bottom: 3 })
-          }.alignItems(VerticalAlign.Bottom).margin({ top: 4 })
-        }.alignItems(HorizontalAlign.Start)
-      }
-      .margin({ left: 28 })
-      .alignItems(HorizontalAlign.Start)
-      .layoutWeight(1)
-    }
-    .width('90%')
-    .padding({ left: 20, right: 20, top: 24, bottom: 24 })
-    .backgroundColor('#1C1C1E') // 苹果健身同款深色背景
-    .borderRadius(24)
-    .shadow({ radius: 15, color: 'rgba(0, 0, 0, 0.15)', offsetY: 8 })
-    .margin({ bottom: 20 })
-    .onClick(() => {
-      router.pushUrl({ url: 'pages/mine/ActivityRecordPage', params: { isTodayOnly: true } })
-    })
-  }
-
   @Builder QuickAddWaterBtn(label: string, amount: number) {
     Button(label)
       .width(86)
@@ -324,18 +253,38 @@ export struct HomePage {
         .padding({ left: 24, right: 24, bottom: 20 })
         .justifyContent(FlexAlign.Start)
 
-        // 2. 核心大盘：Apple Fitness 风格运动圆环
-        this.HealthRingsCard()
-
-        // 快捷加水与提醒卡片
+        // 2. 核心大盘：喝水进度环
         Column() {
+          Stack() {
+            Progress({ value: this.todayDrank, total: this.dailyGoal, type: ProgressType.Ring })
+              .width(180)
+              .height(180)
+              .color('#07C160')
+              .backgroundColor('#F5F7FA')
+              .style({ strokeWidth: 16 })
+              .animation({ duration: 800, curve: Curve.FastOutSlowIn }) // 喝水时的圆环动画
+            
+            Column() {
+              Image($r('app.media.ic_drink_water')).width(28).height(28).fillColor('#07C160').margin({ bottom: 4 })
+              Text(`${this.todayDrank}`)
+                .fontSize(36)
+                .fontWeight(FontWeight.Bolder)
+                .fontColor('#333333')
+              Text(`/ ${this.dailyGoal} ml`)
+                .fontSize(14)
+                .fontColor('#999999')
+            }
+          }.margin({ bottom: 30, top: 10 })
+
           // 快捷加水按钮
           Row({ space: 12 }) {
             this.QuickAddWaterBtn('+150ml', 150)
             this.QuickAddWaterBtn('+250ml', 250)
             this.QuickAddWaterBtn('+500ml', 500)
           }
-          .margin({ bottom: 16 })
+          .margin({ bottom: 24 })
+
+          Divider().color('#F5F5F5').width('80%').margin({ bottom: 16 })
 
           // 智能提醒状态
           Row() {
@@ -350,10 +299,22 @@ export struct HomePage {
           .borderRadius(12)
         }
         .width('90%')
-        .padding({ top: 20, bottom: 20 })
+        .padding({ top: 32, bottom: 24 })
         .backgroundColor('#FFFFFF')
         .borderRadius(24)
         .shadow({ radius: 20, color: 'rgba(0, 0, 0, 0.04)', offsetY: 8 })
+        .margin({ bottom: 20 })
+
+        // 3. 健康双卡片 (防久坐 & 运动时长)
+        Row({ space: 16 }) {
+          this.HealthCard('今日运动', `${this.todayActivityCount}`, '次', $r('app.media.ic_sit_record'), '#FFF', () => {
+            router.pushUrl({ url: 'pages/mine/ActivityRecordPage', params: { isTodayOnly: true } })
+          })
+          this.HealthCard('运动时长', `${this.todayActivityDuration}`, '分钟', $r('app.media.ic_sport_record'), '#FFF', () => {
+            router.pushUrl({ url: 'pages/mine/ActivityRecordPage', params: { isTodayOnly: true } })
+          })
+        }
+        .width('90%')
         .margin({ bottom: 20 })
 
         // 3.1 微型周报趋势图 (Weekly Trend)
