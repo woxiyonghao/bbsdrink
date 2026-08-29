@@ -73,6 +73,7 @@ export struct ActivityRecordPage {
     let progress = Math.min(Math.abs(this.offsetX) / 150, 1);
     if (relIndex === 1) return 0.95 + 0.05 * progress;
     if (relIndex === 2) return 0.90 + 0.05 * progress;
+    if (relIndex === 3) return 0.85 + 0.05 * progress;
     return 0;
   }
 
@@ -80,13 +81,33 @@ export struct ActivityRecordPage {
     let relIndex = index - this.currentIndex;
     if (relIndex <= 0) return this.offsetY;
     let progress = Math.min(Math.abs(this.offsetX) / 150, 1);
-    if (relIndex === 1) return 20 - 20 * progress;
-    if (relIndex === 2) return 40 - 20 * progress;
+    if (relIndex === 1) return 15 - 15 * progress;
+    if (relIndex === 2) return 30 - 15 * progress;
+    if (relIndex === 3) return 45 - 15 * progress;
+    return 0;
+  }
+
+  getCardRotation(index: number): number {
+    let relIndex = index - this.currentIndex;
+    // 顶层卡片随手指滑动旋转
+    if (relIndex <= 0) return this.offsetX / 20;
+    
+    let progress = Math.min(Math.abs(this.offsetX) / 150, 1);
+    
+    // 第2张：初始向左倾斜 -4 度，滑动时逐渐回正到 0 度
+    if (relIndex === 1) return -4 * (1 - progress);
+    
+    // 第3张：初始向右倾斜 +4 度，滑动时逐渐转到 -4 度（成为新的第2张）
+    if (relIndex === 2) return 4 - 8 * progress;
+    
+    // 第4张：初始向左倾斜 -4 度，滑动时逐渐转到 +4 度（成为新的第3张）
+    if (relIndex === 3) return -4 + 8 * progress;
+    
     return 0;
   }
 
   @Builder CardItem(record: CheckInRecord, index: number) {
-    if (index - this.currentIndex >= 0 && index - this.currentIndex < 3) {
+    if (index - this.currentIndex >= 0 && index - this.currentIndex < 4) {
       Column() {
         // 顶部图片（第一帧）带有对应渐变背景
         Stack() {
@@ -138,7 +159,7 @@ export struct ActivityRecordPage {
         x: (index - this.currentIndex) === 0 ? this.offsetX : 0, 
         y: this.getCardTranslateY(index)
       })
-      .rotate({ z: 1, angle: (index - this.currentIndex) === 0 ? (this.offsetX / 20) : 0 })
+      .rotate({ z: 1, angle: this.getCardRotation(index) })
       .gesture(
         PanGesture()
           .onActionUpdate((event: GestureEvent) => {
