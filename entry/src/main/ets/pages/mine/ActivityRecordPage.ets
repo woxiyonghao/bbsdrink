@@ -212,9 +212,9 @@ export struct ActivityRecordPage {
   private userId: number = -1;
 
   async aboutToAppear() {
-    const params = router.getParams() as Record<string, any>;
-    if (params && params.isTodayOnly) {
-      this.isTodayOnly = true;
+    const params = router.getParams() as Record<string, Object>;
+    if (params && params['isTodayOnly']) {
+      this.isTodayOnly = params['isTodayOnly'] as boolean;
     }
     
     this.userId = await PreferencesUtil.getCurrentUserId();
