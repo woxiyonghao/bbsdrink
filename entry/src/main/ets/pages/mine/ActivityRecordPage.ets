@@ -224,6 +224,7 @@ export struct ActivityRecordPage {
   async loadMoreRecords(isRefresh: boolean = false) {
     if (this.userId <= 0) return;
     if (!this.hasMore && !isRefresh) return;
+    if (this.isLoadingMore && !isRefresh) return;
 
     if (isRefresh) {
       const now = new Date();
@@ -266,7 +267,8 @@ export struct ActivityRecordPage {
     }
 
     this.currentEndTime = start - 1;
-    if (this.currentEndTime < new Date('2024-01-01').getTime()) {
+    const oldestTime = await RdbHelper.queryOldestActivityRecordTime(this.userId);
+    if (oldestTime === 0 || this.currentEndTime < oldestTime) {
       this.hasMore = false;
     }
 
@@ -338,14 +340,19 @@ export struct ActivityRecordPage {
                 LoadingProgress().width(24).height(24).margin({ right: 8 })
                 Text('正在加载前一周数据...').fontSize(14).fontColor('#999999')
               } else if (!this.hasMore) {
-                Text('没有更多记录了').fontSize(14).fontColor('#999999')
+                Text('没有更多数据了~').fontSize(14).fontColor('#999999')
               } else {
-                Text('上拉加载前一周记录').fontSize(14).fontColor('#999999')
+                Text('上拉或点击加载前一周记录').fontSize(14).fontColor('#999999')
               }
             }
             .width('100%')
             .justifyContent(FlexAlign.Center)
             .padding({ top: 20, bottom: 40 })
+            .onClick(() => {
+              if (!this.isLoadingMore && this.hasMore) {
+                this.loadMoreRecords();
+              }
+            })
           }
         }
         .width('100%')

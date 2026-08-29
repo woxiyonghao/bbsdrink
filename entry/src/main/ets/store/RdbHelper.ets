@@ -389,6 +389,21 @@ export class RdbHelper {
     const lastTime = await this.queryLastRecordTime(userId, activityType);
     return lastTime > 0 && (Date.now() - lastTime < 60 * 60 * 1000);
   }
+
+  public async queryOldestActivityRecordTime(userId: number): Promise<number> {
+    if (!this.rdbStore) return 0;
+    let predicates = new relationalStore.RdbPredicates('record');
+    predicates.equalTo('userId', userId)
+              .and().greaterThanOrEqualTo('type', 201)
+              .orderByAsc('timestamp');
+    let resultSet = await this.rdbStore.query(predicates, ['timestamp']);
+    let oldest = 0;
+    if (resultSet.goToFirstRow()) {
+      oldest = resultSet.getLong(resultSet.getColumnIndex('timestamp'));
+    }
+    resultSet.close();
+    return oldest;
+  }
 }
 
 export default RdbHelper.getInstance();
