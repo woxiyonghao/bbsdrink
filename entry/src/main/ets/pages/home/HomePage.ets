@@ -390,12 +390,26 @@ export struct HomePage {
           Row() {
             ForEach(['一', '二', '三', '四', '五', '六', '日'], (day: string, index: number) => {
               Column() {
-                Circle()
-                  .width(14)
-                  .height(14)
-                  .fill(this.weekCheckInStatus[index] ? '#07C160' : '#F0F0F0')
-                  .margin({ bottom: 8 })
-                Text(day).fontSize(12).fontColor(this.weekCheckInStatus[index] ? '#333' : '#999')
+                // 如果是今天，在外面加一个小圈
+                Stack() {
+                  if (new Date().getDay() === (index === 6 ? 0 : index + 1)) {
+                    Circle()
+                      .width(20)
+                      .height(20)
+                      .fill('transparent')
+                      .stroke('#07C160')
+                      .strokeWidth(1)
+                  }
+                  Circle()
+                    .width(14)
+                    .height(14)
+                    .fill(this.weekCheckInStatus[index] ? '#07C160' : '#F0F0F0')
+                }.width(20).height(20).margin({ bottom: 8 })
+
+                Text(day)
+                  .fontSize(12)
+                  .fontWeight(new Date().getDay() === (index === 6 ? 0 : index + 1) ? FontWeight.Bold : FontWeight.Normal)
+                  .fontColor(new Date().getDay() === (index === 6 ? 0 : index + 1) ? '#07C160' : (this.weekCheckInStatus[index] ? '#333' : '#999'))
               }.layoutWeight(1)
             })
           }.width('100%')
