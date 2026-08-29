@@ -32,6 +32,7 @@ export struct HomePage {
   @State weekCheckInCount: number = 0;
   
   @State todayActivityCount: number = 0;
+  @State todayActivityDuration: number = 0;
 
   private currentDate: string = '';
 
@@ -50,6 +51,9 @@ export struct HomePage {
       });
       RdbHelper.queryTodayActivityCount(this.userId).then(count => {
         this.todayActivityCount = count;
+      });
+      RdbHelper.queryTodayActivityDuration(this.userId).then(duration => {
+        this.todayActivityDuration = duration;
       });
     }
   }
@@ -70,6 +74,7 @@ export struct HomePage {
       }
       this.todayDrank = await RdbHelper.queryTodayWaterTotal(this.userId);
       this.todayActivityCount = await RdbHelper.queryTodayActivityCount(this.userId);
+      this.todayActivityDuration = await RdbHelper.queryTodayActivityDuration(this.userId);
       this.hasCheckedIn = await RdbHelper.hasCheckedInToday(this.userId);
       this.lastWaterTime = await RdbHelper.queryLatestWaterRecordTime(this.userId);
       this.updateWaterReminder();
@@ -300,12 +305,14 @@ export struct HomePage {
         .shadow({ radius: 20, color: 'rgba(0, 0, 0, 0.04)', offsetY: 8 })
         .margin({ bottom: 20 })
 
-        // 3. 健康双卡片 (防久坐 & 步数)
+        // 3. 健康双卡片 (防久坐 & 运动时长)
         Row({ space: 16 }) {
           this.HealthCard('今日运动', `${this.todayActivityCount}`, '次', $r('app.media.ic_sit_record'), '#FFF', () => {
-            router.pushUrl({ url: 'pages/mine/ActivityRecordPage' })
+            router.pushUrl({ url: 'pages/mine/ActivityRecordPage', params: { isTodayOnly: true } })
           })
-          this.HealthCard('今日步数', '0', '步', $r('app.media.ic_check_record')) // 暂用 check 图标
+          this.HealthCard('运动时长', `${this.todayActivityDuration}`, '分钟', $r('app.media.ic_sport_record'), '#FFF', () => {
+            router.pushUrl({ url: 'pages/mine/ActivityRecordPage', params: { isTodayOnly: true } })
+          })
         }
         .width('90%')
         .margin({ bottom: 20 })

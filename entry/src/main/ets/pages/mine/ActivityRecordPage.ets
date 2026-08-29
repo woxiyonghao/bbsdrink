@@ -208,9 +208,15 @@ export struct ActivityRecordPage {
   @State isLoadingMore: boolean = false;
   @State hasMore: boolean = true;
   @State currentEndTime: number = 0;
+  @State isTodayOnly: boolean = false;
   private userId: number = -1;
 
   async aboutToAppear() {
+    const params = router.getParams() as Record<string, any>;
+    if (params && params.isTodayOnly) {
+      this.isTodayOnly = true;
+    }
+    
     this.userId = await PreferencesUtil.getCurrentUserId();
     if (this.userId > 0) {
       const now = new Date();
@@ -236,8 +242,15 @@ export struct ActivityRecordPage {
       this.isLoadingMore = true;
     }
 
-    // 每次查询 7 天的数据
-    const start = this.currentEndTime - 7 * 24 * 60 * 60 * 1000 + 1;
+    // 每次查询 7 天的数据，如果是“今日运动”则只查询当天
+    let start = this.currentEndTime - 7 * 24 * 60 * 60 * 1000 + 1;
+    if (this.isTodayOnly) {
+      const d = new Date(this.currentEndTime);
+      d.setHours(0, 0, 0, 0);
+      start = d.getTime();
+      this.hasMore = false; // 今日只查一次
+    }
+    
     const records = await RdbHelper.queryActivityRecordsByRange(this.userId, start, this.currentEndTime);
 
     if (records.length > 0) {
@@ -308,7 +321,7 @@ export struct ActivityRecordPage {
             router.back();
           })
         
-        Text('运动记录')
+        Text(this.isTodayOnly ? '今日运动' : '运动记录')
           .fontSize(20)
           .fontWeight(FontWeight.Bold)
           .fontColor('#333333')
@@ -334,25 +347,27 @@ export struct ActivityRecordPage {
             }
           })
 
-          ListItem() {
-            Row() {
-              if (this.isLoadingMore) {
-                LoadingProgress().width(24).height(24).margin({ right: 8 })
-                Text('正在加载前一周数据...').fontSize(14).fontColor('#999999')
-              } else if (!this.hasMore) {
-                Text('没有更多数据了~').fontSize(14).fontColor('#999999')
-              } else {
-                Text('上拉或点击加载前一周记录').fontSize(14).fontColor('#999999')
+          if (!this.isTodayOnly) {
+            ListItem() {
+              Row() {
+                if (this.isLoadingMore) {
+                  LoadingProgress().width(24).height(24).margin({ right: 8 })
+                  Text('正在加载前一周数据...').fontSize(14).fontColor('#999999')
+                } else if (!this.hasMore) {
+                  Text('没有更多数据了~').fontSize(14).fontColor('#999999')
+                } else {
+                  Text('上拉或点击加载前一周记录').fontSize(14).fontColor('#999999')
+                }
               }
+              .width('100%')
+              .justifyContent(FlexAlign.Center)
+              .padding({ top: 20, bottom: 40 })
+              .onClick(() => {
+                if (!this.isLoadingMore && this.hasMore) {
+                  this.loadMoreRecords();
+                }
+              })
             }
-            .width('100%')
-            .justifyContent(FlexAlign.Center)
-            .padding({ top: 20, bottom: 40 })
-            .onClick(() => {
-              if (!this.isLoadingMore && this.hasMore) {
-                this.loadMoreRecords();
-              }
-            })
           }
         }
         .width('100%')

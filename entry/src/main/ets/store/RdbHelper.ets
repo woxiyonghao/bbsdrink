@@ -324,6 +324,32 @@ export class RdbHelper {
     return count > 0 ? count : 0;
   }
 
+  public async queryTodayActivityDuration(userId: number): Promise<number> {
+    if (!this.rdbStore) return 0;
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const startOfDay = now.getTime();
+    now.setHours(23, 59, 59, 999);
+    const endOfDay = now.getTime();
+
+    let predicates = new relationalStore.RdbPredicates('record');
+    predicates.equalTo('userId', userId)
+      .and()
+      .greaterThanOrEqualTo('type', 201)
+      .and()
+      .greaterThanOrEqualTo('timestamp', startOfDay)
+      .and()
+      .lessThanOrEqualTo('timestamp', endOfDay);
+      
+    let resultSet = await this.rdbStore.query(predicates, ['value']);
+    let totalSeconds = 0;
+    while (resultSet.goToNextRow()) {
+      totalSeconds += resultSet.getLong(resultSet.getColumnIndex('value'));
+    }
+    resultSet.close();
+    return Math.floor(totalSeconds / 60); // 返回分钟数
+  }
+
   public async queryActivityRecordsByRange(userId: number, startTimestamp: number, endTimestamp: number): Promise<CheckInRecord[]> {
     if (!this.rdbStore) return [];
     let predicates = new relationalStore.RdbPredicates('record');
