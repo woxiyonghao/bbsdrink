@@ -81,9 +81,9 @@ export struct ActivityRecordPage {
     let relIndex = index - this.currentIndex;
     if (relIndex <= 0) return this.offsetY;
     let progress = Math.min(Math.abs(this.offsetX) / 150, 1);
-    if (relIndex === 1) return 15 - 15 * progress;
-    if (relIndex === 2) return 30 - 15 * progress;
-    if (relIndex === 3) return 45 - 15 * progress;
+    if (relIndex === 1) return 20 - 20 * progress;
+    if (relIndex === 2) return 40 - 20 * progress;
+    if (relIndex === 3) return 60 - 20 * progress;
     return 0;
   }
 
@@ -94,14 +94,14 @@ export struct ActivityRecordPage {
     
     let progress = Math.min(Math.abs(this.offsetX) / 150, 1);
     
-    // 第2张：初始向左倾斜 -4 度，滑动时逐渐回正到 0 度
-    if (relIndex === 1) return -4 * (1 - progress);
+    // 第2张：初始向左倾斜 -8 度，滑动时逐渐回正到 0 度
+    if (relIndex === 1) return -8 * (1 - progress);
     
-    // 第3张：初始向右倾斜 +4 度，滑动时逐渐转到 -4 度（成为新的第2张）
-    if (relIndex === 2) return 4 - 8 * progress;
+    // 第3张：初始向右倾斜 +8 度，滑动时逐渐转到 -8 度（成为新的第2张）
+    if (relIndex === 2) return 8 - 16 * progress;
     
-    // 第4张：初始向左倾斜 -4 度，滑动时逐渐转到 +4 度（成为新的第3张）
-    if (relIndex === 3) return -4 + 8 * progress;
+    // 第4张：初始向左倾斜 -8 度，滑动时逐渐转到 +8 度（成为新的第3张）
+    if (relIndex === 3) return -8 + 16 * progress;
     
     return 0;
   }
