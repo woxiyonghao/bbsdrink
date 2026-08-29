@@ -222,15 +222,15 @@ export class RdbHelper {
 
     let predicates = new relationalStore.RdbPredicates('record');
     predicates.equalTo('userId', userId)
-      .and()
       .equalTo('type', 4)
-      .and()
       .greaterThanOrEqualTo('timestamp', startOfDay)
-      .and()
       .lessThanOrEqualTo('timestamp', endOfDay);
       
     let resultSet = await this.rdbStore.query(predicates, ['id']);
-    const hasRecord = resultSet.rowCount > 0;
+    let hasRecord = false;
+    if (resultSet.goToFirstRow()) {
+      hasRecord = true;
+    }
     resultSet.close();
     return hasRecord;
   }
@@ -241,7 +241,7 @@ export class RdbHelper {
   public async queryAllCheckInTimestamps(userId: number): Promise<number[]> {
     if (!this.rdbStore) return [];
     let predicates = new relationalStore.RdbPredicates('record');
-    predicates.equalTo('userId', userId).and().equalTo('type', 4);
+    predicates.equalTo('userId', userId).equalTo('type', 4);
     let resultSet = await this.rdbStore.query(predicates, ['timestamp']);
     let timestamps: number[] = [];
     while (resultSet.goToNextRow()) {
