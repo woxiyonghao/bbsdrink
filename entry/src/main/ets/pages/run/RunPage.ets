@@ -162,8 +162,10 @@ export struct RunPage {
                   params: { defaultType: item.drinkType }
                 });
               } else {
+                // 优先使用 activityPage 字段，默认跳转 StretchPage
+                const targetUrl = item.activityPage || 'pages/run/StretchPage';
                 router.pushUrl({
-                  url: 'pages/run/StretchPage',
+                  url: targetUrl,
                   params: {
                     activityName: item.name,
                     targetSeconds: item.targetSeconds || 60
