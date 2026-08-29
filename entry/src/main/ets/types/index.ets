@@ -52,18 +52,28 @@ export const GLOBAL_DRINKS: DrinkOption[] = [
   new DrinkOption(11, '补剂', $r('app.media.ic_drink_bottle'))
 ];
 
+/**
+ * 运动活动类
+ * activityType: 数据库存储类型，200+ 专属运动类，避免与喝水类(0~11)、签到(4)冲突
+ *   201: 伸懒腰  202: 颈椎操  203: 眼保健操  204: 吃点水果
+ *   205: 眺望窗外 206: 闭目养神 207: 站起来动动 208: 深蹲一下
+ *   209: 楼下走走 210: 跑一下
+ */
 export class ActivityItem {
   name: string;
   duration: string;
   color1: string;
   color2: string;
+  /** 当前进度（0~100），由数据库查询结果驱动，完成=100，未完成=0 */
   progress: number;
   icon: ResourceStr;
   isEmoji?: boolean;
-  drinkType?: number;
   noFill?: boolean;
-  targetSeconds?: number;
-  /** 指定跳转的运动页面路由，不填默认使用 StretchPage */
+  /** 目标秒数，完成打卡所需时长 */
+  targetSeconds: number;
+  /** 数据库记录类型值，每个运动唯一，范围 201~299 */
+  activityType: number;
+  /** 跳转的运动页面路由，不填默认使用 StretchPage */
   activityPage?: string;
 
   constructor(
@@ -73,10 +83,10 @@ export class ActivityItem {
     color2: string,
     progress: number,
     icon: ResourceStr,
+    activityType: number,
+    targetSeconds: number,
     isEmoji?: boolean,
-    drinkType?: number,
     noFill?: boolean,
-    targetSeconds?: number,
     activityPage?: string
   ) {
     this.name = name;
@@ -85,10 +95,10 @@ export class ActivityItem {
     this.color2 = color2;
     this.progress = progress;
     this.icon = icon;
-    this.isEmoji = isEmoji;
-    this.drinkType = drinkType;
-    this.noFill = noFill;
+    this.activityType = activityType;
     this.targetSeconds = targetSeconds;
+    this.isEmoji = isEmoji;
+    this.noFill = noFill;
     this.activityPage = activityPage;
   }
 
@@ -100,29 +110,30 @@ export class ActivityItem {
       this.color2,
       this.progress,
       this.icon,
-      this.isEmoji,
-      this.drinkType,
-      this.noFill,
+      this.activityType,
       this.targetSeconds,
+      this.isEmoji,
+      this.noFill,
       this.activityPage
     );
   }
 }
 
+/**
+ * 全局运动活动列表
+ * 已移除喝水类（接杯水/喝杯咖啡/喝杯牛奶/喝杯果汁/喝杯茶），这些属于喝水模块
+ * activityType 从 201 起步，每项唯一，确保数据库记录互不干扰
+ */
 export const GLOBAL_ACTIVITIES: ActivityItem[] = [
-  new ActivityItem('伸懒腰', '1分钟', '#FFB75E', '#ED8F03', 0, $r('app.media.stretch'), undefined, undefined, true, 60),
-  new ActivityItem('接杯水', '3分钟', '#8ECAE6', '#219EBC', 0, $r('app.media.ic_cup_water'), undefined, 0),
-  new ActivityItem('颈椎操', '5分钟', '#A8E063', '#56AB2F', 0, $r('app.media.ic_sit_record'), undefined, undefined, undefined, 300),
-  new ActivityItem('喝杯咖啡', '5分钟', '#D4A373', '#A98467', 0, $r('app.media.ic_drink_coffee'), undefined, 1),
-  new ActivityItem('眼保健操', '5分钟', '#FFD166', '#F4A261', 0, '💆', true, undefined, undefined, 300),
-  new ActivityItem('吃点水果', '5分钟', '#EF476F', '#D90429', 0, '🍎', true, undefined, undefined, 300),
-  new ActivityItem('喝杯牛奶', '3分钟', '#8ECAE6', '#0077B6', 0, $r('app.media.ic_drink_milk'), undefined, 3),
-  new ActivityItem('眺望窗外', '2分钟', '#06D6A0', '#00A896', 0, '🏞️', true, undefined, undefined, 120),
-  new ActivityItem('闭目养神', '3分钟', '#FF758C', '#FF7EB3', 0, '🧘', true, undefined, undefined, 180),
-  new ActivityItem('喝杯果汁', '3分钟', '#FF9A9E', '#FECFEF', 0, $r('app.media.ic_drink_juice'), undefined, 4),
-  new ActivityItem('站起来动动', '3分钟', '#A8E063', '#56AB2F', 0, '🤸', true, undefined, undefined, 180),
-  new ActivityItem('深蹲一下', '3分钟', '#FFB75E', '#ED8F03', 0, $r('app.media.squat'), undefined, undefined, true, 180, 'pages/run/SquatPage'),
-  new ActivityItem('楼下走走', '10分钟', '#06D6A0', '#00A896', 0, $r('app.media.ic_sport_white'), undefined, undefined, undefined, 600),
-  new ActivityItem('喝杯茶', '10分钟', '#90E0EF', '#0077B6', 0, $r('app.media.ic_drink_tea'), undefined, 2),
-  new ActivityItem('跑一下', '15分钟', '#118AB2', '#073B4C', 0, $r('app.media.ic_sport_white'), undefined, undefined, undefined, 900)
+  new ActivityItem('伸懒腰',     '1分钟',  '#FFB75E', '#ED8F03', 0, $r('app.media.stretch'),        201, 60),
+  new ActivityItem('颈椎操',     '5分钟',  '#A8E063', '#56AB2F', 0, $r('app.media.ic_sit_record'),  202, 300),
+  new ActivityItem('眼保健操',   '5分钟',  '#FFD166', '#F4A261', 0, '💆',                            203, 300, true),
+  new ActivityItem('吃点水果',   '5分钟',  '#EF476F', '#D90429', 0, '🍎',                            204, 300, true),
+  new ActivityItem('眺望窗外',   '2分钟',  '#06D6A0', '#00A896', 0, '🏞️',                           205, 120, true),
+  new ActivityItem('闭目养神',   '3分钟',  '#FF758C', '#FF7EB3', 0, '🧘',                            206, 180, true),
+  new ActivityItem('站起来动动', '3分钟',  '#A8E063', '#56AB2F', 0, '🤸',                            207, 180, true),
+  new ActivityItem('深蹲一下',   '3分钟',  '#FFB75E', '#ED8F03', 0, $r('app.media.squat'),           208, 180, undefined, true, 'pages/run/SquatPage'),
+  new ActivityItem('楼下走走',   '10分钟', '#06D6A0', '#00A896', 0, $r('app.media.ic_sport_white'), 209, 600),
+  new ActivityItem('跑一下',     '15分钟', '#118AB2', '#073B4C', 0, $r('app.media.ic_sport_white'), 210, 900),
 ];
+

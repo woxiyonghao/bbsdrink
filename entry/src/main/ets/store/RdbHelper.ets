@@ -310,6 +310,17 @@ export class RdbHelper {
     resultSet.close();
     return lastTime;
   }
+
+  /**
+   * 查询某项运动是否在最近 60 分钟内完成过
+   * @param userId 用户 ID
+   * @param activityType 运动类型值（201~299）
+   * @returns true = 已完成（进度条显示 100%），false = 未完成
+   */
+  public async queryActivityDoneInLastHour(userId: number, activityType: number): Promise<boolean> {
+    const lastTime = await this.queryLastRecordTime(userId, activityType);
+    return lastTime > 0 && (Date.now() - lastTime < 60 * 60 * 1000);
+  }
 }
 
 export default RdbHelper.getInstance();

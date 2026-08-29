@@ -1,19 +1,27 @@
 import router from '@ohos.router';
-import { ActivityItem } from '../../types';
 import RdbHelper from '../../store/RdbHelper';
 import PreferencesUtil from '../../store/PreferencesUtil';
 
+/** 60 分钟内重置冷却时间（毫秒） */
+const COOLDOWN_MS = 60 * 60 * 1000;
+
 /**
  * 深蹲打卡页面
- * 逻辑与 StretchPage 一致，仅图片资源和默认时长不同
+ * 与 StretchPage 逻辑完全一致，图片资源使用深蹲专属 GIF
+ * activityType 由路由参数传入（默认 208），确保数据库记录独立
  */
 @Entry
 @Component
 export struct SquatPage {
   /** 活动名称，由路由参数传入 */
   @State activityName: string = '深蹲一下';
-  /** 目标秒数，由路由参数传入，默认 180 秒（3 分钟） */
+  /** 目标秒数，由路由参数传入，默认 180 秒 */
   @State targetSeconds: number = 180;
+  /**
+   * 数据库存储类型，由路由参数传入
+   * 深蹲默认 208，确保与其他运动互不干扰
+   */
+  private activityType: number = 208;
 
   @State isRunning: boolean = false;
   @State isFinished: boolean = false;
@@ -26,25 +34,25 @@ export struct SquatPage {
 
   async aboutToAppear() {
     const params = router.getParams() as Record<string, string | number>;
-    if (params && params.activityName) {
-      this.activityName = params.activityName as string;
-      this.targetSeconds = (params.targetSeconds as number) || 180;
+    if (params) {
+      if (params.activityName)  this.activityName  = params.activityName as string;
+      if (params.targetSeconds) this.targetSeconds = params.targetSeconds as number;
+      if (params.activityType)  this.activityType  = params.activityType as number;
     }
 
     this.userId = await PreferencesUtil.getCurrentUserId();
     if (this.userId <= 0) return;
 
-    // 查询上次深蹲记录时间（type=6 代表深蹲）
-    const lastTime = await RdbHelper.queryLastRecordTime(this.userId, 6);
-    if (Date.now() - lastTime < 60 * 60 * 1000) {
-      // 距上次打卡不足 1 小时，直接显示已完成状态
+    // 查询深蹲最近一次完成时间，60 分钟内则直接显示已完成
+    const lastTime = await RdbHelper.queryLastRecordTime(this.userId, this.activityType);
+    if (lastTime > 0 && Date.now() - lastTime < COOLDOWN_MS) {
       this.isFinished = true;
       this.milliseconds = this.targetSeconds * 1000;
     }
   }
 
   /**
-   * 格式化毫秒数为 MM:SS:ms 字符串
+   * 格式化毫秒为 MM:SS:ms 字符串
    * @param ms 毫秒数
    */
   formatTime(ms: number): string {
@@ -55,21 +63,20 @@ export struct SquatPage {
     return `${mm}:${ss}:${millis}`;
   }
 
-  /** 开始计时器 */
+  /** 开始计时 */
   startTimer() {
     if (this.isRunning) return;
     this.isRunning = true;
     this.startTime = Date.now() - this.milliseconds;
     this.timerId = setInterval(() => {
       this.milliseconds = Date.now() - this.startTime;
-      // 不自动停止，等待用户主动点击停止
+      // 不自动停止，等待用户主动点击
     }, 10);
   }
 
-  /** 处理停止按钮点击：未达标则询问，已达标则完成 */
+  /** 处理停止按钮：未达标弹窗确认，已达标直接完成 */
   handleStopClick() {
     if (this.milliseconds < this.targetSeconds * 1000) {
-      // 未达目标，弹窗确认是否中途放弃
       AlertDialog.show({
         title: '提示',
         message: '运动进行中，确认停止吗？',
@@ -80,18 +87,15 @@ export struct SquatPage {
         secondaryButton: {
           value: '确认',
           fontColor: '#FF5E5E',
-          action: () => {
-            this.stopAndReset();
-          }
+          action: () => { this.stopAndReset(); }
         }
       });
       return;
     }
-    // 已达目标，直接完成
     this.finishTimer();
   }
 
-  /** 停止计时并重置状态 */
+  /** 中途放弃：停止并重置 */
   stopAndReset() {
     if (this.timerId !== -1) {
       clearInterval(this.timerId);
@@ -102,7 +106,10 @@ export struct SquatPage {
     this.milliseconds = 0;
   }
 
-  /** 完成计时：保存记录并展示烟花动效 */
+  /**
+   * 完成计时：写入数据库并展示烟花动效
+   * 使用路由参数传入的 activityType（208）写入，确保记录独立
+   */
   async finishTimer() {
     if (this.timerId !== -1) {
       clearInterval(this.timerId);
@@ -115,7 +122,7 @@ export struct SquatPage {
     if (this.userId > 0) {
       await RdbHelper.insertRecord({
         userId: this.userId,
-        type: 6, // 6 代表深蹲
+        type: this.activityType,
         value: Math.floor(this.milliseconds / 1000),
         timestamp: Date.now()
       });
@@ -140,16 +147,16 @@ export struct SquatPage {
         .height('100%')
         .backgroundColor('#F5F5F5')
 
-      // 绿色半透明磨砂层
+      // 绿色磨砂层
       Column()
         .width('100%')
         .height('100%')
         .backgroundColor('rgba(7, 193, 96, 0.05)')
         .backdropBlur(30)
 
-      // 主内容层
+      // 主内容
       Column() {
-        // 顶部导航栏
+        // 顶部导航
         Row() {
           Image($r('app.media.ic_back'))
             .width(24)
@@ -164,7 +171,6 @@ export struct SquatPage {
             .fontSize(20)
             .fontWeight(FontWeight.Bold)
 
-          // 占位，使标题居中
           Blank().width(24)
         }
         .width('100%')
@@ -174,24 +180,15 @@ export struct SquatPage {
 
         Blank().height(40)
 
-        // 中央图片区域
+        // 中央图片
         Stack() {
           if (this.isFinished) {
-            // 完成后展示点赞图
             Image($r('app.media.zan'))
               .width('75%')
               .aspectRatio(1)
               .objectFit(ImageFit.Contain)
-          } else if (this.isRunning) {
-            // 运动中展示深蹲 GIF
-            Image($r('app.media.squat'))
-              .width('75%')
-              .aspectRatio(1)
-              .objectFit(ImageFit.Contain)
-              .borderRadius(1000)
-              .clip(true)
           } else {
-            // 待开始展示深蹲 GIF（静止帧）
+            // 运动中 / 待开始均显示深蹲 GIF（动图运动中播放，静止时停在首帧）
             Image($r('app.media.squat'))
               .width('75%')
               .aspectRatio(1)
@@ -204,7 +201,7 @@ export struct SquatPage {
         .height(300)
         .alignContent(Alignment.Center)
 
-        // 计时器数字
+        // 计时数字
         Text(this.formatTime(this.milliseconds))
           .fontSize(48)
           .fontWeight(FontWeight.Bold)
@@ -219,10 +216,10 @@ export struct SquatPage {
           .linearGradient({
             direction: GradientDirection.Right,
             colors: this.isRunning
-              ? [['#FFB6C1', 0.0], ['#FF9AA2', 1.0]] as [ResourceColor, number][] // 粉红色：停止中
+              ? [['#FFB6C1', 0.0], ['#FF9AA2', 1.0]] as [ResourceColor, number][]
               : (this.isFinished
-                  ? [['#A8E063', 0.0], ['#56AB2F', 1.0]] as [ResourceColor, number][] // 绿色：已完成
-                  : [['#FFB75E', 0.0], ['#ED8F03', 1.0]] as [ResourceColor, number][]) // 橙色：待开始
+                  ? [['#A8E063', 0.0], ['#56AB2F', 1.0]] as [ResourceColor, number][]
+                  : [['#FFB75E', 0.0], ['#ED8F03', 1.0]] as [ResourceColor, number][])
           })
           .fontColor(Color.White)
           .fontSize(18)
@@ -242,7 +239,7 @@ export struct SquatPage {
       .height('100%')
       .alignItems(HorizontalAlign.Center)
 
-      // 烟花动效蒙层
+      // 烟花蒙层
       if (this.showFirework) {
         Stack() {
           Column()
