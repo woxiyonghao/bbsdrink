@@ -319,9 +319,12 @@ export class RdbHelper {
       .lessThanOrEqualTo('timestamp', endOfDay);
       
     let resultSet = await this.rdbStore.query(predicates, ['id']);
-    const count = resultSet.rowCount;
+    let count = 0;
+    while (resultSet.goToNextRow()) {
+      count++;
+    }
     resultSet.close();
-    return count > 0 ? count : 0;
+    return count;
   }
 
   public async queryTodayActivityDuration(userId: number): Promise<number> {
@@ -347,7 +350,8 @@ export class RdbHelper {
       totalSeconds += resultSet.getLong(resultSet.getColumnIndex('value'));
     }
     resultSet.close();
-    return Math.floor(totalSeconds / 60); // 返回分钟数
+    // 即使只有几秒钟，也向上取整为 1 分钟，避免显示 0 分钟让用户误解
+    return totalSeconds > 0 ? Math.ceil(totalSeconds / 60) : 0;
   }
 
   public async queryActivityRecordsByRange(userId: number, startTimestamp: number, endTimestamp: number): Promise<CheckInRecord[]> {

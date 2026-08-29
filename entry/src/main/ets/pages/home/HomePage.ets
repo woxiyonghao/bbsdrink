@@ -149,6 +149,77 @@ export struct HomePage {
     this.updateWaterReminder();
   }
 
+  @Builder ExerciseRingsCard() {
+    Row() {
+      // 3 rings stack
+      Stack() {
+        // Outer (Move / Calories)
+        Progress({ value: this.todayActivityDuration * 5, total: 200, type: ProgressType.Ring })
+          .width(140).height(140)
+          .color('#07C160').backgroundColor('rgba(7, 193, 96, 0.15)')
+          .style({ strokeWidth: 14 })
+          .animation({ duration: 800, curve: Curve.FastOutSlowIn })
+        
+        // Middle (Exercise / Duration)
+        Progress({ value: this.todayActivityDuration, total: 30, type: ProgressType.Ring })
+          .width(110).height(110)
+          .color('#34C759').backgroundColor('rgba(52, 199, 89, 0.15)')
+          .style({ strokeWidth: 14 })
+          .animation({ duration: 800, curve: Curve.FastOutSlowIn })
+
+        // Inner (Stand / Count)
+        Progress({ value: this.todayActivityCount, total: 5, type: ProgressType.Ring })
+          .width(80).height(80)
+          .color('#30D158').backgroundColor('rgba(48, 209, 88, 0.15)')
+          .style({ strokeWidth: 14 })
+          .animation({ duration: 800, curve: Curve.FastOutSlowIn })
+      }
+      .width(140)
+      
+      // Stats on the right
+      Column({ space: 14 }) {
+        // Calories
+        Column() {
+          Text('活动').fontSize(14).fontWeight(FontWeight.Medium).fontColor('#FFFFFF')
+          Row() {
+            Text(`${this.todayActivityDuration * 5}`).fontSize(20).fontWeight(FontWeight.Bold).fontColor('#07C160')
+            Text(`/200千卡`).fontSize(12).fontColor('#07C160').margin({ left: 2, bottom: 3 })
+          }.alignItems(VerticalAlign.Bottom).margin({ top: 4 })
+        }.alignItems(HorizontalAlign.Start)
+
+        // Duration
+        Column() {
+          Text('锻炼').fontSize(14).fontWeight(FontWeight.Medium).fontColor('#FFFFFF')
+          Row() {
+            Text(`${this.todayActivityDuration}`).fontSize(20).fontWeight(FontWeight.Bold).fontColor('#34C759')
+            Text(`/30分钟`).fontSize(12).fontColor('#34C759').margin({ left: 2, bottom: 3 })
+          }.alignItems(VerticalAlign.Bottom).margin({ top: 4 })
+        }.alignItems(HorizontalAlign.Start)
+
+        // Count
+        Column() {
+          Text('运动次数').fontSize(14).fontWeight(FontWeight.Medium).fontColor('#FFFFFF')
+          Row() {
+            Text(`${this.todayActivityCount}`).fontSize(20).fontWeight(FontWeight.Bold).fontColor('#30D158')
+            Text(`/5次`).fontSize(12).fontColor('#30D158').margin({ left: 2, bottom: 3 })
+          }.alignItems(VerticalAlign.Bottom).margin({ top: 4 })
+        }.alignItems(HorizontalAlign.Start)
+      }
+      .margin({ left: 28 })
+      .alignItems(HorizontalAlign.Start)
+      .layoutWeight(1)
+    }
+    .width('90%')
+    .padding({ left: 20, right: 20, top: 24, bottom: 24 })
+    .backgroundColor('#1C1C1E') // Apple Fitness 黑底
+    .borderRadius(24)
+    .shadow({ radius: 15, color: 'rgba(0, 0, 0, 0.15)', offsetY: 8 })
+    .margin({ bottom: 20 })
+    .onClick(() => {
+      router.pushUrl({ url: 'pages/mine/ActivityRecordPage', params: { isTodayOnly: true } })
+    })
+  }
+
   @Builder QuickAddWaterBtn(label: string, amount: number) {
     Button(label)
       .width(86)
@@ -305,17 +376,8 @@ export struct HomePage {
         .shadow({ radius: 20, color: 'rgba(0, 0, 0, 0.04)', offsetY: 8 })
         .margin({ bottom: 20 })
 
-        // 3. 健康双卡片 (防久坐 & 运动时长)
-        Row({ space: 16 }) {
-          this.HealthCard('今日运动', `${this.todayActivityCount}`, '次', $r('app.media.ic_sit_record'), '#FFF', () => {
-            router.pushUrl({ url: 'pages/mine/ActivityRecordPage', params: { isTodayOnly: true } })
-          })
-          this.HealthCard('运动时长', `${this.todayActivityDuration}`, '分钟', $r('app.media.ic_sport_record'), '#FFF', () => {
-            router.pushUrl({ url: 'pages/mine/ActivityRecordPage', params: { isTodayOnly: true } })
-          })
-        }
-        .width('90%')
-        .margin({ bottom: 20 })
+        // 3. 运动数据大盘 (Apple Fitness 风格)
+        this.ExerciseRingsCard()
 
         // 3.1 微型周报趋势图 (Weekly Trend)
         Column() {
