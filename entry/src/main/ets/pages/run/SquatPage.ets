@@ -187,9 +187,17 @@ export struct SquatPage {
               .width('75%')
               .aspectRatio(1)
               .objectFit(ImageFit.Contain)
-          } else {
-            // 运动中 / 待开始均显示深蹲 GIF（动图运动中播放，静止时停在首帧）
+          } else if (this.isRunning) {
+            // 运动中显示深蹲 GIF 动图
             Image($r('app.media.squat'))
+              .width('75%')
+              .aspectRatio(1)
+              .objectFit(ImageFit.Contain)
+              .borderRadius(1000)
+              .clip(true)
+          } else {
+            // 待开始显示深蹲静态首帧
+            Image($r('app.media.squat_static'))
               .width('75%')
               .aspectRatio(1)
               .objectFit(ImageFit.Contain)
