@@ -137,20 +137,20 @@ export struct RunPage {
               // 右侧：环形进度 + 图标
               Stack() {
                 Progress({ value: item.progress, total: 100, type: ProgressType.Ring })
-                  .width(60)
-                  .height(60)
+                  .width(80)
+                  .height(80)
                   .color(Color.White)
-                  .style({ strokeWidth: 5 })
+                  .style({ strokeWidth: 6 })
                 
                 if (item.isEmoji) {
                   Text(item.icon as string)
-                    .fontSize(30)
+                    .fontSize(42)
                 } else {
                   Image(item.icon)
-                    .width(32)
-                    .height(32)
+                    .width(48)
+                    .height(48)
                     .fillColor(item.noFill ? undefined : Color.White)
-                    .borderRadius(item.noFill ? 16 : 0)
+                    .borderRadius(item.noFill ? 24 : 0)
                 }
               }
               .margin({ right: 25 })
