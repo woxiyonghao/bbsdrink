@@ -94,6 +94,24 @@ export class RdbHelper {
   }
 
   /**
+   * 删除用户及其所有记录
+   */
+  public async deleteUser(userId: number): Promise<boolean> {
+    if (!this.rdbStore) { return false; }
+    
+    // 1. 删除用户的打卡记录
+    let recordPredicates = new relationalStore.RdbPredicates('record');
+    recordPredicates.equalTo('userId', userId);
+    await this.rdbStore.delete(recordPredicates);
+    
+    // 2. 删除用户
+    let userPredicates = new relationalStore.RdbPredicates('user');
+    userPredicates.equalTo('id', userId);
+    const rows = await this.rdbStore.delete(userPredicates);
+    return rows > 0;
+  }
+
+  /**
    * 获取所有用户
    */
   public async queryAllUsers(): Promise<User[]> {
