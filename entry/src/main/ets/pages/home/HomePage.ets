@@ -34,13 +34,7 @@ export struct HomePage {
   @State todayActivityCount: number = 0;
   @State todayActivityDuration: number = 0;
 
-  @State totalHistoricalDays: number = 0;
-  @State totalHistoricalWater: number = 0;
-  @State totalHistoricalActivity: number = 0;
-
   private currentDate: string = '';
-
-  });
 
   @Prop @Watch('onTabChange') currentTabIndex: number = 0;
 
@@ -157,33 +151,26 @@ export struct HomePage {
 
   async showAchievementWall() {
     if (this.userId <= 0) return;
-    
-    // 查询所有饮水记录
     const drinkRecords = await RdbHelper.queryDrinkRecords(this.userId);
-    this.totalHistoricalWater = drinkRecords.reduce((sum, r) => sum + r.value, 0);
-
-    // 查询所有运动记录
+    const totalWater: number = drinkRecords.reduce((sum: number, r) => sum + r.value, 0);
     const activityRecords = await RdbHelper.queryActivityRecords(this.userId);
-    const totalSeconds = activityRecords.reduce((sum, r) => sum + r.value, 0);
-    this.totalHistoricalActivity = Math.ceil(totalSeconds / 60);
-
-    // 查询累计打卡天数（基于签到时间戳或运动时间戳）
-    // 这里使用已有方法 queryAllCheckInTimestamps 即可反映活跃天数
+    const totalSeconds: number = activityRecords.reduce((sum: number, r) => sum + r.value, 0);
+    const totalActivity: number = Math.ceil(totalSeconds / 60);
     const timestamps = await RdbHelper.queryAllCheckInTimestamps(this.userId);
-    const uniqueDays = new Set(timestamps.map(ts => {
+    const daySet = new Set<string>();
+    for (const ts of timestamps) {
       const d = new Date(ts);
-      return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-    }));
-    this.totalHistoricalDays = uniqueDays.size;
-
+      daySet.add(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`);
+    }
+    const totalDays: number = daySet.size;
     router.pushUrl({
       url: 'pages/home/PosterPage',
       params: {
         type: 'achievement',
         nickname: this.nickname,
-        totalDays: this.totalHistoricalDays,
-        totalWater: this.totalHistoricalWater,
-        totalActivity: this.totalHistoricalActivity
+        totalDays: totalDays,
+        totalWater: totalWater,
+        totalActivity: totalActivity
       }
     });
   }
