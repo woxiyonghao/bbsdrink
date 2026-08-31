@@ -176,7 +176,7 @@ export struct MinePage {
         }
         .width('100%').height(50).padding({ left: 15, right: 15 })
         
-        Divider().color('rgba(0,0,0,0.05)').margin({ left: 15, right: 15 })
+        Divider().color('#F5F5F5').margin({ left: 15, right: 15 })
         
         Row() {
           this.GridItem($r('app.media.ic_drink_record'), '喝水记录', () => { router.pushUrl({ url: 'pages/mine/DrinkHistoryPage' }); })
@@ -186,8 +186,7 @@ export struct MinePage {
         .width('100%').padding({ top: 20, bottom: 20 })
       }
       .width('calc(100% - 24vp)')
-      .backgroundColor('rgba(7, 193, 96, 0.15)')
-      .backdropBlur(30)
+      .backgroundColor('#FFFFFF')
       .borderRadius(8)
       .margin({ top: 12, bottom: 6 })
 
@@ -197,15 +196,14 @@ export struct MinePage {
           router.pushUrl({ url: 'pages/mine/AboutPage' }) 
         })
         
-        Divider().color('rgba(0,0,0,0.05)').margin({ left: 45 })
+        Divider().color('#F5F5F5').margin({ left: 45 })
         
         this.ListItem($r('app.media.ic_logout'), '退出登录', () => {
           this.dialogController.open()
         })
       }
       .width('calc(100% - 24vp)')
-      .backgroundColor('rgba(7, 193, 96, 0.15)')
-      .backdropBlur(30)
+      .backgroundColor('#FFFFFF')
       .borderRadius(8)
       .margin({ top: 6, bottom: 12 })
       
