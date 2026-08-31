@@ -78,7 +78,7 @@ export struct TabsPage {
 
             Row() {
               this.TabBarBuilder('首页', 0, $r('app.media.ic_home_filled'), $r('app.media.ic_home'))
-              this.TabBarBuilder('打卡', 1, $r('app.media.ic_ding_filled'), $r('app.media.ic_ding'))
+              this.TabBarBuilder('打卡', 1, $r('app.media.ic_ding_phone_anim'), $r('app.media.ic_ding_phone_static'))
               this.TabBarBuilder('我的', 2, $r('app.media.ic_mine_tie_anim'), $r('app.media.ic_mine_tie_static'))
             }
             .width('100%')
