@@ -157,14 +157,15 @@ export struct MinePage {
           }
           
           Text(this.currentUser?.nickname || '未登录')
-            .fontSize(20).fontWeight(FontWeight.Medium).fontColor('#FFFFFF')
+            .fontSize(20).fontWeight(FontWeight.Medium).fontColor('#333333')
             .margin({ top: 15 })
         }
         .width('100%')
         .margin({ top: 80 })
       }
       .width('100%').height(240)
-      .backgroundColor(THEME_COLOR) // 保持微信绿主色调
+      .backgroundColor('rgba(7, 193, 96, 0.15)')
+      .backdropBlur(30)
 
       // 2. 核心功能区 (宫格样式)
       Column() {
