@@ -5,6 +5,7 @@ import RdbHelper from '../../store/RdbHelper';
 import { User } from '../../types';
 
 import { HealthArticle, HEALTH_ARTICLES } from '../../store/MockArticles';
+import { AchievementPosterDialog, DailyPosterDialog } from './PosterDialogs';
 
 const DAILY_QUOTES = [
   "今天也要好好照顾自己哦 ✨",
@@ -34,7 +35,34 @@ export struct HomePage {
   @State todayActivityCount: number = 0;
   @State todayActivityDuration: number = 0;
 
+  @State totalHistoricalDays: number = 0;
+  @State totalHistoricalWater: number = 0;
+  @State totalHistoricalActivity: number = 0;
+
   private currentDate: string = '';
+
+  private achievementDialogController: CustomDialogController = new CustomDialogController({
+    builder: AchievementPosterDialog({
+      nickname: this.nickname,
+      totalDays: this.totalHistoricalDays,
+      totalWater: this.totalHistoricalWater,
+      totalActivity: this.totalHistoricalActivity
+    }),
+    customStyle: true,
+    alignment: DialogAlignment.Center
+  });
+
+  private dailyDialogController: CustomDialogController = new CustomDialogController({
+    builder: DailyPosterDialog({
+      nickname: this.nickname,
+      dateStr: this.currentDate,
+      todayWater: this.todayDrank,
+      todayActivityDuration: this.todayActivityDuration,
+      todayActivityCount: this.todayActivityCount
+    }),
+    customStyle: true,
+    alignment: DialogAlignment.Center
+  });
 
   @Prop @Watch('onTabChange') currentTabIndex: number = 0;
 
@@ -147,6 +175,34 @@ export struct HomePage {
     });
     this.lastWaterTime = now;
     this.updateWaterReminder();
+  }
+
+  async showAchievementWall() {
+    if (this.userId <= 0) return;
+    
+    // 查询所有饮水记录
+    const drinkRecords = await RdbHelper.queryDrinkRecords(this.userId);
+    this.totalHistoricalWater = drinkRecords.reduce((sum, r) => sum + r.value, 0);
+
+    // 查询所有运动记录
+    const activityRecords = await RdbHelper.queryActivityRecords(this.userId);
+    const totalSeconds = activityRecords.reduce((sum, r) => sum + r.value, 0);
+    this.totalHistoricalActivity = Math.ceil(totalSeconds / 60);
+
+    // 查询累计打卡天数（基于签到时间戳或运动时间戳）
+    // 这里使用已有方法 queryAllCheckInTimestamps 即可反映活跃天数
+    const timestamps = await RdbHelper.queryAllCheckInTimestamps(this.userId);
+    const uniqueDays = new Set(timestamps.map(ts => {
+      const d = new Date(ts);
+      return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    }));
+    this.totalHistoricalDays = uniqueDays.size;
+
+    this.achievementDialogController.open();
+  }
+
+  showDailyPoster() {
+    this.dailyDialogController.open();
   }
 
   @Builder ExerciseRingsCard() {
@@ -292,7 +348,7 @@ export struct HomePage {
             .backgroundColor('#F5F7FA')
             .borderRadius(21)
             .onClick(() => {
-              promptAction.showToast({ message: '健康成就墙功能即将开放！' });
+              this.showAchievementWall();
             })
 
             // 分享海报按钮
@@ -306,7 +362,7 @@ export struct HomePage {
             .backgroundColor('#F5F7FA')
             .borderRadius(21)
             .onClick(() => {
-              promptAction.showToast({ message: '每日健康海报功能即将开放！' });
+              this.showDailyPoster();
             })
           }
         }
