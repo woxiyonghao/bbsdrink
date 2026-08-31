@@ -150,9 +150,10 @@ export struct MinePage {
               .border({ width: 3, color: '#FFFFFF' })
               .objectFit(ImageFit.Cover)
           } else {
-            Image($r('app.media.ic_avatar_placeholder'))
+            Image($r('app.media.ic_avatar_selfie_anim'))
               .width(84).height(84).borderRadius(42)
               .border({ width: 3, color: '#FFFFFF' })
+              .objectFit(ImageFit.Cover)
           }
           
           Text(this.currentUser?.nickname || '未登录')
