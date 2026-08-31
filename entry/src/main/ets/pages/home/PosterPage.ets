@@ -22,21 +22,19 @@ export struct PosterPage {
   @State totalActivity: number = 0;
 
   aboutToAppear() {
-    const params = router.getParams() as Record<string, any>;
+    const params = router.getParams() as Record<string, string | number>;
     if (params) {
-      this.type = params.type || 'daily';
-      this.nickname = params.nickname || '';
-      this.dateStr = params.dateStr || '';
-      this.todayWater = params.todayWater || 0;
-      this.todayActivityDuration = params.todayActivityDuration || 0;
-      this.todayActivityCount = params.todayActivityCount || 0;
-      
-      this.totalDays = params.totalDays || 0;
-      this.totalWater = params.totalWater || 0;
-      this.totalActivity = params.totalActivity || 0;
+      if (params.type) this.type = params.type as string;
+      if (params.nickname) this.nickname = params.nickname as string;
+      if (params.dateStr) this.dateStr = params.dateStr as string;
+      if (params.todayWater !== undefined) this.todayWater = params.todayWater as number;
+      if (params.todayActivityDuration !== undefined) this.todayActivityDuration = params.todayActivityDuration as number;
+      if (params.todayActivityCount !== undefined) this.todayActivityCount = params.todayActivityCount as number;
+      if (params.totalDays !== undefined) this.totalDays = params.totalDays as number;
+      if (params.totalWater !== undefined) this.totalWater = params.totalWater as number;
+      if (params.totalActivity !== undefined) this.totalActivity = params.totalActivity as number;
     }
   }
-
   build() {
     Column() {
       // Top Navigation Bar
