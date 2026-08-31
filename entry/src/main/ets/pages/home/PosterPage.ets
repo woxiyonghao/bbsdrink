@@ -105,47 +105,50 @@ export struct PosterPage {
             Text('健康成就墙')
               .fontSize(28)
               .fontWeight(FontWeight.Bolder)
-              .fontColor('#FFFFFF')
+              .fontColor('#333333')
               .margin({ top: 30, bottom: 20 })
 
             Image($r('app.media.ic_trophy'))
               .width(80)
               .height(80)
-              .fillColor('#FFD700')
+              .fillColor('#07C160')
               .margin({ bottom: 20 })
 
             Text(`亲爱的 ${this.nickname}`)
               .fontSize(18)
-              .fontColor('#EEEEEE')
+              .fontColor('#666666')
               .margin({ bottom: 30 })
 
             Row() {
               Column() {
-                Text('累计打卡').fontSize(14).fontColor('#AAAAAA')
-                Text(`${this.totalDays} 天`).fontSize(22).fontWeight(FontWeight.Bold).fontColor('#07C160').margin({ top: 8 })
-              }.layoutWeight(1)
+                Text('累计打卡').fontSize(14).fontColor('#999999')
+                Text(`${this.totalDays}`).fontSize(24).fontWeight(FontWeight.Bold).fontColor('#333333').margin({ top: 8 })
+                Text('天').fontSize(12).fontColor('#999999').margin({ top: 4 })
+              }.layoutWeight(1).alignItems(HorizontalAlign.Center)
 
               Column() {
-                Text('累计饮水').fontSize(14).fontColor('#AAAAAA')
-                Text(`${this.totalWater} ml`).fontSize(22).fontWeight(FontWeight.Bold).fontColor('#8ECAE6').margin({ top: 8 })
-              }.layoutWeight(1)
+                Text('累计饮水').fontSize(14).fontColor('#999999')
+                Text(`${this.totalWater}`).fontSize(24).fontWeight(FontWeight.Bold).fontColor('#333333').margin({ top: 8 })
+                Text('ml').fontSize(12).fontColor('#999999').margin({ top: 4 })
+              }.layoutWeight(1).alignItems(HorizontalAlign.Center)
 
               Column() {
-                Text('累计运动').fontSize(14).fontColor('#AAAAAA')
-                Text(`${this.totalActivity} 分钟`).fontSize(22).fontWeight(FontWeight.Bold).fontColor('#FF7F50').margin({ top: 8 })
-              }.layoutWeight(1)
+                Text('累计运动').fontSize(14).fontColor('#999999')
+                Text(`${this.totalActivity}`).fontSize(24).fontWeight(FontWeight.Bold).fontColor('#333333').margin({ top: 8 })
+                Text('分钟').fontSize(12).fontColor('#999999').margin({ top: 4 })
+              }.layoutWeight(1).alignItems(HorizontalAlign.Center)
             }.width('100%').padding({ left: 10, right: 10 })
             
             Blank()
             
             Text('每一滴汗水与水分，都在塑造更好的你')
               .fontSize(12)
-              .fontColor('#666666')
+              .fontColor('#999999')
               .margin({ bottom: 20 })
           }
           .width('100%')
           .height(400)
-          .backgroundColor('#1C1C1E')
+          .backgroundColor('#F5F7FA')
           .borderRadius(16)
         } else {
           // Daily UI
@@ -153,7 +156,7 @@ export struct PosterPage {
             Text('每日健康报告')
               .fontSize(28)
               .fontWeight(FontWeight.Bolder)
-              .fontColor('#FFFFFF')
+              .fontColor('#333333')
               .margin({ top: 30, bottom: 10 })
 
             Text(this.dateStr)
@@ -163,34 +166,36 @@ export struct PosterPage {
 
             Row() {
               Column() {
-                Image($r('app.media.ic_drink_water')).width(40).height(40).fillColor('#8ECAE6')
-                Text('今日饮水').fontSize(14).fontColor('#AAAAAA').margin({ top: 10 })
-                Text(`${this.todayWater} ml`).fontSize(24).fontWeight(FontWeight.Bold).fontColor('#FFFFFF').margin({ top: 8 })
-              }.layoutWeight(1)
+                Image($r('app.media.ic_drink_water')).width(40).height(40).fillColor('#07C160')
+                Text('今日饮水').fontSize(14).fontColor('#999999').margin({ top: 10 })
+                Text(`${this.todayWater}`).fontSize(24).fontWeight(FontWeight.Bold).fontColor('#333333').margin({ top: 8 })
+                Text('ml').fontSize(12).fontColor('#999999').margin({ top: 4 })
+              }.layoutWeight(1).alignItems(HorizontalAlign.Center)
 
               Column() {
-                Image($r('app.media.ic_sport_white')).width(40).height(40).fillColor('#34C759')
-                Text('今日运动').fontSize(14).fontColor('#AAAAAA').margin({ top: 10 })
-                Text(`${this.todayActivityDuration} 分钟`).fontSize(24).fontWeight(FontWeight.Bold).fontColor('#FFFFFF').margin({ top: 8 })
-              }.layoutWeight(1)
+                Image($r('app.media.ic_sport_white')).width(40).height(40).fillColor('#07C160')
+                Text('今日运动').fontSize(14).fontColor('#999999').margin({ top: 10 })
+                Text(`${this.todayActivityDuration}`).fontSize(24).fontWeight(FontWeight.Bold).fontColor('#333333').margin({ top: 8 })
+                Text('分钟').fontSize(12).fontColor('#999999').margin({ top: 4 })
+              }.layoutWeight(1).alignItems(HorizontalAlign.Center)
             }.width('100%')
             
             Row() {
               Text(`共计活动 ${this.todayActivityCount} 次`)
                 .fontSize(14)
-                .fontColor('#AAAAAA')
+                .fontColor('#999999')
             }.margin({ top: 20 })
             
             Blank()
             
             Text(`${this.nickname}，今天也辛苦啦！`)
               .fontSize(14)
-              .fontColor('#888888')
+              .fontColor('#999999')
               .margin({ bottom: 20 })
           }
           .width('100%')
           .height(400)
-          .backgroundColor('#1C1C1E')
+          .backgroundColor('#F5F7FA')
           .borderRadius(16)
         }
       }
