@@ -337,6 +337,37 @@ export struct ActivityRecordPage {
         Column() {
           LoadingProgress().width(40).height(40)
         }.width('100%').layoutWeight(1).justifyContent(FlexAlign.Center)
+      } else if (this.groups.length === 0) {
+        Column() {
+          Image($r('app.media.run_empty'))
+            .width('60%')
+            .aspectRatio(1)
+            .objectFit(ImageFit.Contain)
+            .borderRadius(1000)
+            .clip(true)
+            
+          Text(this.isTodayOnly ? '今天还没有开始运动喔。' : '暂无运动记录喔。')
+            .fontSize(16)
+            .fontColor('#999999')
+            .margin({ top: 30, bottom: 50 })
+
+          Button('去运动')
+            .width(200)
+            .height(50)
+            .backgroundColor('#07C160') // 微信淡绿色
+            .fontColor(Color.White)
+            .fontSize(18)
+            .fontWeight(FontWeight.Bold)
+            .type(ButtonType.Capsule)
+            .onClick(() => {
+              router.pushUrl({ url: 'pages/run/RunPage' });
+            })
+        }
+        .width('100%')
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Center)
+        .justifyContent(FlexAlign.Center)
+        .padding({ bottom: 40 })
       } else {
         List() {
           ForEach(this.groups, (group: DailyRecordGroup) => {
