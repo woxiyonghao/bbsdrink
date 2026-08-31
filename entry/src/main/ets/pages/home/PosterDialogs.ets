@@ -1,3 +1,4 @@
+import image from '@ohos.multimedia.image';
 import componentSnapshot from '@ohos.arkui.componentSnapshot';
 import { ImageSaveUtil } from '../../tools/ImageSaveUtil';
 
@@ -71,7 +72,7 @@ export struct AchievementPosterDialog {
         .backgroundColor('#07C160')
         .margin({ top: 10, bottom: 20 })
         .onClick(() => {
-          componentSnapshot.get('achievement_poster_id', (error, pixmap) => {
+          componentSnapshot.get('achievement_poster_id', (error: Error, pixmap: image.PixelMap) => {
             if (pixmap) {
               ImageSaveUtil.savePixelMapToGallery(pixmap);
             }
@@ -152,7 +153,7 @@ export struct DailyPosterDialog {
         .backgroundColor('#07C160')
         .margin({ top: 10, bottom: 20 })
         .onClick(() => {
-          componentSnapshot.get('daily_poster_id', (error, pixmap) => {
+          componentSnapshot.get('daily_poster_id', (error: Error, pixmap: image.PixelMap) => {
             if (pixmap) {
               ImageSaveUtil.savePixelMapToGallery(pixmap);
             }
