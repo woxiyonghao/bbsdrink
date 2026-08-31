@@ -22,6 +22,7 @@
     "pages/mine/AboutPage",
     "pages/home/ArticleDetailPage",
     "pages/home/CheckInCalendarPage",
-    "pages/mine/DrinkHistoryPage"
+    "pages/mine/DrinkHistoryPage",
+    "pages/home/PosterPage"
   ]
 }

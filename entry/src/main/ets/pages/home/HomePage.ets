@@ -5,7 +5,6 @@ import RdbHelper from '../../store/RdbHelper';
 import { User } from '../../types';
 
 import { HealthArticle, HEALTH_ARTICLES } from '../../store/MockArticles';
-import { AchievementPosterDialog, DailyPosterDialog } from './PosterDialogs';
 
 const DAILY_QUOTES = [
   "今天也要好好照顾自己哦 ✨",
@@ -41,27 +40,6 @@ export struct HomePage {
 
   private currentDate: string = '';
 
-  private achievementDialogController: CustomDialogController = new CustomDialogController({
-    builder: AchievementPosterDialog({
-      nickname: this.nickname,
-      totalDays: this.totalHistoricalDays,
-      totalWater: this.totalHistoricalWater,
-      totalActivity: this.totalHistoricalActivity
-    }),
-    customStyle: true,
-    alignment: DialogAlignment.Center
-  });
-
-  private dailyDialogController: CustomDialogController = new CustomDialogController({
-    builder: DailyPosterDialog({
-      nickname: this.nickname,
-      dateStr: this.currentDate,
-      todayWater: this.todayDrank,
-      todayActivityDuration: this.todayActivityDuration,
-      todayActivityCount: this.todayActivityCount
-    }),
-    customStyle: true,
-    alignment: DialogAlignment.Center
   });
 
   @Prop @Watch('onTabChange') currentTabIndex: number = 0;
@@ -198,11 +176,30 @@ export struct HomePage {
     }));
     this.totalHistoricalDays = uniqueDays.size;
 
-    this.achievementDialogController.open();
+    router.pushUrl({
+      url: 'pages/home/PosterPage',
+      params: {
+        type: 'achievement',
+        nickname: this.nickname,
+        totalDays: this.totalHistoricalDays,
+        totalWater: this.totalHistoricalWater,
+        totalActivity: this.totalHistoricalActivity
+      }
+    });
   }
 
   showDailyPoster() {
-    this.dailyDialogController.open();
+    router.pushUrl({
+      url: 'pages/home/PosterPage',
+      params: {
+        type: 'daily',
+        nickname: this.nickname,
+        dateStr: this.currentDate,
+        todayWater: this.todayDrank,
+        todayActivityDuration: this.todayActivityDuration,
+        todayActivityCount: this.todayActivityCount
+      }
+    });
   }
 
   @Builder ExerciseRingsCard() {
