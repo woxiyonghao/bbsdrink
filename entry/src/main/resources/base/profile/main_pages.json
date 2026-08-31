@@ -1,6 +1,7 @@
 {
   "src": [
     "pages/login/LoginPage",
+    "pages/login/PrivacyPage",
     "pages/tabs/TabsPage",
     "pages/home/HomePage",
     "pages/ding/DingPage",

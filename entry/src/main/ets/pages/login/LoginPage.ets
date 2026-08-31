@@ -13,6 +13,7 @@ export struct LoginPage {
   @State avatarUri: string = '';
   @State gender: number = 2; // 0: 女, 1: 男, 2: 未知
   @State birthday: number = new Date().getTime(); // 默认今天
+  @State isAgreePrivacy: boolean = false; // 是否同意隐私协议
 
   @State scaleValue: number = 1;
   @State opacityValue: number = 1;
@@ -58,6 +59,11 @@ export struct LoginPage {
    * 提交表单并创建用户
    */
   private async onSubmit() {
+    if (!this.isAgreePrivacy) {
+      promptAction.showToast({ message: '请先阅读并同意隐私政策和用户协议', bottom: 60 });
+      return;
+    }
+
     if (this.nickname.trim() === '') {
       promptAction.showToast({ message: '请输入专属昵称', bottom: 60 });
       return;
@@ -187,6 +193,42 @@ export struct LoginPage {
       .width('85%')
 
       Blank()
+
+      // 隐私政策勾选
+      Row() {
+        Checkbox({ name: 'privacy', group: 'privacyGroup' })
+          .select(this.isAgreePrivacy)
+          .onChange((value: boolean) => {
+            this.isAgreePrivacy = value
+          })
+          .selectedColor(this.primaryColor)
+          .width(14).height(14)
+          .margin({ right: 6 })
+        Text() {
+          Span('我已阅读并同意')
+            .fontColor('#999')
+            .fontSize(12)
+          Span('《用户协议》')
+            .fontColor(this.primaryColor)
+            .fontSize(12)
+            .onClick(() => {
+              router.pushUrl({ url: 'pages/login/PrivacyPage', params: { type: 'user' } })
+            })
+          Span('与')
+            .fontColor('#999')
+            .fontSize(12)
+          Span('《隐私政策》')
+            .fontColor(this.primaryColor)
+            .fontSize(12)
+            .onClick(() => {
+              router.pushUrl({ url: 'pages/login/PrivacyPage', params: { type: 'privacy' } })
+            })
+        }
+      }
+      .width('85%')
+      .margin({ bottom: 16 })
+      .alignItems(VerticalAlign.Center)
+      .justifyContent(FlexAlign.Start)
 
       // 提交按钮
       Button('开启健康生活')
