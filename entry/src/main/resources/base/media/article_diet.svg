@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#7ED321" rx="20"/>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-size="48" font-weight="bold" font-family="sans-serif">健康饮食</text>
+  <circle cx="200" cy="80" r="40" fill="#ffffff" opacity="0.3"/>
+  <path d="M100 250 Q 200 150 300 250" stroke="#ffffff" stroke-width="8" fill="none" opacity="0.3"/>
+</svg>

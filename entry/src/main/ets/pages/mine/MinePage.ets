@@ -201,6 +201,26 @@ export struct MinePage {
         this.ListItem($r('app.media.ic_logout'), '退出登录', () => {
           this.dialogController.open()
         })
+
+        Divider().color('#F5F5F5').margin({ left: 45 })
+
+        this.ListItem($r('app.media.ic_about'), '注销账号', () => {
+          promptAction.showDialog({
+            title: '注销账号',
+            message: '注销后所有打卡数据将被清空且无法恢复，确认要注销吗？',
+            buttons: [
+              { text: '取消', color: '#666666' },
+              { text: '确认注销', color: '#FF4D4F' }
+            ]
+          }).then(async (data) => {
+            if (data.index === 1 && this.currentUser) {
+              await RdbHelper.deleteUser(this.currentUser.id!);
+              await PreferencesUtil.setCurrentUserId(-1);
+              promptAction.showToast({ message: '账号已成功注销' });
+              router.replaceUrl({ url: 'pages/login/LoginPage' });
+            }
+          })
+        })
       }
       .width('calc(100% - 24vp)')
       .backgroundColor('#FFFFFF')

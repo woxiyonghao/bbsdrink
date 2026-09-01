@@ -1,7 +1,7 @@
 {
   "app": {
-    "bundleName": "com.example.bbsdrink",
-    "vendor": "example",
+    "bundleName": "com.bbsdrink.app",
+    "vendor": "bbsdrink",
     "versionCode": 1000000,
     "versionName": "1.0.0",
     "buildVersion": "1",
