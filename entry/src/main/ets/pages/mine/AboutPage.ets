@@ -55,6 +55,25 @@ export struct AboutPage {
       }
       
       Blank()
+      
+      Row() {
+        Text('《用户协议》')
+          .fontSize(12)
+          .fontColor('#007DFF')
+          .onClick(() => {
+            router.pushUrl({ url: 'pages/login/PrivacyPage', params: { type: 'user' } })
+          })
+        Text(' 和 ')
+          .fontSize(12)
+          .fontColor('#666666')
+        Text('《隐私政策》')
+          .fontSize(12)
+          .fontColor('#007DFF')
+          .onClick(() => {
+            router.pushUrl({ url: 'pages/login/PrivacyPage', params: { type: 'privacy' } })
+          })
+      }
+      .margin({ bottom: 12 })
 
       Text('Copyright © 2026. All Rights Reserved.')
         .fontSize(12)

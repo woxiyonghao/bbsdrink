@@ -6,6 +6,83 @@ import RdbHelper from '../../store/RdbHelper';
 import PreferencesUtil from '../../store/PreferencesUtil';
 import { THEME_COLOR } from '../../tools/Theme';
 
+import common from '@ohos.app.ability.common';
+
+@CustomDialog
+export struct PrivacyDialog {
+  controller: CustomDialogController
+  cancel: () => void = () => {}
+  confirm: () => void = () => {}
+
+  build() {
+    Column() {
+      Text('服务协议和隐私政策')
+        .fontSize(18)
+        .fontWeight(FontWeight.Bold)
+        .fontColor('#333333')
+        .margin({ top: 24, bottom: 12 })
+      
+      Scroll() {
+        Text() {
+          Span('欢迎使用“该喝水啦亲”！\n\n')
+          Span('我们非常重视您的隐私保护和个人信息安全。在您使用本应用前，请认真阅读')
+          Span('《用户协议》')
+            .fontColor(THEME_COLOR)
+            .onClick(() => {
+              router.pushUrl({ url: 'pages/login/PrivacyPage', params: { type: 'user' } })
+            })
+          Span('和')
+          Span('《隐私政策》')
+            .fontColor(THEME_COLOR)
+            .onClick(() => {
+              router.pushUrl({ url: 'pages/login/PrivacyPage', params: { type: 'privacy' } })
+            })
+          Span('。\n\n')
+          Span('本应用为纯本地应用，您的所有健康数据（包含头像、昵称、打卡记录等）均加密存储在您的本地设备上。我们不会将您的个人数据上传至任何云端服务器，也不会与任何第三方共享。\n\n')
+          Span('如果您同意上述协议内容，请点击“同意”开始使用。')
+        }
+        .fontSize(14)
+        .fontColor('#666666')
+        .lineHeight(24)
+      }
+      .height(180)
+      .margin({ left: 24, right: 24, bottom: 20 })
+
+      Divider().color('rgba(0, 0, 0, 0.05)')
+
+      Row() {
+        Text('不同意')
+          .fontSize(16)
+          .fontColor('#888888')
+          .layoutWeight(1)
+          .textAlign(TextAlign.Center)
+          .onClick(() => {
+            this.controller.close()
+            this.cancel()
+          })
+        
+        Divider().vertical(true).height('100%').color('rgba(0, 0, 0, 0.05)')
+        
+        Text('同意')
+          .fontSize(16)
+          .fontColor(THEME_COLOR)
+          .fontWeight(FontWeight.Medium)
+          .layoutWeight(1)
+          .textAlign(TextAlign.Center)
+          .onClick(() => {
+            this.controller.close()
+            this.confirm()
+          })
+      }
+      .width('100%')
+      .height(50)
+    }
+    .width('85%')
+    .backgroundColor('#FFFFFF')
+    .borderRadius(16)
+  }
+}
+
 @Entry
 @Component
 export struct LoginPage {
@@ -23,7 +100,30 @@ export struct LoginPage {
 
   private primaryColor: string = THEME_COLOR; // 微信绿
 
+  privacyDialogController: CustomDialogController = new CustomDialogController({
+    builder: PrivacyDialog({
+      cancel: () => {
+        const context = getContext(this) as common.UIAbilityContext;
+        context.terminateSelf();
+      },
+      confirm: async () => {
+        await PreferencesUtil.setPrivacyAgreed(true);
+        this.isAgreePrivacy = true;
+      }
+    }),
+    alignment: DialogAlignment.Center,
+    autoCancel: false,
+    customStyle: true
+  })
+
   async aboutToAppear() {
+    const isAgreed = await PreferencesUtil.getPrivacyAgreed();
+    if (!isAgreed) {
+      this.privacyDialogController.open();
+    } else {
+      this.isAgreePrivacy = true;
+    }
+
     this.existingUsers = await RdbHelper.queryAllUsers();
     if (this.existingUsers.length === 0) {
       this.isLoginMode = false;

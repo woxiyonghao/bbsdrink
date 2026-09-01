@@ -46,6 +46,24 @@ export class PreferencesUtil {
     const userId = await this.pref.get(KEY_CURRENT_USER_ID, -1);
     return userId as number;
   }
+
+  /**
+   * 设置是否同意隐私政策
+   */
+  public async setPrivacyAgreed(agreed: boolean): Promise<void> {
+    if (!this.pref) { return; }
+    await this.pref.put('is_privacy_agreed', agreed);
+    await this.pref.flush();
+  }
+
+  /**
+   * 获取是否同意隐私政策
+   */
+  public async getPrivacyAgreed(): Promise<boolean> {
+    if (!this.pref) { return false; }
+    const agreed = await this.pref.get('is_privacy_agreed', false);
+    return agreed as boolean;
+  }
 }
 
 export default PreferencesUtil.getInstance();
