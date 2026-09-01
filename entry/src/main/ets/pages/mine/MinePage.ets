@@ -204,7 +204,7 @@ export struct MinePage {
 
         Divider().color('#F5F5F5').margin({ left: 45 })
 
-        this.ListItem($r('app.media.ic_about'), '注销账号', () => {
+        this.ListItem($r('app.media.ic_delete_account'), '注销账号', () => {
           promptAction.showDialog({
             title: '注销账号',
             message: '注销后所有打卡数据将被清空且无法恢复，确认要注销吗？',
