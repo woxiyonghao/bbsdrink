@@ -2,11 +2,11 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "module description"
+      "value": "一款帮助您养成按时喝水与健康作息习惯的打卡应用。"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "description"
+      "value": "该喝水啦亲主界面"
     },
     {
       "name": "EntryAbility_label",
