@@ -89,7 +89,7 @@ export struct LoginPage {
   @State nickname: string = '';
   @State avatarUri: string = '';
   @State gender: number = 2; // 0: 女, 1: 男, 2: 未知
-  @State birthday: number = new Date().getTime(); // 默认今天
+  @State birthday: number = new Date(new Date().setFullYear(new Date().getFullYear() - 14)).getTime(); // 默认14年前，限制未成年人
   @State isAgreePrivacy: boolean = false; // 是否同意隐私协议
 
   @State scaleValue: number = 1;
@@ -152,9 +152,12 @@ export struct LoginPage {
    * 显示日期选择器，供用户选择生日
    */
   private showDatePicker() {
+    const maxDate = new Date();
+    maxDate.setFullYear(maxDate.getFullYear() - 14);
+
     DatePickerDialog.show({
       start: new Date("1900-1-1"),
-      end: new Date(),
+      end: maxDate,
       selected: new Date(this.birthday),
       onAccept: (value: DatePickerResult) => {
         const date = new Date();
