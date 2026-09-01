@@ -1,6 +1,20 @@
 {
   "app": {
-    "signingConfigs": [],
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "storeFile": "/Users/mk10/Downloads/bbsdrink_cer/bbs123456.p12",
+          "storePassword": "000000196DC72ABAF3A230E62ECD4677D3FFDE9A4DDB7BADF43CB17A11FB3B2EF7FBE4DD2C58E7A058",
+          "keyAlias": "bbsdrink",
+          "keyPassword": "0000001908C745730DB6C0B5232B7781ED1B33BCF2DF30A4C2B6ED3A0C65F92723DF3AFC963ECA3D8A",
+          "signAlg": "SHA256withECDSA",
+          "profile": "/Users/mk10/Downloads/bbsdrink_cer/bbsdrink_proRelease.p7b",
+          "certpath": "/Users/mk10/Downloads/bbsdrink_cer/bbsdrink_hw_download_cer.cer"
+        }
+      }
+    ],
     "products": [
       {
         "name": "default",
