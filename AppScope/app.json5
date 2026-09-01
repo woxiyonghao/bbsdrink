@@ -1,7 +1,7 @@
 {
   "app": {
-    "bundleName": "com.bbsdrink.app",
-    "vendor": "bbsdrink",
+    "bundleName": "com.winheo.bbsdrink",
+    "vendor": "winheo",
     "versionCode": 1000000,
     "versionName": "1.0.0",
     "buildVersion": "1",
