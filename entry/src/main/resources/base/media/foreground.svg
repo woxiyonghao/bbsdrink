@@ -1,8 +1,7 @@
-<svg viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Water inside the glass (solid white, mimicking liquid) -->
-  <path d="M 78 120 L 85 198 C 86 205 90 208 97 208 L 159 208 C 166 208 170 205 171 198 L 178 120 C 158 132 98 132 78 120 Z" fill="#FFFFFF"/>
-  <!-- The glass rim (ellipse) -->
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M 128 60 L 150 20" stroke="#81C784" stroke-width="12" stroke-linecap="round"/>
+  <path d="M 78 120 L 85 198 C 86 205 90 208 97 208 L 159 208 C 166 208 170 205 171 198 L 178 120 C 158 132 98 132 78 120 Z" fill="#A5D6A7"/>
   <ellipse cx="128" cy="60" rx="58" ry="16" stroke="#FFFFFF" stroke-width="16"/>
-  <!-- The glass body (white outline, thick) -->
   <path d="M 70 60 L 85 200 C 86 210 95 216 105 216 L 151 216 C 161 216 170 210 171 200 L 186 60" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
