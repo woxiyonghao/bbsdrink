@@ -221,41 +221,6 @@ export struct SettingPage {
         Text('正在加载用户信息...').margin({ top: 50 }).fontColor('#888888')
       }
 
-        Button('退出登录')
-          .width('90%')
-          .height(50)
-          .margin({ top: 40 })
-          .backgroundColor('#F0F0F0')
-          .fontColor('#333333')
-          .onClick(async () => {
-            await PreferencesUtil.setCurrentUserId(-1);
-            router.replaceUrl({ url: 'pages/login/LoginPage' });
-          })
-
-        Button('注销账号')
-          .width('90%')
-          .height(50)
-          .margin({ top: 15 })
-          .backgroundColor('#FFE5E5')
-          .fontColor('#FF4D4F')
-          .onClick(() => {
-            promptAction.showDialog({
-              title: '注销账号',
-              message: '注销后所有打卡数据将被清空且无法恢复，确认要注销吗？',
-              buttons: [
-                { text: '取消', color: '#666666' },
-                { text: '确认注销', color: '#FF4D4F' }
-              ]
-            }).then(async (data) => {
-              if (data.index === 1 && this.currentUser) {
-                await RdbHelper.deleteUser(this.currentUser.id!);
-                await PreferencesUtil.setCurrentUserId(-1);
-                promptAction.showToast({ message: '账号已成功注销' });
-                router.replaceUrl({ url: 'pages/login/LoginPage' });
-              }
-            })
-          })
-
       Blank()
     }
     .width('100%')
