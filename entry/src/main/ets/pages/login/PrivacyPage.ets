@@ -1,6 +1,6 @@
 import router from '@ohos.router';
-import { 隐私政策 } from './PrivacyPolicy';
-import { 用户政策 } from './UserPolicy';
+import { PRIVACY_POLICY } from './PrivacyPolicy';
+import { USER_POLICY } from './UserPolicy';
 
 @Entry
 @Component
@@ -12,10 +12,10 @@ export struct PrivacyPage {
     const params = router.getParams() as Record<string, string>;
     if (params && params.type === 'user') {
       this.title = '用户政策';
-      this.content = 用户政策;
+      this.content = USER_POLICY;
     } else {
       this.title = '隐私政策';
-      this.content = 隐私政策;
+      this.content = PRIVACY_POLICY;
     }
   }
 
