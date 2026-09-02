@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "/Users/mk10/.ohos/config/default_bbsdrink_TfkuOPsgwwiiIp_NPZ9dyCQF9ncFG5bk2baMMd1o2aI=.cer",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001B69312C5C7F5D3528CB0B406C92447A7358E413878255FDE720A0B10C51F59AD59F3DB8AE0939D6",
-          "profile": "/Users/mk10/.ohos/config/default_bbsdrink_TfkuOPsgwwiiIp_NPZ9dyCQF9ncFG5bk2baMMd1o2aI=.p7b",
+          "storeFile": "/Users/mk10/Desktop/bbs/cers/bbsdrink.p12",
+          "storePassword": "000000196AA042BAE799A86B85D2BF771F52B1A9736A4548672B488CCBF0F38D930DCF9BCEF36F3751",
+          "keyAlias": "bbsdrink",
+          "keyPassword": "000000197747E7823FC964FCA8093206E4EEDA3D218EC54FD3D05C00AD640C2E56DB044C8BA945D137",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "/Users/mk10/.ohos/config/default_bbsdrink_TfkuOPsgwwiiIp_NPZ9dyCQF9ncFG5bk2baMMd1o2aI=.p12",
-          "storePassword": "0000001BB9339AA5FC24BACDBEEDBC5280080CAB880FD37D3AF18EB9D12A6E78B69590CF4367341F75020E"
+          "profile": "/Users/mk10/Desktop/bbs/cers/bbsdrink_profileRelease.p7b",
+          "certpath": "/Users/mk10/Desktop/bbs/cers/bbsdrink_cer.cer"
         }
       }
     ],
