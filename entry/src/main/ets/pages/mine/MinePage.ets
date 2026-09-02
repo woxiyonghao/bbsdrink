@@ -165,7 +165,6 @@ export struct MinePage {
       }
       .width('100%').height(240)
       .backgroundColor('rgba(7, 193, 96, 0.15)')
-      .backdropBlur(30)
 
       // 2. 核心功能区 (宫格样式)
       Column() {

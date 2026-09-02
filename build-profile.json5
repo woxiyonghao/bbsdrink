@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "storeFile": "/Users/mk10/Downloads/bbsdrink_cer/bbs123456.p12",
-          "storePassword": "000000196DC72ABAF3A230E62ECD4677D3FFDE9A4DDB7BADF43CB17A11FB3B2EF7FBE4DD2C58E7A058",
-          "keyAlias": "bbsdrink",
-          "keyPassword": "0000001908C745730DB6C0B5232B7781ED1B33BCF2DF30A4C2B6ED3A0C65F92723DF3AFC963ECA3D8A",
+          "certpath": "/Users/mk10/.ohos/config/default_bbsdrink_TfkuOPsgwwiiIp_NPZ9dyCQF9ncFG5bk2baMMd1o2aI=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001B69312C5C7F5D3528CB0B406C92447A7358E413878255FDE720A0B10C51F59AD59F3DB8AE0939D6",
+          "profile": "/Users/mk10/.ohos/config/default_bbsdrink_TfkuOPsgwwiiIp_NPZ9dyCQF9ncFG5bk2baMMd1o2aI=.p7b",
           "signAlg": "SHA256withECDSA",
-          "profile": "/Users/mk10/Downloads/bbsdrink_cer/bbsdrink_proRelease.p7b",
-          "certpath": "/Users/mk10/Downloads/bbsdrink_cer/bbsdrink_hw_download_cer.cer"
+          "storeFile": "/Users/mk10/.ohos/config/default_bbsdrink_TfkuOPsgwwiiIp_NPZ9dyCQF9ncFG5bk2baMMd1o2aI=.p12",
+          "storePassword": "0000001BB9339AA5FC24BACDBEEDBC5280080CAB880FD37D3AF18EB9D12A6E78B69590CF4367341F75020E"
         }
       }
     ],

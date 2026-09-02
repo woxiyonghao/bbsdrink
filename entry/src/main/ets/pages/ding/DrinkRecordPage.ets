@@ -63,6 +63,7 @@ struct BubbleView {
 @Entry
 @Component
 export struct DrinkRecordPage {
+  @State isDrinking: boolean = false;
   @State selectedIndex: number = 0;
   @State currentAmount: number = 250;
     @State waveOffsetX: number = 0;
@@ -121,56 +122,64 @@ export struct DrinkRecordPage {
   }
 
 
-  spawnBubbles() {
-    let spawnCount = 0;
-    const maxSpawns = 12; // 总共生成12批次气泡
-    
-    const intervalId = setInterval(() => {
-      spawnCount++;
-      if (spawnCount > maxSpawns) {
-        clearInterval(intervalId);
-        return;
-      }
-
-      // 每次随机生成 2 到 8 个气泡
-      const count = Math.floor(Math.random() * 7) + 2; 
-      const newBubbles: Bubble[] = [];
-      const now = Date.now();
+  spawnBubbles(): Promise<void> {
+    return new Promise((resolve) => {
+      let spawnCount = 0;
+      const maxSpawns = 12; // 总共生成12批次气泡
       
-      for (let i = 0; i < count; i++) {
-        const size = Math.random() * 70 + 8; // 尺寸 8 到 78，扩大大小的随机范围
-        const depthFactor = (size - 8) / 70; // 0.0(最小) 到 1.0(最大)
+      const intervalId = setInterval(() => {
+        spawnCount++;
+        if (spawnCount > maxSpawns) {
+          clearInterval(intervalId);
+          return;
+        }
         
-        // 层次感：大的一般上浮快一点，小的一般上浮慢一点
-        const duration = 4000 + (1 - depthFactor) * 3500; // 4秒 到 7.5秒
-        const opacity = 0.25 + depthFactor * 0.55; // 0.25 到 0.8
-        
-        newBubbles.push(new Bubble(
-          now + i + Math.random(), // 确保ID唯一
-          Math.random() * 90 + 5, // X轴：5% 到 95%
-          110, // Y轴：从屏幕下方开始
-          size,
-          opacity,
-          duration
-        ));
-      }
-      
-      this.bubbles = this.bubbles.concat(newBubbles);
-      
-      // 等待组件挂载后，触发属性动画使其飘到屏幕外
-      setTimeout(() => {
-        newBubbles.forEach(b => {
-          b.y = -20; // 目标位置：屏幕上方外侧
-        });
-      }, 50);
+        const currentBatch = spawnCount;
 
-      // 动画结束后清理对应批次的气泡
-      setTimeout(() => {
-        const idsToRemove = new Set(newBubbles.map(b => b.id));
-        this.bubbles = this.bubbles.filter(b => !idsToRemove.has(b.id));
-      }, 8500); 
-      
-    }, 400); // 每 400 毫秒生成一批气泡
+        // 每次随机生成 2 到 8 个气泡
+        const count = Math.floor(Math.random() * 7) + 2; 
+        const newBubbles: Bubble[] = [];
+        const now = Date.now();
+        
+        for (let i = 0; i < count; i++) {
+          const size = Math.random() * 70 + 8; // 尺寸 8 到 78，扩大大小的随机范围
+          const depthFactor = (size - 8) / 70; // 0.0(最小) 到 1.0(最大)
+          
+          // 层次感：大的一般上浮快一点，小的一般上浮慢一点
+          const duration = 4000 + (1 - depthFactor) * 3500; // 4秒 到 7.5秒
+          const opacity = 0.25 + depthFactor * 0.55; // 0.25 到 0.8
+          
+          newBubbles.push(new Bubble(
+            now + i + Math.random(), // 确保ID唯一
+            Math.random() * 90 + 5, // X轴：5% 到 95%
+            110, // Y轴：从屏幕下方开始
+            size,
+            opacity,
+            duration
+          ));
+        }
+        
+        this.bubbles = this.bubbles.concat(newBubbles);
+        
+        // 等待组件挂载后，触发属性动画使其飘到屏幕外
+        setTimeout(() => {
+          newBubbles.forEach(b => {
+            b.y = -20; // 目标位置：屏幕上方外侧
+          });
+        }, 50);
+
+        // 动画结束后清理对应批次的气泡
+        setTimeout(() => {
+          const idsToRemove = new Set(newBubbles.map(b => b.id));
+          this.bubbles = this.bubbles.filter(b => !idsToRemove.has(b.id));
+          
+          if (currentBatch === maxSpawns) {
+            resolve();
+          }
+        }, 8500); 
+        
+      }, 400); // 每 400 毫秒生成一批气泡
+    });
   }
 
   async playDrinkAnimation() {
@@ -209,6 +218,9 @@ export struct DrinkRecordPage {
   }
 
   async handleDrink() {
+    if (this.isDrinking) return;
+    this.isDrinking = true;
+
     const userId = await PreferencesUtil.getCurrentUserId();
     const drink = this.DRINKS[this.selectedIndex];
     if (userId > 0) {
@@ -224,11 +236,16 @@ export struct DrinkRecordPage {
       });
       
       promptAction.showToast({ message: `吨吨吨！成功记录 ${this.currentAmount}ml ${drink.name}！` });
-      await this.playDrinkAnimation();
-      this.spawnBubbles();
+      
+      await Promise.all([
+        this.playDrinkAnimation(),
+        this.spawnBubbles()
+      ]);
     } else {
       promptAction.showToast({ message: '请先登录' });
     }
+
+    this.isDrinking = false;
   }
 
   build() {
@@ -296,7 +313,6 @@ export struct DrinkRecordPage {
           .height(400)
           .fill('rgba(80, 180, 255, 0.35)') // 更蓝一点
           .backgroundBlurStyle(BlurStyle.Thin) 
-          .backdropBlur(40) // 增强原生模糊效果，模糊背景的波浪
           .margin({ bottom: -120 })
 
         Column() {
