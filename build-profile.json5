@@ -6,11 +6,11 @@
         "type": "HarmonyOS",
         "material": {
           "storeFile": "/Users/mk10/Desktop/bbs/cers/bbsdrink.p12",
-          "storePassword": "000000196AA042BAE799A86B85D2BF771F52B1A9736A4548672B488CCBF0F38D930DCF9BCEF36F3751",
+          "storePassword": "000000198BB97409D4CA5C5ED9F476A2D96BD52AB4B3F90A90DFDA65C8D4455BB25913E8515C19094C",
           "keyAlias": "bbsdrink",
-          "keyPassword": "000000197747E7823FC964FCA8093206E4EEDA3D218EC54FD3D05C00AD640C2E56DB044C8BA945D137",
+          "keyPassword": "000000197E166E2249874BA0AB3BE3468ACF810E739243CFC4F481B537CB744C886476AD95AB7F147E",
           "signAlg": "SHA256withECDSA",
-          "profile": "/Users/mk10/Desktop/bbs/cers/bbsdrink_profileRelease.p7b",
+          "profile": "/Users/mk10/Desktop/bbs/cers/bbsdrink_lib_profileRelease.p7b",
           "certpath": "/Users/mk10/Desktop/bbs/cers/bbsdrink_cer.cer"
         }
       }
